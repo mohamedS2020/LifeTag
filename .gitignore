@@ -1,0 +1,106 @@
+# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# local env files
+.env*.local
+.env
+
+# typescript
+*.tsbuildinfo
+
+# generated native folders
+/ios
+/android
+
+# LifeTag specific exclusions
+# Development and configuration folders
+.curser/
+tasks/
+
+# Environment files with sensitive data
+.env.local
+.env.development
+.env.production
+.env.staging
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+logs/
+*.log
+
+# Runtime data
+pids/
+*.pid
+*.seed
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# Test files and temporary data
+test-results/
+screenshots/
+.nyc_output/
+
+# Temporary files
+tmp/
+temp/
+
+# Build artifacts
+build/
+dist/
+
+# Package manager lock files (optional - some teams prefer to include these)
+# package-lock.json
+# yarn.lock
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+
+# Firebase specific
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
+# Medical data backups (if any)
+backups/
+*.backup
+
+# Documentation drafts
+drafts/
