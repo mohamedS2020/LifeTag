@@ -5,3 +5,5 @@
 
 export * from './LoadingOverlay';
 export * from './ErrorDisplay';
+export * from './PasswordVerificationModal';
+export * from './ProfileErrorDisplay';

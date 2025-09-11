@@ -139,7 +139,9 @@ class AuthServiceImpl implements AuthService {
         id: userId,
         email: userData.email,
         userType: userData.userType,
-        isVerified: userData.isVerified || false
+        isVerified: userData.isVerified || false,
+        createdAt: userData.createdAt?.toDate() || new Date(),
+        updatedAt: userData.updatedAt?.toDate() || new Date()
       };
     } catch (error: any) {
       console.error('Get user profile error:', error);
@@ -156,11 +158,14 @@ class AuthServiceImpl implements AuthService {
     additionalData?: any
   ): Promise<User> {
     try {
+      const now = new Date();
       const userProfile: User = {
         id: firebaseUser.uid,
         email: firebaseUser.email || '',
         userType,
-        isVerified: false
+        isVerified: false,
+        createdAt: now,
+        updatedAt: now
       };
 
       // Create user document
@@ -176,11 +181,24 @@ class AuthServiceImpl implements AuthService {
       if (userType === 'medical_professional' && additionalData) {
         const medicalProfessional: Omit<MedicalProfessional, 'id'> = {
           userId: firebaseUser.uid,
-          name: additionalData.name,
-          email: firebaseUser.email || '',
-          licenseNumber: additionalData.licenseNumber,
-          isVerified: false,
-          createdAt: new Date()
+          personalInfo: {
+            firstName: additionalData.firstName || additionalData.name?.split(' ')[0] || '',
+            lastName: additionalData.lastName || additionalData.name?.split(' ').slice(1).join(' ') || '',
+            email: firebaseUser.email || '',
+            phoneNumber: additionalData.phoneNumber
+          },
+          professionalInfo: {
+            licenseNumber: additionalData.licenseNumber,
+            licenseState: additionalData.licenseState,
+            specialty: additionalData.specialty,
+            hospitalAffiliation: additionalData.hospitalAffiliation
+          },
+          verificationStatus: {
+            isVerified: false,
+            verificationNotes: 'Pending verification'
+          },
+          createdAt: now,
+          updatedAt: now
         };
 
         await setDoc(doc(db, 'medical_professionals', firebaseUser.uid), medicalProfessional);
@@ -200,7 +218,7 @@ class AuthServiceImpl implements AuthService {
     try {
       const q = query(
         collection(db, 'medical_professionals'), 
-        where('licenseNumber', '==', licenseNumber)
+        where('professionalInfo.licenseNumber', '==', licenseNumber)
       );
       const querySnapshot = await getDocs(q);
       return !querySnapshot.empty;
