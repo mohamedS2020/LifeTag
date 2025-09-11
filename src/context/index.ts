@@ -1,5 +1,5 @@
 // Context Providers
 // This directory contains React Context providers for state management
 
-export { default as AuthContext } from './AuthContext';
-export { default as ProfileContext } from './ProfileContext';
+export { AuthProvider, useAuth, AuthContext } from './AuthContext';
+// ProfileContext will be added in task 3.0
