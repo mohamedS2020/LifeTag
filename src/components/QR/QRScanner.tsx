@@ -13,7 +13,7 @@ import {
   TextInput,
   ScrollView
 } from 'react-native';
-import { BarCodeScanner, BarCodeScannerResult } from 'expo-barcode-scanner';
+import { CameraView, CameraType, useCameraPermissions, BarcodeScanningResult } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
 import { QRService, EmergencyQRData } from '../../services/qrService';
 
@@ -41,8 +41,10 @@ const QRScanner: React.FC<QRScannerProps> = ({
   onError,
   onClose,
 }) => {
+  // Camera permissions
+  const [permission, requestPermission] = useCameraPermissions();
+  
   // State management
-  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showManualEntry, setShowManualEntry] = useState(false);
@@ -64,30 +66,30 @@ const QRScanner: React.FC<QRScannerProps> = ({
   useEffect(() => {
     (async () => {
       try {
-        const { status } = await BarCodeScanner.requestPermissionsAsync();
-        setHasPermission(status === 'granted');
-        
-        if (status !== 'granted') {
-          Alert.alert(
-            'Camera Permission Required',
-            'LifeTag needs camera access to scan QR codes containing emergency medical information. Please enable camera permissions in your device settings.',
-            [
-              { text: 'Cancel', style: 'cancel' },
-              { text: 'Use Manual Entry', onPress: () => setShowManualEntry(true) }
-            ]
-          );
+        if (!permission?.granted) {
+          const result = await requestPermission();
+          if (!result.granted) {
+            Alert.alert(
+              'Camera Permission Required',
+              'LifeTag needs camera access to scan QR codes containing emergency medical information. Please enable camera permissions in your device settings.',
+              [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'Use Manual Entry', onPress: () => setShowManualEntry(true) }
+              ]
+            );
+          }
         }
       } catch (error) {
         console.error('Permission request failed:', error);
         onError?.('Failed to request camera permissions');
       }
     })();
-  }, [onError]);
+  }, [permission, requestPermission, onError]);
 
   /**
    * Handle QR code scan result
    */
-  const handleBarCodeScanned = async ({ type, data }: BarCodeScannerResult) => {
+  const handleBarcodeScanned = async ({ type, data }: BarcodeScanningResult) => {
     if (scanned || !data || data === lastScanned) {
       return;
     }
@@ -199,7 +201,7 @@ const QRScanner: React.FC<QRScannerProps> = ({
   /**
    * Render permission request screen
    */
-  if (hasPermission === null) {
+  if (!permission) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centerContent}>
@@ -213,7 +215,7 @@ const QRScanner: React.FC<QRScannerProps> = ({
   /**
    * Render permission denied screen
    */
-  if (hasPermission === false) {
+  if (!permission.granted) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centerContent}>
@@ -324,11 +326,13 @@ const QRScanner: React.FC<QRScannerProps> = ({
 
       {/* Scanner View */}
       <View style={styles.scannerContainer}>
-        <BarCodeScanner
+        <CameraView
           ref={scannerRef}
-          onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+          onBarcodeScanned={scanned ? undefined : handleBarcodeScanned}
           style={[styles.scanner, { width, height: height * 0.7 }]}
-          barCodeTypes={[BarCodeScanner.Constants.BarCodeType.qr]}
+          barcodeScannerSettings={{
+            barcodeTypes: ['qr'],
+          }}
         />
 
         {/* Scan Overlay */}

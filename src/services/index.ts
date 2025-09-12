@@ -6,6 +6,17 @@ export { default as profileService } from './profileService';
 export type { ProfileService } from './profileService';
 export { default as passwordService } from './passwordService';
 export { 
+  MedicalProfessionalApprovalService,
+  type ApprovalAction,
+  type ApprovalNotification,
+  type ApprovalHistory
+} from './medicalProfessionalApprovalService';
+export { 
+  MedicalProfessionalAccessService,
+  type AccessResult,
+  type ProfileAccessLog
+} from './medicalProfessionalAccessService';
+export { 
   EnhancedProfileValidator,
   MedicalDataValidator,
   EmergencyContactValidator,

@@ -10,8 +10,9 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { UserProfile } from '../../types';
-import { profileService, passwordService } from '../../services';
-import { LoadingOverlay, PasswordVerificationModal } from '../common';
+import { profileService, passwordService, MedicalProfessionalAccessService } from '../../services';
+import { LoadingOverlay, PasswordVerificationModal, VerifiedProfessionalIndicator } from '../common';
+import { useAuth } from '../../context/AuthContext';
 
 interface ProfileDisplayProps {
   userId: string;
@@ -35,12 +36,18 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
   onEdit,
   onError,
 }) => {
+  const { user: currentUser } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(initialProfile || null);
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [hasPasswordAccess, setHasPasswordAccess] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [accessTimeRemaining, setAccessTimeRemaining] = useState<number | null>(null);
+  
+  // Medical professional access state
+  const [hasMedicalProfessionalAccess, setHasMedicalProfessionalAccess] = useState(false);
+  const [medicalProfessionalData, setMedicalProfessionalData] = useState<any>(null);
+  const [accessType, setAccessType] = useState<string | null>(null);
 
   // =============================================
   // INITIALIZATION & DATA LOADING
@@ -50,13 +57,13 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
     if (!initialProfile) {
       loadProfile();
     }
-    checkPasswordAccess();
-  }, [userId, initialProfile]);
+    checkAccess();
+  }, [userId, initialProfile, currentUser]);
 
-  // Check password access status periodically
+  // Check access status periodically
   useEffect(() => {
     const interval = setInterval(async () => {
-      await checkPasswordAccess();
+      await checkAccess();
     }, 60000); // Check every minute
 
     return () => clearInterval(interval);
@@ -90,27 +97,73 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
     }
   };
 
-  const checkPasswordAccess = async () => {
-    if (!showPasswordProtection || !profile?.privacySettings.requirePasswordForFullAccess) {
+  const checkAccess = async () => {
+    if (!showPasswordProtection || !profile) {
       setHasPasswordAccess(true);
+      setHasMedicalProfessionalAccess(false);
       return;
     }
 
     try {
+      // First check for medical professional privileged access
+      const accessResult = await MedicalProfessionalAccessService.canAccessProfile(
+        currentUser,
+        userId,
+        {
+          allowMedicalProfessionalAccess: profile.privacySettings.allowMedicalProfessionalAccess,
+          requirePasswordForFullAccess: profile.privacySettings.requirePasswordForFullAccess
+        }
+      );
+
+      if (accessResult.canAccess && accessResult.bypassPassword) {
+        // Medical professional has privileged access
+        setHasMedicalProfessionalAccess(true);
+        setHasPasswordAccess(true);
+        setMedicalProfessionalData(accessResult.professionalData);
+        setAccessType(accessResult.accessType || 'medical_professional_privileged');
+        
+        // Log the access for audit trail
+        if (accessResult.professionalData && profile.personalInfo) {
+          const accessLog = MedicalProfessionalAccessService.createAccessLog(
+            accessResult.professionalData,
+            userId,
+            `${profile.personalInfo.firstName} ${profile.personalInfo.lastName}`,
+            accessResult.accessType
+          );
+          await MedicalProfessionalAccessService.logProfileAccess(accessLog);
+        }
+        
+        setAccessTimeRemaining(null); // No time limit for medical professional access
+        return;
+      } else {
+        setHasMedicalProfessionalAccess(false);
+        setMedicalProfessionalData(null);
+        setAccessType(null);
+      }
+
+      // Fall back to regular password access check
+      if (!profile.privacySettings.requirePasswordForFullAccess) {
+        setHasPasswordAccess(true);
+        return;
+      }
+
       const hasAccess = await passwordService.hasValidTempAccess();
       const timeRemaining = await passwordService.getRemainingAccessTime();
       
       setHasPasswordAccess(hasAccess);
       setAccessTimeRemaining(timeRemaining);
     } catch (error) {
-      console.error('Error checking password access:', error);
+      console.error('Error checking access:', error);
       setHasPasswordAccess(false);
+      setHasMedicalProfessionalAccess(false);
+      setMedicalProfessionalData(null);
+      setAccessType(null);
     }
   };
 
   const handlePasswordVerified = async () => {
     setShowPasswordModal(false);
-    await checkPasswordAccess();
+    await checkAccess();
   };
 
   const handleRefresh = () => {
@@ -505,6 +558,27 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
           )}
         </View>
 
+        {/* Medical Professional Access Indicator */}
+        {hasMedicalProfessionalAccess && medicalProfessionalData && (
+          <View style={styles.medicalAccessBanner}>
+            <View style={styles.medicalAccessContent}>
+              <VerifiedProfessionalIndicator 
+                isVerified={true}
+                compact={true}
+              />
+              <View style={styles.medicalAccessText}>
+                <Text style={styles.medicalAccessTitle}>
+                  Medical Professional Access
+                </Text>
+                <Text style={styles.medicalAccessSubtitle}>
+                  Accessed by: {MedicalProfessionalAccessService.formatProfessionalCredentials(medicalProfessionalData)}
+                </Text>
+              </View>
+            </View>
+            <Ionicons name="shield-checkmark" size={20} color="#28A745" />
+          </View>
+        )}
+
         {/* Content */}
         {needsPasswordAccess ? (
           renderPasswordProtectionScreen()
@@ -794,6 +868,40 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: '600',
+  },
+  // Medical Professional Access Banner Styles
+  medicalAccessBanner: {
+    backgroundColor: '#E8F5E8',
+    borderLeftWidth: 4,
+    borderLeftColor: '#28A745',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginHorizontal: 16,
+    marginVertical: 8,
+    borderRadius: 8,
+  },
+  medicalAccessContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  medicalAccessText: {
+    marginLeft: 12,
+    flex: 1,
+  },
+  medicalAccessTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#28A745',
+    marginBottom: 2,
+  },
+  medicalAccessSubtitle: {
+    fontSize: 12,
+    color: '#666666',
+    lineHeight: 16,
   },
 });
 

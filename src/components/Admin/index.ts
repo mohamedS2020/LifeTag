@@ -1,4 +1,4 @@
 // Admin Components
-// This directory contains administrative components
+// Export all admin interface components
 
-// Admin components will be added in task 5.0
+export { default as ProfessionalVerification } from './ProfessionalVerification';
