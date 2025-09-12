@@ -14,11 +14,9 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { UserProfile, MedicalProfessional } from '../../types';
 import { profileService, MedicalProfessionalAccessService } from '../../services';
-import { 
-  LoadingOverlay, 
-  VerifiedBadge, 
-  MedicalProfessionalList 
-} from '../common';
+import { LoadingOverlay } from './LoadingOverlay';
+import VerifiedBadge from './VerifiedBadge';
+import MedicalProfessionalList from './MedicalProfessionalList';
 import { ProfileDisplay } from '../Profile';
 import { QRScanner } from '../QR';
 import { useMedicalProfessionalAccess } from '../../hooks';

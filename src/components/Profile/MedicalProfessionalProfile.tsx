@@ -12,7 +12,8 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { MedicalProfessional } from '../../types';
 import { MedicalProfessionalApprovalService } from '../../services/medicalProfessionalApprovalService';
-import { LoadingOverlay, VerifiedBadge, ProfileHeaderBadge } from '../common';
+import { LoadingOverlay } from '../common/LoadingOverlay';
+import VerifiedBadge, { ProfileHeaderBadge } from '../common/VerifiedBadge';
 
 interface MedicalProfessionalProfileProps {
   professionalId?: string;

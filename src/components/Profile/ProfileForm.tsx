@@ -38,7 +38,7 @@ import {
   calculateProfileCompletion 
 } from '../../utils/profileValidation';
 import { profileService, passwordService } from '../../services';
-import { LoadingOverlay } from '../common';
+import { LoadingOverlay } from '../common/LoadingOverlay';
 
 // =============================================
 // INTERFACES

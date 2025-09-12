@@ -11,7 +11,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { MedicalProfessional } from '../../types';
 import { MedicalProfessionalApprovalService } from '../../services/medicalProfessionalApprovalService';
-import { VerifiedBadge, VerifiedProfessionalIndicator } from '../common';
+import VerifiedBadge, { VerifiedProfessionalIndicator } from './VerifiedBadge';
 
 /**
  * Props for MedicalProfessionalList component

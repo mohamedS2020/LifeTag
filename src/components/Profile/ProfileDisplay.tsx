@@ -11,7 +11,9 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { UserProfile } from '../../types';
 import { profileService, passwordService, MedicalProfessionalAccessService } from '../../services';
-import { LoadingOverlay, PasswordVerificationModal, VerifiedProfessionalIndicator } from '../common';
+import { LoadingOverlay } from '../common/LoadingOverlay';
+import { PasswordVerificationModal } from '../common/PasswordVerificationModal';
+import { VerifiedProfessionalIndicator } from '../common/VerifiedBadge';
 import { useAuth } from '../../context/AuthContext';
 
 interface ProfileDisplayProps {
