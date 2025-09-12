@@ -12,4 +12,11 @@ export {
   ProfileCompletenessValidator,
   DataIntegrityValidator
 } from './enhancedProfileValidator';
+export { 
+  QRService,
+  QRCodeGenerator,
+  type EmergencyQRData,
+  type QREncodingOptions,
+  type QRCodeGenerationResult
+} from './qrService';
 // Other services will be added in upcoming tasks
