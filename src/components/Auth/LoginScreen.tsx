@@ -153,13 +153,13 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
       setPasswordError('');
       setAuthError(null);
       
-      // Small delay to show success message before navigating
+      // Small delay to show success message before navigation
       setTimeout(() => {
         if (onLoginSuccess) {
           onLoginSuccess();
-        } else if (navigation) {
-          navigation.navigate('Home'); // Will be set up in navigation task
         }
+        // Navigation will happen automatically via AuthContext state change
+        // No manual navigation needed since we use conditional rendering
       }, 1000);
       
     } catch (error: any) {

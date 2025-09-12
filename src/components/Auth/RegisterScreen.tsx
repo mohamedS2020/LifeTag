@@ -175,9 +175,9 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({
       setTimeout(() => {
         if (onRegisterSuccess) {
           onRegisterSuccess();
-        } else if (navigation) {
-          navigation.navigate('Home'); // Will be set up in navigation task
         }
+        // Navigation will happen automatically via AuthContext state change
+        // No manual navigation needed since we use conditional rendering
       }, 1500);
       
     } catch (error: any) {
@@ -202,7 +202,7 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({
     if (onNavigateToMedicalRegister) {
       onNavigateToMedicalRegister();
     } else if (navigation) {
-      navigation.navigate('MedicalRegister');
+      navigation.navigate('MedicalProfessionalRegister');
     }
   };
 
