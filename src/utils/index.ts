@@ -6,3 +6,4 @@ export * from './security';
 export * from './authPersistence';
 export * from './errorHandling';
 export * from './profileValidation';
+export * from './auditRetention';

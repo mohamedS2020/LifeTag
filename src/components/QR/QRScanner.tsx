@@ -16,6 +16,9 @@ import {
 import { CameraView, CameraType, useCameraPermissions, BarcodeScanningResult } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
 import { QRService, EmergencyQRData } from '../../services/qrService';
+import { profileService } from '../../services';
+import { useAuth } from '../../context/AuthContext';
+import { AuditLog } from '../../types';
 
 /**
  * QR Scanner Component Props
@@ -43,6 +46,9 @@ const QRScanner: React.FC<QRScannerProps> = ({
 }) => {
   // Camera permissions
   const [permission, requestPermission] = useCameraPermissions();
+  
+  // Auth context for user identification
+  const { user } = useAuth();
   
   // State management
   const [scanned, setScanned] = useState(false);
@@ -87,6 +93,43 @@ const QRScanner: React.FC<QRScannerProps> = ({
   }, [permission, requestPermission, onError]);
 
   /**
+   * Log QR scan activity for audit purposes
+   */
+  const logQRScan = async (
+    scannedData: string, 
+    scanResult: 'success' | 'error' | 'invalid_format',
+    scanType: 'emergency_qr' | 'regular_qr' | 'unknown',
+    profileId?: string
+  ) => {
+    try {
+      if (!user) {
+        console.log('No authenticated user for QR scan logging');
+        return;
+      }
+
+      const auditLog: Omit<AuditLog, 'id' | 'timestamp'> = {
+        profileId: profileId || 'unknown', // Use scanned profile ID or 'unknown' for non-LifeTag QRs
+        accessedBy: user.id,
+        accessorType: user.userType === 'medical_professional' ? 'medical_professional' : 'individual',
+        accessType: 'qr_scan',
+        accessMethod: 'qr_code',
+        fieldsAccessed: scanType === 'emergency_qr' ? ['name', 'bloodType', 'allergies', 'emergencyContact'] : undefined,
+        dataModified: false,
+        location: undefined, // Could be added with location services later
+        deviceInfo: Platform.OS === 'ios' ? 'iOS Device' : 'Android Device',
+        notes: `QR scan: ${scanResult} (${scanType}) - Data length: ${scannedData.length} chars`
+      };
+
+      const result = await profileService.logProfileAccess(profileId || 'unknown', auditLog);
+      if (!result.success) {
+        console.error('Failed to log QR scan:', result.error);
+      }
+    } catch (error) {
+      console.error('QR scan logging error:', error);
+    }
+  };
+
+  /**
    * Handle QR code scan result
    */
   const handleBarcodeScanned = async ({ type, data }: BarcodeScanningResult) => {
@@ -119,6 +162,9 @@ const QRScanner: React.FC<QRScannerProps> = ({
           setEmergencyData(parsedEmergencyData);
           
           if (parsedEmergencyData) {
+            // Log successful emergency QR scan
+            await logQRScan(data, 'success', 'emergency_qr', parsedEmergencyData.profileId);
+            
             Alert.alert(
               '✅ Emergency Medical QR Code Detected',
               `Successfully scanned medical information for: ${parsedEmergencyData.name}\n\nBlood Type: ${parsedEmergencyData.bloodType || 'Not specified'}\nAllergies: ${parsedEmergencyData.allergies.length}\nEmergency Contact: ${parsedEmergencyData.emergencyContact?.name || 'Not specified'}`,
@@ -130,6 +176,10 @@ const QRScanner: React.FC<QRScannerProps> = ({
           }
         } catch (parseError) {
           console.error('Failed to parse QR data:', parseError);
+          
+          // Log failed parse attempt
+          await logQRScan(data, 'error', 'emergency_qr');
+          
           Alert.alert(
             '⚠️ QR Code Format Issue',
             'This appears to be a LifeTag QR code but there was an issue reading the medical information. The QR code may be damaged or from an older version.',
@@ -140,6 +190,9 @@ const QRScanner: React.FC<QRScannerProps> = ({
           );
         }
       } else {
+        // Log non-LifeTag QR scan
+        await logQRScan(data, 'success', 'regular_qr');
+        
         // Not a LifeTag emergency QR - ask user what to do
         Alert.alert(
           'Non-Emergency QR Code',
@@ -152,6 +205,10 @@ const QRScanner: React.FC<QRScannerProps> = ({
       }
     } catch (error) {
       console.error('QR processing error:', error);
+      
+      // Log general QR processing error
+      await logQRScan(data, 'error', 'unknown');
+      
       onError?.(`Failed to process QR code: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsLoading(false);
@@ -185,6 +242,17 @@ const QRScanner: React.FC<QRScannerProps> = ({
 
       if (isValidQR) {
         parsedEmergencyData = QRService.decodeQRString(manualQRCode);
+        
+        // Log successful manual emergency QR entry
+        await logQRScan(
+          manualQRCode, 
+          'success', 
+          'emergency_qr', 
+          parsedEmergencyData?.profileId
+        );
+      } else {
+        // Log manual entry of non-LifeTag QR
+        await logQRScan(manualQRCode, 'success', 'regular_qr');
       }
 
       onQRScanned?.(manualQRCode, parsedEmergencyData);
@@ -192,6 +260,10 @@ const QRScanner: React.FC<QRScannerProps> = ({
       setShowManualEntry(false);
     } catch (error) {
       console.error('Manual entry error:', error);
+      
+      // Log manual entry error
+      await logQRScan(manualQRCode, 'error', 'unknown');
+      
       onError?.(`Failed to process manual entry: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsLoading(false);

@@ -25,6 +25,7 @@ import {
   arrayRemove
 } from 'firebase/firestore';
 import { db } from '../config/firebase.config';
+import CONFIG from '../config';
 import { 
   UserProfile, 
   PersonalInfo, 
@@ -80,6 +81,14 @@ export interface ProfileService {
   // Audit and Logging
   logProfileAccess: (profileId: string, accessLog: Omit<AuditLog, 'id' | 'timestamp'>) => Promise<ApiResponse<void>>;
   getProfileAccessLogs: (profileId: string, limit?: number) => Promise<ApiResponse<AuditLog[]>>;
+  cleanupAuditLogs: (profileId?: string) => Promise<ApiResponse<{ deletedCount: number }>>;
+  getAuditLogStatistics: (profileId?: string) => Promise<ApiResponse<{
+    totalLogs: number;
+    oldestLog?: Date;
+    newestLog?: Date;
+    logsByType: Record<string, number>;
+    logsByAccessorType: Record<string, number>;
+  }>>;
 }
 
 // =============================================
@@ -985,6 +994,184 @@ class ProfileServiceImpl implements ProfileService {
         error: {
           code: 'DATABASE_ERROR',
           message: 'Failed to get profile access logs',
+          details: error
+        },
+        timestamp: new Date()
+      };
+    }
+  }
+
+  /**
+   * Clean up old audit logs based on retention policies
+   */
+  async cleanupAuditLogs(profileId?: string): Promise<ApiResponse<{ deletedCount: number }>> {
+    try {
+      const { RETENTION_DAYS, MAX_LOGS_PER_PROFILE } = CONFIG.AUDIT;
+      let totalDeleted = 0;
+
+      if (profileId) {
+        // Clean up logs for specific profile
+        totalDeleted = await this.cleanupProfileAuditLogs(profileId, RETENTION_DAYS, MAX_LOGS_PER_PROFILE);
+      } else {
+        // Clean up logs for all profiles (admin operation)
+        const profilesQuery = query(collection(db, 'user_profiles'));
+        const profilesSnapshot = await getDocs(profilesQuery);
+        
+        for (const profileDoc of profilesSnapshot.docs) {
+          const profileIdToClean = profileDoc.id;
+          const deleted = await this.cleanupProfileAuditLogs(profileIdToClean, RETENTION_DAYS, MAX_LOGS_PER_PROFILE);
+          totalDeleted += deleted;
+        }
+      }
+
+      console.log(`Audit cleanup completed: ${totalDeleted} logs deleted`);
+      
+      return {
+        success: true,
+        data: { deletedCount: totalDeleted },
+        timestamp: new Date()
+      };
+
+    } catch (error: any) {
+      console.error('Audit cleanup error:', error);
+      return {
+        success: false,
+        error: {
+          code: 'CLEANUP_ERROR',
+          message: 'Failed to cleanup audit logs',
+          details: error
+        },
+        timestamp: new Date()
+      };
+    }
+  }
+
+  /**
+   * Clean up audit logs for a specific profile
+   */
+  private async cleanupProfileAuditLogs(
+    profileId: string, 
+    retentionDays: number, 
+    maxLogsPerProfile: number
+  ): Promise<number> {
+    let deletedCount = 0;
+
+    try {
+      // Step 1: Delete logs older than retention period
+      const cutoffDate = new Date();
+      cutoffDate.setDate(cutoffDate.getDate() - retentionDays);
+
+      const oldLogsQuery = query(
+        collection(db, 'audit_logs'),
+        where('profileId', '==', profileId),
+        where('timestamp', '<', cutoffDate)
+      );
+
+      const oldLogsSnapshot = await getDocs(oldLogsQuery);
+      
+      // Delete old logs in batches
+      const batch = writeBatch(db);
+      oldLogsSnapshot.forEach((doc) => {
+        batch.delete(doc.ref);
+        deletedCount++;
+      });
+
+      if (oldLogsSnapshot.size > 0) {
+        await batch.commit();
+        console.log(`Deleted ${oldLogsSnapshot.size} old audit logs for profile ${profileId}`);
+      }
+
+      // Step 2: Enforce maximum logs per profile limit
+      const allLogsQuery = query(
+        collection(db, 'audit_logs'),
+        where('profileId', '==', profileId),
+        orderBy('timestamp', 'desc')
+      );
+
+      const allLogsSnapshot = await getDocs(allLogsQuery);
+      
+      if (allLogsSnapshot.size > maxLogsPerProfile) {
+        const excessLogs = allLogsSnapshot.size - maxLogsPerProfile;
+        const logsToDelete = allLogsSnapshot.docs.slice(maxLogsPerProfile);
+        
+        const excessBatch = writeBatch(db);
+        logsToDelete.forEach((doc) => {
+          excessBatch.delete(doc.ref);
+        });
+
+        await excessBatch.commit();
+        deletedCount += excessLogs;
+        
+        console.log(`Deleted ${excessLogs} excess audit logs for profile ${profileId} (over limit of ${maxLogsPerProfile})`);
+      }
+
+    } catch (error: any) {
+      console.error(`Error cleaning up audit logs for profile ${profileId}:`, error);
+      throw error;
+    }
+
+    return deletedCount;
+  }
+
+  /**
+   * Get audit log statistics for monitoring
+   */
+  async getAuditLogStatistics(profileId?: string): Promise<ApiResponse<{
+    totalLogs: number;
+    oldestLog?: Date;
+    newestLog?: Date;
+    logsByType: Record<string, number>;
+    logsByAccessorType: Record<string, number>;
+  }>> {
+    try {
+      let logsQuery;
+      
+      if (profileId) {
+        logsQuery = query(
+          collection(db, 'audit_logs'),
+          where('profileId', '==', profileId),
+          orderBy('timestamp', 'desc')
+        );
+      } else {
+        logsQuery = query(
+          collection(db, 'audit_logs'),
+          orderBy('timestamp', 'desc')
+        );
+      }
+
+      const snapshot = await getDocs(logsQuery);
+      const logs = snapshot.docs.map(doc => ({
+        ...doc.data(),
+        timestamp: doc.data().timestamp?.toDate() || new Date()
+      })) as AuditLog[];
+
+      const stats = {
+        totalLogs: logs.length,
+        oldestLog: logs.length > 0 ? logs[logs.length - 1].timestamp : undefined,
+        newestLog: logs.length > 0 ? logs[0].timestamp : undefined,
+        logsByType: {} as Record<string, number>,
+        logsByAccessorType: {} as Record<string, number>
+      };
+
+      // Count logs by type
+      logs.forEach(log => {
+        stats.logsByType[log.accessType] = (stats.logsByType[log.accessType] || 0) + 1;
+        stats.logsByAccessorType[log.accessorType] = (stats.logsByAccessorType[log.accessorType] || 0) + 1;
+      });
+
+      return {
+        success: true,
+        data: stats,
+        timestamp: new Date()
+      };
+
+    } catch (error: any) {
+      console.error('Get audit statistics error:', error);
+      return {
+        success: false,
+        error: {
+          code: 'DATABASE_ERROR',
+          message: 'Failed to get audit log statistics',
           details: error
         },
         timestamp: new Date()

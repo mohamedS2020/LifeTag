@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
@@ -12,6 +12,9 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { EmergencyQRData } from '../services/qrService';
+import { profileService } from '../services';
+import { useAuth } from '../context/AuthContext';
+import { AuditLog } from '../types';
 
 /**
  * Props for EmergencyInfoScreen component
@@ -40,6 +43,47 @@ const EmergencyInfoScreen: React.FC<EmergencyInfoScreenProps> = ({
   onCallEmergencyContact,
   onScanAnother,
 }) => {
+  // Auth context for audit logging
+  const { user } = useAuth();
+
+  /**
+   * Log emergency-only access when component mounts
+   */
+  useEffect(() => {
+    const logEmergencyAccess = async () => {
+      try {
+        if (!user) {
+          console.log('No authenticated user for emergency access logging');
+          return;
+        }
+
+        const auditLog: Omit<AuditLog, 'id' | 'timestamp'> = {
+          profileId: emergencyData.profileId || 'unknown_emergency_qr',
+          accessedBy: user.id,
+          accessorType: user.userType === 'medical_professional' ? 'medical_professional' : 'individual',
+          accessType: 'emergency_access', // Key distinction: emergency-only access
+          accessMethod: 'qr_code',
+          fieldsAccessed: ['name', 'bloodType', 'allergies', 'emergencyContact'], // Only emergency fields
+          dataModified: false,
+          deviceInfo: Platform.OS === 'ios' ? 'iOS Device' : 'Android Device',
+          notes: `Emergency QR access - Emergency data only (not full profile)`
+        };
+
+        const result = await profileService.logProfileAccess(
+          emergencyData.profileId || 'unknown_emergency_qr', 
+          auditLog
+        );
+        
+        if (!result.success) {
+          console.error('Failed to log emergency access:', result.error);
+        }
+      } catch (error) {
+        console.error('Emergency access logging error:', error);
+      }
+    };
+
+    logEmergencyAccess();
+  }, [emergencyData.profileId, user]);
 
   /**
    * Handle emergency contact call

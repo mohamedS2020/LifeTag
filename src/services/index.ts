@@ -30,4 +30,8 @@ export {
   type QREncodingOptions,
   type QRCodeGenerationResult
 } from './qrService';
+export { 
+  auditCleanupService,
+  AuditCleanupService
+} from './auditCleanupService';
 // Other services will be added in upcoming tasks

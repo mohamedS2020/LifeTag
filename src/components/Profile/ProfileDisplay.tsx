@@ -7,9 +7,10 @@ import {
   TouchableOpacity,
   Alert,
   RefreshControl,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { UserProfile } from '../../types';
+import { UserProfile, AuditLog } from '../../types';
 import { profileService, passwordService, MedicalProfessionalAccessService } from '../../services';
 import { LoadingOverlay } from '../common/LoadingOverlay';
 import { PasswordVerificationModal } from '../common/PasswordVerificationModal';
@@ -99,6 +100,34 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
     }
   };
 
+  /**
+   * Log full profile access for audit purposes
+   */
+  const logFullProfileAccess = async (accessMethod: string) => {
+    try {
+      if (!currentUser || !profile) return;
+
+      const auditLog: Omit<AuditLog, 'id' | 'timestamp'> = {
+        profileId: profile.id,
+        accessedBy: currentUser.id,
+        accessorType: currentUser.userType === 'medical_professional' ? 'medical_professional' : 'individual',
+        accessType: 'full_profile', // Key distinction: full profile access
+        accessMethod: 'app_interface',
+        fieldsAccessed: ['personalInfo', 'medicalInfo', 'emergencyContacts', 'privacySettings'], // All profile fields
+        dataModified: false,
+        deviceInfo: Platform.OS === 'ios' ? 'iOS Device' : 'Android Device',
+        notes: `Full profile access granted via ${accessMethod}`
+      };
+
+      const result = await profileService.logProfileAccess(profile.id, auditLog);
+      if (!result.success) {
+        console.error('Failed to log full profile access:', result.error);
+      }
+    } catch (error) {
+      console.error('Full profile access logging error:', error);
+    }
+  };
+
   const checkAccess = async () => {
     if (!showPasswordProtection || !profile) {
       setHasPasswordAccess(true);
@@ -135,6 +164,9 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
           await MedicalProfessionalAccessService.logProfileAccess(accessLog);
         }
         
+        // Log full profile access via medical professional privilege
+        await logFullProfileAccess('medical_professional_privilege');
+        
         setAccessTimeRemaining(null); // No time limit for medical professional access
         return;
       } else {
@@ -146,6 +178,9 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
       // Fall back to regular password access check
       if (!profile.privacySettings.requirePasswordForFullAccess) {
         setHasPasswordAccess(true);
+        
+        // Log full profile access (no password required)
+        await logFullProfileAccess('no_password_required');
         return;
       }
 
@@ -154,6 +189,11 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
       
       setHasPasswordAccess(hasAccess);
       setAccessTimeRemaining(timeRemaining);
+
+      // Log full profile access if password access is valid
+      if (hasAccess) {
+        await logFullProfileAccess('password_verified');
+      }
     } catch (error) {
       console.error('Error checking access:', error);
       setHasPasswordAccess(false);
