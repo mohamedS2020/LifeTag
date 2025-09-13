@@ -10,17 +10,32 @@ import {
   Linking,
   Platform
 } from 'react-native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
 import { EmergencyQRData } from '../services/qrService';
 import { profileService } from '../services';
 import { useAuth } from '../context/AuthContext';
 import { AuditLog } from '../types';
 
+// Navigation type definitions
+type RootStackParamList = {
+  EmergencyInfoScreen: {
+    emergencyData: EmergencyQRData;
+    qrCodeString?: string;
+    scannedBy?: string;
+    medicalProfessionalAccess?: boolean;
+  };
+};
+
+type EmergencyInfoScreenRouteProp = RouteProp<RootStackParamList, 'EmergencyInfoScreen'>;
+type EmergencyInfoScreenNavigationProp = StackNavigationProp<RootStackParamList, 'EmergencyInfoScreen'>;
+
 /**
- * Props for EmergencyInfoScreen component
+ * Props for EmergencyInfoScreen component (legacy, now using navigation)
  */
 interface EmergencyInfoScreenProps {
-  emergencyData: EmergencyQRData;
+  emergencyData?: EmergencyQRData;
   qrCodeString?: string;
   onClose?: () => void;
   onCallEmergencyContact?: (phone: string) => void;
@@ -36,13 +51,14 @@ interface EmergencyInfoScreenProps {
  * - Color-coded critical information
  * - Optimized for high-stress emergency scenarios
  */
-const EmergencyInfoScreen: React.FC<EmergencyInfoScreenProps> = ({
-  emergencyData,
-  qrCodeString,
-  onClose,
-  onCallEmergencyContact,
-  onScanAnother,
-}) => {
+const EmergencyInfoScreen: React.FC = () => {
+  // Navigation hooks
+  const navigation = useNavigation<any>();
+  const route = useRoute<EmergencyInfoScreenRouteProp>();
+  
+  // Extract data from route params
+  const { emergencyData, qrCodeString, scannedBy, medicalProfessionalAccess } = route.params;
+  
   // Auth context for audit logging
   const { user } = useAuth();
 
@@ -86,6 +102,23 @@ const EmergencyInfoScreen: React.FC<EmergencyInfoScreenProps> = ({
   }, [emergencyData.profileId, user]);
 
   /**
+   * Handle full profile access
+   */
+  const handleFullProfileAccess = () => {
+    if (!emergencyData.profileId) {
+      Alert.alert('Error', 'Profile ID not available');
+      return;
+    }
+
+    // Navigate to ProfileDisplay with correct parameters
+    // The ProfileDisplay screen will handle access control based on current user's type
+    navigation.navigate('ProfileDisplay', {
+      profileId: emergencyData.profileId,
+      isViewingOtherProfile: true
+    });
+  };
+
+  /**
    * Handle emergency contact call
    */
   const handleCallEmergencyContact = () => {
@@ -105,15 +138,11 @@ const EmergencyInfoScreen: React.FC<EmergencyInfoScreenProps> = ({
           text: 'Call', 
           style: 'default',
           onPress: () => {
-            if (onCallEmergencyContact) {
-              onCallEmergencyContact(phoneNumber);
-            } else {
-              const phoneUrl = `tel:${phoneNumber}`;
-              Linking.openURL(phoneUrl).catch((err) => {
-                console.error('Failed to open phone dialer:', err);
-                Alert.alert('Error', 'Could not open phone dialer');
-              });
-            }
+            const phoneUrl = `tel:${phoneNumber}`;
+            Linking.openURL(phoneUrl).catch((err) => {
+              console.error('Failed to open phone dialer:', err);
+              Alert.alert('Error', 'Could not open phone dialer');
+            });
           }
         }
       ]
@@ -150,11 +179,11 @@ const EmergencyInfoScreen: React.FC<EmergencyInfoScreenProps> = ({
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={onClose} style={styles.headerButton}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
           <Ionicons name="close" size={24} color="white" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Emergency Medical Info</Text>
-        <TouchableOpacity onPress={onScanAnother} style={styles.headerButton}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
           <Ionicons name="qr-code" size={24} color="white" />
         </TouchableOpacity>
       </View>
@@ -266,34 +295,51 @@ const EmergencyInfoScreen: React.FC<EmergencyInfoScreenProps> = ({
             )}
           </View>
         </View>
-      </ScrollView>
 
-      {/* Action Buttons */}
-      <View style={styles.actionButtons}>
-        {emergencyData.emergencyContact && (
-          <TouchableOpacity
-            style={styles.emergencyCallButton}
-            onPress={handleCallEmergencyContact}
-          >
-            <Ionicons name="call" size={20} color="white" />
-            <Text style={styles.emergencyCallText}>
-              Call {emergencyData.emergencyContact.name}
-            </Text>
-          </TouchableOpacity>
-        )}
-        
-        <View style={styles.secondaryButtons}>
-          <TouchableOpacity style={styles.secondaryButton} onPress={onScanAnother}>
-            <Ionicons name="qr-code" size={18} color="#666666" />
-            <Text style={styles.secondaryButtonText}>Scan Another</Text>
-          </TouchableOpacity>
+        {/* Action Buttons - Inside ScrollView */}
+        <View style={styles.actionButtons}>
+          {/* Full Profile Button - Show if profileId exists */}
+          {emergencyData.profileId && (
+            <TouchableOpacity
+              style={styles.fullProfileButton}
+              onPress={handleFullProfileAccess}
+            >
+              <Ionicons name="person" size={20} color="white" />
+              <Text style={styles.fullProfileButtonText}>
+                {user?.userType === 'medical_professional' && user?.isVerified 
+                  ? 'View Full Profile' 
+                  : 'Full Profile'}
+              </Text>
+            </TouchableOpacity>
+          )}
+
+          {/* Emergency Call Button */}
+          {emergencyData.emergencyContact && (
+            <TouchableOpacity
+              style={styles.emergencyCallButton}
+              onPress={handleCallEmergencyContact}
+            >
+              <Ionicons name="call" size={20} color="white" />
+              <Text style={styles.emergencyCallText}>
+                Call {emergencyData.emergencyContact.name}
+              </Text>
+            </TouchableOpacity>
+          )}
           
-          <TouchableOpacity style={styles.secondaryButton} onPress={onClose}>
-            <Ionicons name="close" size={18} color="#666666" />
-            <Text style={styles.secondaryButtonText}>Close</Text>
-          </TouchableOpacity>
+          {/* Secondary Buttons */}
+          <View style={styles.secondaryButtons}>
+            <TouchableOpacity style={styles.secondaryButton} onPress={() => navigation.goBack()}>
+              <Ionicons name="qr-code" size={18} color="#666666" />
+              <Text style={styles.secondaryButtonText}>Scan Another</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity style={styles.secondaryButton} onPress={() => navigation.goBack()}>
+              <Ionicons name="close" size={18} color="#666666" />
+              <Text style={styles.secondaryButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -329,7 +375,6 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 20,
-    paddingBottom: 100, // Space for action buttons
   },
   patientNameSection: {
     backgroundColor: '#F8F9FA',
@@ -480,14 +525,24 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
   actionButtons: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
     backgroundColor: 'white',
     padding: 20,
-    borderTopWidth: 1,
-    borderTopColor: '#EEEEEE',
+    paddingBottom: 30,
+  },
+  fullProfileButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#2196F3',
+    paddingVertical: 15,
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  fullProfileButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginLeft: 8,
   },
   emergencyCallButton: {
     flexDirection: 'row',

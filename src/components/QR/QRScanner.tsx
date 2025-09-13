@@ -113,12 +113,18 @@ const QRScanner: React.FC<QRScannerProps> = ({
         accessorType: user.userType === 'medical_professional' ? 'medical_professional' : 'individual',
         accessType: 'qr_scan',
         accessMethod: 'qr_code',
-        fieldsAccessed: scanType === 'emergency_qr' ? ['name', 'bloodType', 'allergies', 'emergencyContact'] : undefined,
         dataModified: false,
-        location: undefined, // Could be added with location services later
         deviceInfo: Platform.OS === 'ios' ? 'iOS Device' : 'Android Device',
         notes: `QR scan: ${scanResult} (${scanType}) - Data length: ${scannedData.length} chars`
       };
+
+      // Only add fieldsAccessed if it has values
+      if (scanType === 'emergency_qr') {
+        auditLog.fieldsAccessed = ['name', 'bloodType', 'allergies', 'emergencyContact'];
+      }
+
+      // Only add location if available (currently not implemented)
+      // auditLog.location = undefined; // Remove this to avoid undefined values
 
       const result = await profileService.logProfileAccess(profileId || 'unknown', auditLog);
       if (!result.success) {
@@ -167,7 +173,7 @@ const QRScanner: React.FC<QRScannerProps> = ({
             
             Alert.alert(
               '✅ Emergency Medical QR Code Detected',
-              `Successfully scanned medical information for: ${parsedEmergencyData.name}\n\nBlood Type: ${parsedEmergencyData.bloodType || 'Not specified'}\nAllergies: ${parsedEmergencyData.allergies.length}\nEmergency Contact: ${parsedEmergencyData.emergencyContact?.name || 'Not specified'}`,
+              `Successfully scanned medical information for: ${parsedEmergencyData.name}\n\nBlood Type: ${parsedEmergencyData.bloodType || 'Not specified'}\nAllergies: ${parsedEmergencyData.allergies && parsedEmergencyData.allergies.length > 0 ? parsedEmergencyData.allergies.join(', ') : 'None specified'}\nEmergency Contact: ${parsedEmergencyData.emergencyContact?.name || 'Not specified'}${parsedEmergencyData.emergencyContact?.phone ? ` (${parsedEmergencyData.emergencyContact.phone})` : ''}`,
               [
                 { text: 'View Details', onPress: () => onQRScanned?.(data, parsedEmergencyData) },
                 { text: 'Scan Another', onPress: resetScanner }

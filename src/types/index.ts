@@ -264,6 +264,10 @@ export interface EmergencyQRData {
     phone: string;
   };
   emergencyNotes?: string; // Brief critical info
+  profileId?: string; // For app-based full profile access
+  hasFullProfile?: boolean; // Indicates if full profile is available
+  version?: string; // QR format version
+  timestamp?: string; // Generation timestamp
 }
 
 // =============================================

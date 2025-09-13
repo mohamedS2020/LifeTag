@@ -214,7 +214,7 @@ export const ProfileDisplayScreen: React.FC = () => {
           userId={profile.id}
           profile={profile}
           showEditButton={false}
-          showPasswordProtection={false}
+          showPasswordProtection={isViewingOtherProfile}
         />
       </ScrollView>
     );

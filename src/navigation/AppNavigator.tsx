@@ -12,7 +12,31 @@ import { Ionicons } from '@expo/vector-icons';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { LoginScreen, RegisterScreen, MedicalProfessionalRegister } from '../components/Auth';
-import { HomeScreen, ProfileFormScreen, ProfileDisplayScreen, QRTabScreen, QRDisplayScreen, QRScannerScreen } from '../screens';
+import { HomeScreen, ProfileFormScreen, ProfileDisplayScreen, QRTabScreen, QRDisplayScreen, QRScannerScreen, EmergencyInfoScreen } from '../screens';
+import { EmergencyQRData } from '../services/qrService';
+
+// Type definitions for navigation
+export type RootStackParamList = {
+  MainTabs: undefined;
+  QRDisplay: undefined;
+  QRScanner: undefined;
+  ProfileForm: {
+    mode: 'create' | 'edit';
+    profileId?: string;
+  };
+  ProfileDisplay: {
+    profileId?: string;
+    isViewingOtherProfile?: boolean;
+    accessType?: string;
+    scannedBy?: string;
+  };
+  EmergencyInfoScreen: {
+    emergencyData: EmergencyQRData;
+    qrCodeString?: string;
+    scannedBy?: string;
+    medicalProfessionalAccess?: boolean;
+  };
+};
 
 // Create navigators
 const Stack = createStackNavigator();
@@ -145,6 +169,14 @@ const AuthenticatedStack: React.FC = () => {
       <Stack.Screen 
         name="ProfileDisplay" 
         component={ProfileDisplayScreen}
+        options={{ 
+          headerShown: false,
+          presentation: 'modal'
+        }}
+      />
+      <Stack.Screen 
+        name="EmergencyInfoScreen" 
+        component={EmergencyInfoScreen}
         options={{ 
           headerShown: false,
           presentation: 'modal'

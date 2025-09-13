@@ -320,41 +320,125 @@ function getNestedValue(obj: any, path: string): any {
  * Sanitize profile data before saving
  */
 export function sanitizeProfileData(profile: Partial<UserProfile>): Partial<UserProfile> {
-  const sanitized = { ...profile };
+  console.log('🧹 Sanitizing profile data:', JSON.stringify(profile, null, 2));
+  
+  const removeUndefinedValues = (obj: any): any => {
+    if (obj === null) return null;
+    if (obj === undefined) return undefined;
+    
+    if (Array.isArray(obj)) {
+      return obj
+        .map(removeUndefinedValues)
+        .filter(item => item !== undefined);
+    }
+    
+    if (typeof obj === 'object' && obj !== null) {
+      // Handle Date objects specially
+      if (obj instanceof Date) {
+        return obj;
+      }
+      
+      const cleaned: any = {};
+      Object.entries(obj).forEach(([key, value]) => {
+        if (value !== undefined) {
+          const cleanedValue = removeUndefinedValues(value);
+          if (cleanedValue !== undefined) {
+            cleaned[key] = cleanedValue;
+          }
+        }
+      });
+      return cleaned;
+    }
+    
+    return obj;
+  };
+
+  const sanitized = removeUndefinedValues(profile);
+  console.log('🧹 After removing undefined values:', JSON.stringify(sanitized, null, 2));
 
   // Sanitize personal info
   if (sanitized.personalInfo) {
-    const personalInfo: any = {
-      ...sanitized.personalInfo
-    };
+    const personalInfo: any = {};
     
     // Only set fields that exist and are not undefined
-    if (personalInfo.firstName !== undefined) {
-      personalInfo.firstName = personalInfo.firstName?.trim();
+    if (sanitized.personalInfo.firstName !== undefined) {
+      personalInfo.firstName = sanitized.personalInfo.firstName?.trim();
     }
-    if (personalInfo.lastName !== undefined) {
-      personalInfo.lastName = personalInfo.lastName?.trim();
+    if (sanitized.personalInfo.lastName !== undefined) {
+      personalInfo.lastName = sanitized.personalInfo.lastName?.trim();
     }
-    if (personalInfo.displayName !== undefined) {
-      personalInfo.displayName = personalInfo.displayName?.trim();
+    if (sanitized.personalInfo.dateOfBirth !== undefined) {
+      personalInfo.dateOfBirth = sanitized.personalInfo.dateOfBirth;
     }
-    if (personalInfo.phoneNumber !== undefined) {
-      personalInfo.phoneNumber = personalInfo.phoneNumber?.replace(/\D/g, ''); // Remove non-digits
+    if (sanitized.personalInfo.gender !== undefined) {
+      personalInfo.gender = sanitized.personalInfo.gender;
     }
+    if (sanitized.personalInfo.phoneNumber !== undefined) {
+      personalInfo.phoneNumber = sanitized.personalInfo.phoneNumber?.replace(/\D/g, ''); // Remove non-digits
+    }
+    if (sanitized.personalInfo.address !== undefined) {
+      personalInfo.address = sanitized.personalInfo.address;
+    }
+    if (sanitized.personalInfo.profilePicture !== undefined) {
+      personalInfo.profilePicture = sanitized.personalInfo.profilePicture?.trim();
+    }
+    // Skip displayName - we don't want it in Firestore
     
     sanitized.personalInfo = personalInfo;
   }
 
-  // Sanitize emergency contacts
-  if (sanitized.emergencyContacts) {
-    sanitized.emergencyContacts = sanitized.emergencyContacts.map(contact => ({
-      ...contact,
-      name: contact.name?.trim(),
-      phoneNumber: contact.phoneNumber?.replace(/\D/g, ''), // Remove non-digits
-      email: contact.email?.trim().toLowerCase(),
-      relationship: contact.relationship?.toLowerCase()
-    }));
+  // Sanitize medical info
+  if (sanitized.medicalInfo) {
+    const medicalInfo: any = {};
+    
+    // Copy all medical info fields that are not undefined
+    Object.entries(sanitized.medicalInfo).forEach(([key, value]) => {
+      if (value !== undefined) {
+        if (Array.isArray(value)) {
+          medicalInfo[key] = value.filter(item => item !== undefined && item !== null && item.trim() !== '');
+        } else if (typeof value === 'string') {
+          const trimmed = value.trim();
+          if (trimmed !== '') {
+            medicalInfo[key] = trimmed;
+          }
+        } else {
+          medicalInfo[key] = value;
+        }
+      }
+    });
+    
+    sanitized.medicalInfo = medicalInfo;
   }
 
+  // Sanitize emergency contacts
+  if (sanitized.emergencyContacts) {
+    sanitized.emergencyContacts = sanitized.emergencyContacts
+      .filter((contact: any) => contact !== undefined && contact !== null)
+      .map((contact: any) => {
+        const cleaned: any = {};
+        if (contact.id !== undefined) cleaned.id = contact.id;
+        if (contact.name !== undefined) cleaned.name = contact.name?.trim();
+        if (contact.phoneNumber !== undefined) cleaned.phoneNumber = contact.phoneNumber?.replace(/\D/g, '');
+        if (contact.email !== undefined) cleaned.email = contact.email?.trim().toLowerCase();
+        if (contact.relationship !== undefined) cleaned.relationship = contact.relationship?.toLowerCase();
+        if (contact.isPrimary !== undefined) cleaned.isPrimary = contact.isPrimary;
+        return cleaned;
+      });
+  }
+
+  // Sanitize privacy settings
+  if (sanitized.privacySettings) {
+    const privacySettings: any = {};
+    
+    Object.entries(sanitized.privacySettings).forEach(([key, value]) => {
+      if (value !== undefined) {
+        privacySettings[key] = value;
+      }
+    });
+    
+    sanitized.privacySettings = privacySettings;
+  }
+
+  console.log('✨ Final sanitized profile data:', JSON.stringify(sanitized, null, 2));
   return sanitized;
 }

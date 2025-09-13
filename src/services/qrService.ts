@@ -81,7 +81,8 @@ export class QRService {
 
   /**
    * Encode emergency data into QR string format
-   * Format: "N:FirstName LastName;BT:BloodType;ALG:Allergy1,Allergy2;EC:ContactName-Phone-Relationship;NOTE:Emergency info;APP:ProfileId"
+   * Format: "V:1.0;N:FirstName LastName;BT:BloodType;ALG:Allergy1,Allergy2;EC:ContactName-Phone-Relationship;NOTE:Emergency info;FULL access in LifeTag app;LT:base64ProfileId;TS:timestamp"
+   * Note: LT: contains base64-encoded profileId for security (not obvious to other apps)
    */
   static encodeQRString(emergencyData: EmergencyQRData): string {
     const parts: string[] = [];
@@ -118,9 +119,16 @@ export class QRService {
       parts.push(`NOTE:${note}`);
     }
     
-    // Full profile available indicator
+    // Full profile available indicator with embedded profileId
     if (emergencyData.hasFullProfile) {
       parts.push('FULL access in LifeTag app');
+    }
+
+    // Hidden profileId (encoded to be non-obvious to other apps)
+    if (emergencyData.profileId) {
+      // Encode profileId in a way that looks like part of timestamp or app data
+      const encodedId = btoa(emergencyData.profileId);
+      parts.push(`LT:${encodedId}`); // LifeTag internal identifier
     }
     
     // Timestamp
@@ -172,6 +180,14 @@ export class QRService {
             break;
           case 'APP':
             data.profileId = value;
+            break;
+          case 'LT':
+            // Decode hidden profileId (LifeTag internal)
+            try {
+              data.profileId = atob(value);
+            } catch (error) {
+              console.warn('Failed to decode LifeTag internal ID:', error);
+            }
             break;
           case 'FULL':
             data.hasFullProfile = value === '1';

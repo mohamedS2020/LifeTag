@@ -997,16 +997,34 @@ class ProfileServiceImpl implements ProfileService {
   async logProfileAccess(profileId: string, accessLog: Omit<AuditLog, 'id' | 'timestamp'>): Promise<ApiResponse<void>> {
     try {
       const logId = `log_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
+      // Clean the access log to remove undefined values
+      const cleanedAccessLog: any = {};
+      Object.entries(accessLog).forEach(([key, value]) => {
+        if (value !== undefined) {
+          cleanedAccessLog[key] = value;
+        }
+      });
+      
       const auditLog: AuditLog = {
-        ...accessLog,
+        ...cleanedAccessLog,
         id: logId,
         timestamp: new Date()
       };
 
-      await setDoc(doc(db, 'audit_logs', logId), {
-        ...auditLog,
-        timestamp: serverTimestamp()
+      // Also clean the final audit log before sending to Firestore
+      const firestoreData: any = {};
+      Object.entries(auditLog).forEach(([key, value]) => {
+        if (value !== undefined) {
+          if (key === 'timestamp') {
+            firestoreData[key] = serverTimestamp();
+          } else {
+            firestoreData[key] = value;
+          }
+        }
       });
+
+      await setDoc(doc(db, 'audit_logs', logId), firestoreData);
 
       return {
         success: true,

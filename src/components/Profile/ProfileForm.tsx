@@ -148,8 +148,12 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [wantToChangePassword, setWantToChangePassword] = useState(false);
 
   const steps = ['Personal Info', 'Medical Info', 'Emergency Contacts', 'Privacy'];
+
+  // Check if user has existing password
+  const hasExistingPassword = mode === 'edit' && initialProfile?.privacySettings?.profilePassword;
 
   // =============================================
   // INITIALIZATION
@@ -187,6 +191,12 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
     if (profile.personalInfo) {
       Object.entries(profile.personalInfo).forEach(([key, value]) => {
         console.log(`  📝 ${key}: ${JSON.stringify(value)} (type: ${typeof value})`);
+        if (key === 'dateOfBirth') {
+          console.log(`  🗓️ DATEOFBIRTH DETAILS:`, value);
+          console.log(`  🗓️ Is Date?`, value instanceof Date);
+          console.log(`  🗓️ Has toDate?`, value && typeof value === 'object' && 'toDate' in value);
+          console.log(`  🗓️ Has seconds?`, value && typeof value === 'object' && 'seconds' in value);
+        }
         if (value === undefined) {
           console.warn(`  ⚠️  WARNING: ${key} is undefined in profile.personalInfo`);
         }
@@ -352,19 +362,26 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
       case 3: // Privacy Settings
         // Validate password if password protection is enabled
         if (formState.privacySettings.requirePasswordForFullAccess) {
-          if (!profilePassword.trim()) {
-            setPasswordError('Password is required when password protection is enabled');
-            isValid = false;
-          } else if (profilePassword !== confirmPassword) {
-            setPasswordError('Passwords do not match');
-            isValid = false;
+          // If editing and has existing password, only validate if user wants to change password
+          if (mode === 'edit' && hasExistingPassword && !wantToChangePassword) {
+            // User is keeping existing password, no validation needed
+            setPasswordError('');
           } else {
-            const passwordValidation = passwordService.validateProfilePassword(profilePassword);
-            if (!passwordValidation.isValid) {
-              setPasswordError(passwordValidation.error || 'Invalid password');
+            // Either creating new profile, no existing password, or user wants to change password
+            if (!profilePassword.trim()) {
+              setPasswordError('Password is required when password protection is enabled');
+              isValid = false;
+            } else if (profilePassword !== confirmPassword) {
+              setPasswordError('Passwords do not match');
               isValid = false;
             } else {
-              setPasswordError('');
+              const passwordValidation = passwordService.validateProfilePassword(profilePassword);
+              if (!passwordValidation.isValid) {
+                setPasswordError(passwordValidation.error || 'Invalid password');
+                isValid = false;
+              } else {
+                setPasswordError('');
+              }
             }
           }
         } else {
@@ -414,12 +431,49 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
     
     if (personalInfo.dateOfBirth !== undefined && personalInfo.dateOfBirth !== null) {
       console.log('🗓️ ProfileForm: Processing dateOfBirth:', personalInfo.dateOfBirth, 'Type:', typeof personalInfo.dateOfBirth);
-      // Ensure we have a valid Date object before saving
+      
+      let dateToSave = null;
+      
+      // Handle different date formats (similar to DatePicker's getValidDate function)
       if (personalInfo.dateOfBirth instanceof Date) {
-        cleanPersonalInfo.dateOfBirth = personalInfo.dateOfBirth;
-        console.log('✅ ProfileForm: Valid Date object assigned');
+        dateToSave = personalInfo.dateOfBirth;
+        console.log('✅ ProfileForm: Valid Date object');
+      } else if (typeof personalInfo.dateOfBirth === 'object' && personalInfo.dateOfBirth !== null) {
+        try {
+          const dateObj = personalInfo.dateOfBirth as any;
+          // Handle Firestore Timestamp objects
+          if ('seconds' in dateObj) {
+            dateToSave = new Date(dateObj.seconds * 1000);
+            console.log('✅ ProfileForm: Converted from Firestore timestamp (seconds)');
+          } else if ('toDate' in dateObj && typeof dateObj.toDate === 'function') {
+            dateToSave = dateObj.toDate();
+            console.log('✅ ProfileForm: Converted using toDate() method');
+          } else if ('_seconds' in dateObj) {
+            dateToSave = new Date(dateObj._seconds * 1000);
+            console.log('✅ ProfileForm: Converted from _seconds property');
+          }
+        } catch (error) {
+          console.error('❌ ProfileForm: Error converting date object:', error);
+        }
+      } else if (typeof personalInfo.dateOfBirth === 'string') {
+        try {
+          dateToSave = new Date(personalInfo.dateOfBirth);
+          if (isNaN(dateToSave.getTime())) {
+            dateToSave = null;
+            console.log('❌ ProfileForm: Invalid date string');
+          } else {
+            console.log('✅ ProfileForm: Converted from string');
+          }
+        } catch (error) {
+          console.error('❌ ProfileForm: Error parsing date string:', error);
+        }
+      }
+      
+      if (dateToSave && !isNaN(dateToSave.getTime())) {
+        cleanPersonalInfo.dateOfBirth = dateToSave;
+        console.log('✅ ProfileForm: Final date assigned:', dateToSave);
       } else {
-        console.log('❌ ProfileForm: dateOfBirth is not a Date object, skipping');
+        console.log('❌ ProfileForm: Could not convert dateOfBirth, skipping');
       }
     } else {
       console.log('❌ ProfileForm: dateOfBirth is undefined or null');
@@ -533,9 +587,16 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
       let privacySettings = { ...formState.privacySettings };
       console.log('🔐 Privacy settings before password hash:', JSON.stringify(privacySettings, null, 2));
       
-      if (privacySettings.requirePasswordForFullAccess && profilePassword) {
-        privacySettings.profilePassword = passwordService.hashPassword(profilePassword);
-        console.log('🔑 Password hashed and added to privacy settings');
+      if (privacySettings.requirePasswordForFullAccess) {
+        if (mode === 'edit' && hasExistingPassword && !wantToChangePassword) {
+          // User is keeping existing password, preserve it
+          console.log('🔑 Keeping existing password (not changing)');
+          privacySettings.profilePassword = initialProfile?.privacySettings?.profilePassword;
+        } else if (profilePassword) {
+          // Either new profile or user wants to change password
+          privacySettings.profilePassword = passwordService.hashPassword(profilePassword);
+          console.log('🔑 New password hashed and added to privacy settings');
+        }
       }
 
       // Log the raw data before cleaning
@@ -573,6 +634,41 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
         console.log('⚠️  WARNING: displayName still exists in cleaned data:', profileData.personalInfo.displayName);
       } else {
         console.log('✅ displayName successfully removed from cleaned data');
+      }
+
+      // Deep check for undefined values before sending to Firestore
+      const checkForUndefined = (obj: any, path: string = ''): string[] => {
+        const undefinedPaths: string[] = [];
+        
+        if (obj === undefined) {
+          undefinedPaths.push(path);
+          return undefinedPaths;
+        }
+        
+        if (obj === null || typeof obj !== 'object') {
+          return undefinedPaths;
+        }
+        
+        if (Array.isArray(obj)) {
+          obj.forEach((item, index) => {
+            undefinedPaths.push(...checkForUndefined(item, `${path}[${index}]`));
+          });
+        } else {
+          Object.entries(obj).forEach(([key, value]) => {
+            const currentPath = path ? `${path}.${key}` : key;
+            undefinedPaths.push(...checkForUndefined(value, currentPath));
+          });
+        }
+        
+        return undefinedPaths;
+      };
+      
+      const undefinedPaths = checkForUndefined(profileData);
+      if (undefinedPaths.length > 0) {
+        console.error('❌ FOUND UNDEFINED VALUES AT PATHS:', undefinedPaths);
+        throw new Error(`Cannot save profile: undefined values found at ${undefinedPaths.join(', ')}`);
+      } else {
+        console.log('✅ No undefined values found in final data');
       }
 
       let response;
@@ -1140,6 +1236,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
               setProfilePassword('');
               setConfirmPassword('');
               setPasswordError('');
+              setWantToChangePassword(false);
             }
           }}
         />
@@ -1148,60 +1245,151 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
       {/* Password Setup Section */}
       {formState.privacySettings.requirePasswordForFullAccess && (
         <View style={styles.passwordSection}>
-          <Text style={styles.passwordSectionTitle}>Set Profile Password</Text>
-          <Text style={styles.passwordSectionDescription}>
-            This password will be required to access your full profile information through the app.
-          </Text>
-
-          <View style={styles.passwordInputContainer}>
-            <Text style={styles.label}>Profile Password</Text>
-            <View style={styles.passwordFieldContainer}>
-              <TextInput
-                style={[styles.passwordInput, passwordError ? styles.inputError : null]}
-                placeholder="Enter profile password"
-                value={profilePassword}
-                onChangeText={setProfilePassword}
-                secureTextEntry={!showPassword}
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-              <TouchableOpacity
-                style={styles.passwordToggle}
-                onPress={() => setShowPassword(!showPassword)}
-              >
-                <Text style={styles.passwordToggleText}>
-                  {showPassword ? 'Hide' : 'Show'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          <View style={styles.passwordInputContainer}>
-            <Text style={styles.label}>Confirm Password</Text>
-            <TextInput
-              style={[styles.passwordInput, passwordError ? styles.inputError : null]}
-              placeholder="Confirm profile password"
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              secureTextEntry={!showPassword}
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-          </View>
-
-          {passwordError ? (
-            <Text style={styles.passwordError}>{passwordError}</Text>
-          ) : null}
-
-          {profilePassword && (
-            <View style={styles.passwordStrengthContainer}>
-              <Text style={styles.passwordStrengthLabel}>Password Strength:</Text>
-              <Text style={[
-                styles.passwordStrengthText,
-                { color: getPasswordStrengthColor(passwordService.validateProfilePassword(profilePassword).strength) }
-              ]}>
-                {passwordService.validateProfilePassword(profilePassword).strength.toUpperCase()}
+          {hasExistingPassword ? (
+            // User has existing password - show change password option
+            <View>
+              <Text style={styles.passwordSectionTitle}>Password Protection</Text>
+              <Text style={styles.passwordSectionDescription}>
+                You already have a password set up for profile protection.
               </Text>
+              
+              <View style={styles.existingPasswordInfo}>
+                <Text style={styles.existingPasswordText}>✓ Password protection is currently enabled</Text>
+                <TouchableOpacity
+                  style={styles.changePasswordButton}
+                  onPress={() => {
+                    setWantToChangePassword(!wantToChangePassword);
+                    if (!wantToChangePassword) {
+                      // Clear password fields when wanting to change
+                      setProfilePassword('');
+                      setConfirmPassword('');
+                      setPasswordError('');
+                    }
+                  }}
+                >
+                  <Text style={styles.changePasswordButtonText}>
+                    {wantToChangePassword ? 'Keep Current Password' : 'Change Password'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {wantToChangePassword && (
+                <View style={styles.changePasswordForm}>
+                  <Text style={styles.changePasswordTitle}>Set New Password</Text>
+                  
+                  <View style={styles.passwordInputContainer}>
+                    <Text style={styles.label}>New Profile Password</Text>
+                    <View style={styles.passwordFieldContainer}>
+                      <TextInput
+                        style={[styles.passwordInput, passwordError ? styles.inputError : null]}
+                        placeholder="Enter new profile password"
+                        value={profilePassword}
+                        onChangeText={setProfilePassword}
+                        secureTextEntry={!showPassword}
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                      />
+                      <TouchableOpacity
+                        style={styles.passwordToggle}
+                        onPress={() => setShowPassword(!showPassword)}
+                      >
+                        <Text style={styles.passwordToggleText}>
+                          {showPassword ? 'Hide' : 'Show'}
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+
+                  <View style={styles.passwordInputContainer}>
+                    <Text style={styles.label}>Confirm New Password</Text>
+                    <TextInput
+                      style={[styles.passwordInput, passwordError ? styles.inputError : null]}
+                      placeholder="Confirm new profile password"
+                      value={confirmPassword}
+                      onChangeText={setConfirmPassword}
+                      secureTextEntry={!showPassword}
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                    />
+                  </View>
+
+                  {passwordError ? (
+                    <Text style={styles.passwordError}>{passwordError}</Text>
+                  ) : null}
+
+                  {profilePassword && (
+                    <View style={styles.passwordStrengthContainer}>
+                      <Text style={styles.passwordStrengthLabel}>Password Strength:</Text>
+                      <Text style={[
+                        styles.passwordStrengthText,
+                        { color: getPasswordStrengthColor(passwordService.validateProfilePassword(profilePassword).strength) }
+                      ]}>
+                        {passwordService.validateProfilePassword(profilePassword).strength.toUpperCase()}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              )}
+            </View>
+          ) : (
+            // No existing password - show create password form
+            <View>
+              <Text style={styles.passwordSectionTitle}>Set Profile Password</Text>
+              <Text style={styles.passwordSectionDescription}>
+                This password will be required to access your full profile information through the app.
+              </Text>
+
+              <View style={styles.passwordInputContainer}>
+                <Text style={styles.label}>Profile Password</Text>
+                <View style={styles.passwordFieldContainer}>
+                  <TextInput
+                    style={[styles.passwordInput, passwordError ? styles.inputError : null]}
+                    placeholder="Enter profile password"
+                    value={profilePassword}
+                    onChangeText={setProfilePassword}
+                    secureTextEntry={!showPassword}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                  />
+                  <TouchableOpacity
+                    style={styles.passwordToggle}
+                    onPress={() => setShowPassword(!showPassword)}
+                  >
+                    <Text style={styles.passwordToggleText}>
+                      {showPassword ? 'Hide' : 'Show'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <View style={styles.passwordInputContainer}>
+                <Text style={styles.label}>Confirm Password</Text>
+                <TextInput
+                  style={[styles.passwordInput, passwordError ? styles.inputError : null]}
+                  placeholder="Confirm profile password"
+                  value={confirmPassword}
+                  onChangeText={setConfirmPassword}
+                  secureTextEntry={!showPassword}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                />
+              </View>
+
+              {passwordError ? (
+                <Text style={styles.passwordError}>{passwordError}</Text>
+              ) : null}
+
+              {profilePassword && (
+                <View style={styles.passwordStrengthContainer}>
+                  <Text style={styles.passwordStrengthLabel}>Password Strength:</Text>
+                  <Text style={[
+                    styles.passwordStrengthText,
+                    { color: getPasswordStrengthColor(passwordService.validateProfilePassword(profilePassword).strength) }
+                  ]}>
+                    {passwordService.validateProfilePassword(profilePassword).strength.toUpperCase()}
+                  </Text>
+                </View>
+              )}
             </View>
           )}
         </View>
@@ -1743,6 +1931,40 @@ const styles = StyleSheet.create({
     color: '#007bff',
     fontSize: 14,
     fontWeight: '600',
+  },
+  existingPasswordInfo: {
+    backgroundColor: '#e7f3ff',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#bee5eb',
+  },
+  existingPasswordText: {
+    fontSize: 14,
+    color: '#0c5460',
+    marginBottom: 8,
+  },
+  changePasswordButton: {
+    backgroundColor: '#007bff',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 4,
+    alignSelf: 'flex-start',
+  },
+  changePasswordButtonText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  changePasswordForm: {
+    marginTop: 12,
+  },
+  changePasswordTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 12,
   },
 });
 
