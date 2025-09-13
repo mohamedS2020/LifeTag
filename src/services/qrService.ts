@@ -5,6 +5,14 @@ import { UserProfile, EmergencyContact, MedicalCondition } from '../types';
  * Handles QR code generation and data encoding for offline emergency access
  */
 
+// Cache interface for QR data
+interface QRCacheEntry {
+  qrData: string;
+  emergencyData: EmergencyQRData;
+  dataHash: string;
+  timestamp: number;
+}
+
 // Emergency data format for QR codes (offline readable)
 export interface EmergencyQRData {
   version: string; // QR format version for future compatibility
@@ -38,6 +46,82 @@ export class QRService {
   // Maximum QR code data length (for reliable scanning)
   private static readonly MAX_QR_LENGTH = 1000;
   private static readonly QR_VERSION = '1.0';
+  
+  // In-memory cache for QR data
+  private static qrCache = new Map<string, QRCacheEntry>();
+  
+  /**
+   * Generate hash for emergency data to detect changes
+   */
+  private static generateDataHash(profile: UserProfile, options: QREncodingOptions): string {
+    const { includeProfileId = true, emergencyOnly = false } = options;
+    
+    // Include only data that affects QR content
+    const hashData = {
+      name: `${profile.personalInfo.firstName} ${profile.personalInfo.lastName}`,
+      bloodType: profile.medicalInfo.bloodType,
+      allergies: profile.medicalInfo.allergies,
+      emergencyMedicalInfo: profile.medicalInfo.emergencyMedicalInfo,
+      emergencyContacts: profile.emergencyContacts,
+      requirePassword: profile.privacySettings?.requirePasswordForFullAccess,
+      profileId: includeProfileId ? profile.id : null,
+      emergencyOnly,
+      options: { includeProfileId, emergencyOnly }
+    };
+    
+    return JSON.stringify(hashData);
+  }
+  
+  /**
+   * Get cached QR data or generate new if changed
+   */
+  static getCachedOrGenerateQR(
+    profile: UserProfile, 
+    options: QREncodingOptions = {},
+    forceRefresh: boolean = false
+  ): { qrData: string; emergencyData: EmergencyQRData; fromCache: boolean } {
+    const cacheKey = profile.id;
+    const dataHash = this.generateDataHash(profile, options);
+    const cached = this.qrCache.get(cacheKey);
+    
+    // Check if we can use cached data
+    if (!forceRefresh && cached && cached.dataHash === dataHash) {
+      console.log('QR: Using cached data for profile', profile.id);
+      return {
+        qrData: cached.qrData,
+        emergencyData: cached.emergencyData,
+        fromCache: true
+      };
+    }
+    
+    // Generate new QR data
+    console.log('QR: Generating new data for profile', profile.id, forceRefresh ? '(forced)' : '(data changed)');
+    const emergencyData = this.generateEmergencyData(profile, options);
+    const qrData = this.encodeQRString(emergencyData);
+    
+    // Cache the result
+    this.qrCache.set(cacheKey, {
+      qrData,
+      emergencyData,
+      dataHash,
+      timestamp: Date.now()
+    });
+    
+    return { qrData, emergencyData, fromCache: false };
+  }
+  
+  /**
+   * Clear cache for specific profile or all profiles
+   */
+  static clearCache(profileId?: string): void {
+    if (profileId) {
+      this.qrCache.delete(profileId);
+      console.log('QR: Cleared cache for profile', profileId);
+    } else {
+      this.qrCache.clear();
+      console.log('QR: Cleared all QR cache');
+    }
+  }
   
   /**
    * Generate emergency QR data from user profile
@@ -405,11 +489,12 @@ export interface QRCodeGenerationResult {
 export class QRCodeGenerator {
   
   /**
-   * Generate complete QR code data with optimization
+   * Generate complete QR code data with optimization and caching
    */
   static generateForProfile(
     profile: UserProfile,
-    customOptions?: Partial<QREncodingOptions>
+    customOptions?: Partial<QREncodingOptions>,
+    forceRefresh: boolean = false
   ): QRCodeGenerationResult {
     const warnings: string[] = [];
     
@@ -417,33 +502,37 @@ export class QRCodeGenerator {
     const optimalOptions = QRService.getOptimalQROptions(profile);
     const options = { ...optimalOptions, ...customOptions };
     
-    // Generate emergency data
-    const emergencyData = QRService.generateEmergencyData(profile, options);
+    // Get cached or generate new QR data
+    const result = QRService.getCachedOrGenerateQR(profile, options, forceRefresh);
     
-    // Generate QR string
-    const qrData = QRService.encodeQRString(emergencyData);
+    // Add cache info to warnings if debugging
+    if (result.fromCache) {
+      console.log('QR Generator: Using cached QR code');
+    } else {
+      console.log('QR Generator: Generated new QR code');
+    }
     
     // Check for warnings
     if (!profile.isComplete) {
       warnings.push('Profile is incomplete - QR code contains limited information');
     }
     
-    if (!emergencyData.emergencyContact) {
+    if (!result.emergencyData.emergencyContact) {
       warnings.push('No emergency contact available - consider adding one');
     }
     
-    if (!emergencyData.bloodType) {
+    if (!result.emergencyData.bloodType) {
       warnings.push('Blood type not specified - important for emergency care');
     }
     
-    if (emergencyData.allergies.length === 0) {
+    if (result.emergencyData.allergies.length === 0) {
       warnings.push('No allergies listed - verify if this is accurate');
     }
     
     return {
-      qrData,
-      emergencyData,
-      isOptimized: qrData.length <= QRService['MAX_QR_LENGTH'],
+      qrData: result.qrData,
+      emergencyData: result.emergencyData,
+      isOptimized: result.qrData.length <= QRService['MAX_QR_LENGTH'],
       warnings
     };
   }

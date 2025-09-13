@@ -287,12 +287,6 @@ const EmergencyInfoScreen: React.FC = () => {
                 </Text>
               </View>
             )}
-            {emergencyData.profileId && (
-              <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Profile ID:</Text>
-                <Text style={styles.infoValue}>{emergencyData.profileId}</Text>
-              </View>
-            )}
           </View>
         </View>
 

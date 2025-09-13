@@ -73,7 +73,7 @@ export const QRDisplay: React.FC<QRDisplayProps> = ({
   /**
    * Generate QR code for display
    */
-  const generateQRCode = async () => {
+  const generateQRCode = async (forceRefresh: boolean = false) => {
     if (!profile) {
       onError?.('No profile data available');
       return;
@@ -87,7 +87,7 @@ export const QRDisplay: React.FC<QRDisplayProps> = ({
         emergencyOnly: emergencyMode,
         includeProfileId: !emergencyMode,
         compressData: false // Don't compress for better readability
-      });
+      }, forceRefresh);
 
       setQrData(result.qrData);
       setEmergencyData(result.emergencyData);
@@ -95,7 +95,8 @@ export const QRDisplay: React.FC<QRDisplayProps> = ({
       console.log('QR Display generated:', {
         dataLength: result.qrData.length,
         emergencyMode,
-        warnings: result.warnings.length
+        warnings: result.warnings.length,
+        forceRefresh
       });
 
     } catch (error) {
@@ -362,7 +363,7 @@ export const QRDisplay: React.FC<QRDisplayProps> = ({
 
         <TouchableOpacity 
           style={styles.controlButton} 
-          onPress={generateQRCode}
+          onPress={() => generateQRCode(true)}
           disabled={isGenerating}
         >
           <Ionicons name="refresh" size={24} color="#007AFF" />
