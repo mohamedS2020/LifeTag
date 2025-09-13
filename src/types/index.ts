@@ -74,10 +74,10 @@ export interface MedicalInfo {
   height?: string; // e.g., "5'10\"" or "178 cm"
   weight?: string; // e.g., "150 lbs" or "68 kg"
   
-  // Medical Conditions and History
-  allergies: MedicalCondition[];
-  medications: Medication[];
-  medicalConditions: MedicalCondition[];
+  // Medical Conditions and History (simple arrays for basic profile)
+  allergies: string[];
+  medications: string[];
+  medicalConditions: string[];
   surgeries: Surgery[];
   
   // Emergency Medical Information

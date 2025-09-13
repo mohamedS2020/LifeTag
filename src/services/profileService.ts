@@ -106,6 +106,11 @@ class ProfileServiceImpl implements ProfileService {
    */
   async createProfile(userId: string, profileData: Partial<UserProfile>): Promise<ApiResponse<UserProfile>> {
     try {
+      console.log('🏭 ProfileService: createProfile called');
+      console.log('📋 ProfileService: Received profileData:', JSON.stringify(profileData, null, 2));
+      console.log('🔍 ProfileService: personalInfo keys:', Object.keys(profileData.personalInfo || {}));
+      console.log('🔍 ProfileService: personalInfo displayName:', (profileData.personalInfo as any)?.displayName);
+
       // Check if profile already exists
       const existingProfileResponse = await this.getProfile(userId);
       if (existingProfileResponse.success && existingProfileResponse.data) {
@@ -138,14 +143,31 @@ class ProfileServiceImpl implements ProfileService {
 
       // Create profile with default values
       const now = new Date();
+      
+      // Create clean personalInfo with displayName
+      const dateOfBirth = sanitizedData.personalInfo?.dateOfBirth;
+      console.log('🗓️ ProfileService: Processing dateOfBirth:', dateOfBirth, 'Type:', typeof dateOfBirth, 'instanceof Date:', dateOfBirth instanceof Date);
+      
+      const personalInfo: PersonalInfo = {
+        firstName: sanitizedData.personalInfo?.firstName || '',
+        lastName: sanitizedData.personalInfo?.lastName || '',
+        displayName: `${sanitizedData.personalInfo?.firstName || ''} ${sanitizedData.personalInfo?.lastName || ''}`.trim(),
+        dateOfBirth: (dateOfBirth instanceof Date) ? dateOfBirth : new Date(),
+        ...(sanitizedData.personalInfo?.gender && { gender: sanitizedData.personalInfo.gender }),
+        ...(sanitizedData.personalInfo?.phoneNumber && { phoneNumber: sanitizedData.personalInfo.phoneNumber }),
+        ...(sanitizedData.personalInfo?.address && { address: sanitizedData.personalInfo.address }),
+        ...(sanitizedData.personalInfo?.profilePicture && { profilePicture: sanitizedData.personalInfo.profilePicture })
+      };
+
+      console.log('✨ ProfileService: Created personalInfo:', JSON.stringify(personalInfo, null, 2));
+      console.log('🔍 ProfileService: personalInfo keys:', Object.keys(personalInfo));
+      console.log('🔍 ProfileService: displayName value:', personalInfo.displayName);
+      console.log('🗓️ ProfileService: Final dateOfBirth before profile creation:', personalInfo.dateOfBirth, 'Type:', typeof personalInfo.dateOfBirth);
+
       const profile: UserProfile = {
         id: userId,
         userId,
-        personalInfo: sanitizedData.personalInfo || {
-          firstName: '',
-          lastName: '',
-          dateOfBirth: new Date()
-        },
+        personalInfo,
         medicalInfo: sanitizedData.medicalInfo || {
           allergies: [],
           medications: [],
@@ -189,13 +211,61 @@ class ProfileServiceImpl implements ProfileService {
       const completionStatus = calculateProfileCompletion(profile);
       profile.isComplete = completionStatus.isComplete;
 
+      console.log('💾 ProfileService: About to save profile to Firestore');
+      console.log('📋 ProfileService: Final profile data:', JSON.stringify(profile, null, 2));
+      console.log('🔍 ProfileService: Final personalInfo keys:', Object.keys(profile.personalInfo));
+      console.log('🔍 ProfileService: Final displayName:', profile.personalInfo.displayName);
+
+      // Final cleaning step - remove any undefined values before Firestore save
+      const cleanForFirestore = (obj: any): any => {
+        if (obj === null || obj === undefined) {
+          return obj;
+        }
+        
+        if (Array.isArray(obj)) {
+          return obj.map(cleanForFirestore).filter(item => item !== undefined);
+        }
+        
+        if (typeof obj === 'object') {
+          // Handle Date objects specially - don't try to clean them
+          if (obj instanceof Date) {
+            console.log('📅 ProfileService: Found Date object in cleanForFirestore, returning as-is:', obj);
+            return obj;
+          }
+          
+          const cleaned: any = {};
+          for (const [key, value] of Object.entries(obj)) {
+            if (value !== undefined) {
+              cleaned[key] = cleanForFirestore(value);
+            }
+          }
+          return cleaned;
+        }
+        
+        return obj;
+      };
+
+      const cleanedProfile = cleanForFirestore(profile);
+      console.log('🧹 ProfileService: Cleaned profile for Firestore:', JSON.stringify(cleanedProfile, null, 2));
+      console.log('🔍 ProfileService: Cleaned personalInfo keys:', Object.keys(cleanedProfile.personalInfo));
+      console.log('🗓️ ProfileService: Cleaned dateOfBirth:', cleanedProfile.personalInfo.dateOfBirth, 'Type:', typeof cleanedProfile.personalInfo.dateOfBirth);
+      
       // Save to Firestore
-      await setDoc(doc(db, 'profiles', userId), {
-        ...profile,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-        lastAccessedAt: serverTimestamp()
-      });
+      try {
+        console.log('🔥 ProfileService: Calling setDoc...');
+        await setDoc(doc(db, 'profiles', userId), {
+          ...cleanedProfile,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+          lastAccessedAt: serverTimestamp()
+        });
+        console.log('✅ ProfileService: setDoc completed successfully');
+      } catch (firestoreError: any) {
+        console.error('❌ ProfileService: setDoc failed:', firestoreError);
+        console.error('❌ ProfileService: Error message:', firestoreError.message);
+        console.error('❌ ProfileService: Error code:', firestoreError.code);
+        throw firestoreError; // Re-throw to be caught by outer try-catch
+      }
 
       // Log profile creation
       await this.logProfileAccess(userId, {

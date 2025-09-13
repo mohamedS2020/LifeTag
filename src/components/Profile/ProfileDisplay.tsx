@@ -26,6 +26,53 @@ interface ProfileDisplayProps {
   onError?: (error: string) => void;
 }
 
+// Helper function to safely format dates from Firestore
+const formatFirestoreDate = (date: any): string => {
+  if (!date) return 'Not provided';
+  
+  try {
+    console.log('🗓️ ProfileDisplay: Formatting date:', date, 'Type:', typeof date, 'Keys:', Object.keys(date || {}));
+    
+    // Check if it's an empty object
+    if (typeof date === 'object' && Object.keys(date).length === 0) {
+      console.log('❌ ProfileDisplay: Empty object detected');
+      return 'Date not set';
+    }
+    
+    // If it's already a Date object and valid
+    if (date instanceof Date && !isNaN(date.getTime())) {
+      return date.toLocaleDateString();
+    }
+    
+    // If it's a Firestore timestamp object with seconds
+    if (typeof date === 'object' && 'seconds' in date) {
+      return new Date(date.seconds * 1000).toLocaleDateString();
+    }
+    
+    // If it's a Firestore timestamp with toDate method
+    if (typeof date === 'object' && 'toDate' in date && typeof date.toDate === 'function') {
+      return date.toDate().toLocaleDateString();
+    }
+    
+    // If it's a string, try to parse it
+    if (typeof date === 'string') {
+      const parsed = new Date(date);
+      return !isNaN(parsed.getTime()) ? parsed.toLocaleDateString() : 'Invalid date';
+    }
+    
+    // If it's an object with _seconds property
+    if (typeof date === 'object' && '_seconds' in date) {
+      return new Date(date._seconds * 1000).toLocaleDateString();
+    }
+    
+    console.log('🗓️ ProfileDisplay: Unknown date format:', date, 'Type:', typeof date);
+    return 'Invalid date format';
+  } catch (error) {
+    console.error('❌ ProfileDisplay: Error formatting date:', error);
+    return 'Invalid date';
+  }
+};
+
 /**
  * ProfileDisplay Component
  * Displays user profile information in a read-only format
@@ -282,7 +329,7 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
             <View style={styles.infoRow}>
               <Text style={styles.label}>Date of Birth</Text>
               <Text style={styles.value}>
-                {personalInfo.dateOfBirth.toLocaleDateString()}
+                {formatFirestoreDate(personalInfo.dateOfBirth)}
               </Text>
             </View>
           )}

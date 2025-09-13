@@ -97,8 +97,8 @@ export function validateMedicalInfo(medicalInfo: Partial<MedicalInfo>): Validati
   // Validate allergies array
   if (medicalInfo.allergies) {
     medicalInfo.allergies.forEach((allergy, index) => {
-      if (!allergy.name || allergy.name.trim().length === 0) {
-        errors.push(`Allergy #${index + 1} name is required`);
+      if (!allergy || allergy.trim().length === 0) {
+        errors.push(`Allergy #${index + 1} cannot be empty`);
       }
     });
   }
@@ -106,8 +106,8 @@ export function validateMedicalInfo(medicalInfo: Partial<MedicalInfo>): Validati
   // Validate medications array
   if (medicalInfo.medications) {
     medicalInfo.medications.forEach((medication, index) => {
-      if (!medication.name || medication.name.trim().length === 0) {
-        errors.push(`Medication #${index + 1} name is required`);
+      if (!medication || medication.trim().length === 0) {
+        errors.push(`Medication #${index + 1} cannot be empty`);
       }
     });
   }
@@ -115,8 +115,8 @@ export function validateMedicalInfo(medicalInfo: Partial<MedicalInfo>): Validati
   // Validate medical conditions array
   if (medicalInfo.medicalConditions) {
     medicalInfo.medicalConditions.forEach((condition, index) => {
-      if (!condition.name || condition.name.trim().length === 0) {
-        errors.push(`Medical condition #${index + 1} name is required`);
+      if (!condition || condition.trim().length === 0) {
+        errors.push(`Medical condition #${index + 1} cannot be empty`);
       }
     });
   }
@@ -324,13 +324,25 @@ export function sanitizeProfileData(profile: Partial<UserProfile>): Partial<User
 
   // Sanitize personal info
   if (sanitized.personalInfo) {
-    sanitized.personalInfo = {
-      ...sanitized.personalInfo,
-      firstName: sanitized.personalInfo.firstName?.trim(),
-      lastName: sanitized.personalInfo.lastName?.trim(),
-      displayName: sanitized.personalInfo.displayName?.trim(),
-      phoneNumber: sanitized.personalInfo.phoneNumber?.replace(/\D/g, ''), // Remove non-digits
+    const personalInfo: any = {
+      ...sanitized.personalInfo
     };
+    
+    // Only set fields that exist and are not undefined
+    if (personalInfo.firstName !== undefined) {
+      personalInfo.firstName = personalInfo.firstName?.trim();
+    }
+    if (personalInfo.lastName !== undefined) {
+      personalInfo.lastName = personalInfo.lastName?.trim();
+    }
+    if (personalInfo.displayName !== undefined) {
+      personalInfo.displayName = personalInfo.displayName?.trim();
+    }
+    if (personalInfo.phoneNumber !== undefined) {
+      personalInfo.phoneNumber = personalInfo.phoneNumber?.replace(/\D/g, ''); // Remove non-digits
+    }
+    
+    sanitized.personalInfo = personalInfo;
   }
 
   // Sanitize emergency contacts

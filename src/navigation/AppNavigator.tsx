@@ -12,7 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { LoginScreen, RegisterScreen, MedicalProfessionalRegister } from '../components/Auth';
-import { HomeScreen } from '../screens';
+import { HomeScreen, ProfileFormScreen, ProfileDisplayScreen, QRTabScreen, QRDisplayScreen, QRScannerScreen } from '../screens';
 
 // Create navigators
 const Stack = createStackNavigator();
@@ -86,7 +86,7 @@ const AuthenticatedTabs: React.FC = () => {
       />
       <Tab.Screen 
         name="QR" 
-        component={QRPlaceholderScreen}
+        component={QRTabScreen}
         options={{ 
           tabBarLabel: 'QR Code',
           title: 'QR Scanner'
@@ -101,6 +101,56 @@ const AuthenticatedTabs: React.FC = () => {
         }}
       />
     </Tab.Navigator>
+  );
+};
+
+// Authenticated Stack Navigator (wraps tabs and modal screens)
+const AuthenticatedStack: React.FC = () => {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+        gestureEnabled: true,
+      }}
+    >
+      <Stack.Screen 
+        name="MainTabs" 
+        component={AuthenticatedTabs}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen 
+        name="QRDisplay" 
+        component={QRDisplayScreen}
+        options={{ 
+          headerShown: false,
+          presentation: 'modal'
+        }}
+      />
+      <Stack.Screen 
+        name="QRScanner" 
+        component={QRScannerScreen}
+        options={{ 
+          headerShown: false,
+          presentation: 'modal'
+        }}
+      />
+      <Stack.Screen 
+        name="ProfileForm" 
+        component={ProfileFormScreen}
+        options={{ 
+          headerShown: false,
+          presentation: 'modal'
+        }}
+      />
+      <Stack.Screen 
+        name="ProfileDisplay" 
+        component={ProfileDisplayScreen}
+        options={{ 
+          headerShown: false,
+          presentation: 'modal'
+        }}
+      />
+    </Stack.Navigator>
   );
 };
 
@@ -155,7 +205,7 @@ const AppNavigator: React.FC = () => {
       {loading ? (
         <LoadingScreen />
       ) : user ? (
-        <AuthenticatedTabs />
+        <AuthenticatedStack />
       ) : (
         <AuthStack />
       )}

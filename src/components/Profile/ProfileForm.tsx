@@ -39,6 +39,7 @@ import {
 } from '../../utils/profileValidation';
 import { profileService, passwordService } from '../../services';
 import { LoadingOverlay } from '../common/LoadingOverlay';
+import { DatePicker } from '../common/DatePicker';
 
 // =============================================
 // INTERFACES
@@ -180,12 +181,26 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
   };
 
   const populateForm = (profile: UserProfile) => {
+    console.log('🔄 Populating form with profile data:', JSON.stringify(profile, null, 2));
+    console.log('🔍 Profile personalInfo keys:', Object.keys(profile.personalInfo || {}));
+    
+    if (profile.personalInfo) {
+      Object.entries(profile.personalInfo).forEach(([key, value]) => {
+        console.log(`  📝 ${key}: ${JSON.stringify(value)} (type: ${typeof value})`);
+        if (value === undefined) {
+          console.warn(`  ⚠️  WARNING: ${key} is undefined in profile.personalInfo`);
+        }
+      });
+    }
+    
     setFormState({
       personalInfo: { ...profile.personalInfo },
       medicalInfo: { ...profile.medicalInfo },
       emergencyContacts: [...profile.emergencyContacts],
       privacySettings: { ...profile.privacySettings }
     });
+    
+    console.log('✅ Form populated successfully');
   };
 
   // =============================================
@@ -193,13 +208,30 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
   // =============================================
 
   const updatePersonalInfo = useCallback((field: keyof PersonalInfo, value: any) => {
-    setFormState(prev => ({
-      ...prev,
-      personalInfo: {
+    console.log(`📝 Updating personal info field: ${field}, value:`, value, 'type:', typeof value);
+    
+    setFormState(prev => {
+      const newPersonalInfo = {
         ...prev.personalInfo,
         [field]: value
-      }
-    }));
+      };
+      
+      console.log('📋 Updated personalInfo:', JSON.stringify(newPersonalInfo, null, 2));
+      console.log('🔍 All personalInfo keys after update:', Object.keys(newPersonalInfo));
+      
+      // Check for undefined values
+      Object.entries(newPersonalInfo).forEach(([key, val]) => {
+        if (val === undefined) {
+          console.warn(`⚠️  WARNING: ${key} is undefined in personalInfo`);
+        }
+      });
+      
+      return {
+        ...prev,
+        personalInfo: newPersonalInfo
+      };
+    });
+    
     setErrors(prev => ({ ...prev, [field]: '' }));
   }, []);
 
@@ -365,8 +397,133 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
   // FORM SUBMISSION
   // =============================================
 
+  // Helper function to create clean PersonalInfo object
+  const createCleanPersonalInfo = (personalInfo: Partial<PersonalInfo>): PersonalInfo => {
+    console.log('🧹 Creating clean PersonalInfo from:', JSON.stringify(personalInfo, null, 2));
+    
+    const cleanPersonalInfo: any = {};
+    
+    // Only include fields that have actual values (not undefined)
+    if (personalInfo.firstName !== undefined && personalInfo.firstName !== null) {
+      cleanPersonalInfo.firstName = personalInfo.firstName;
+    }
+    
+    if (personalInfo.lastName !== undefined && personalInfo.lastName !== null) {
+      cleanPersonalInfo.lastName = personalInfo.lastName;
+    }
+    
+    if (personalInfo.dateOfBirth !== undefined && personalInfo.dateOfBirth !== null) {
+      console.log('🗓️ ProfileForm: Processing dateOfBirth:', personalInfo.dateOfBirth, 'Type:', typeof personalInfo.dateOfBirth);
+      // Ensure we have a valid Date object before saving
+      if (personalInfo.dateOfBirth instanceof Date) {
+        cleanPersonalInfo.dateOfBirth = personalInfo.dateOfBirth;
+        console.log('✅ ProfileForm: Valid Date object assigned');
+      } else {
+        console.log('❌ ProfileForm: dateOfBirth is not a Date object, skipping');
+      }
+    } else {
+      console.log('❌ ProfileForm: dateOfBirth is undefined or null');
+    }
+    
+    if (personalInfo.gender !== undefined && personalInfo.gender !== null) {
+      cleanPersonalInfo.gender = personalInfo.gender;
+    }
+    
+    if (personalInfo.phoneNumber !== undefined && personalInfo.phoneNumber !== null && personalInfo.phoneNumber.trim() !== '') {
+      cleanPersonalInfo.phoneNumber = personalInfo.phoneNumber;
+    }
+    
+    if (personalInfo.address !== undefined && personalInfo.address !== null) {
+      cleanPersonalInfo.address = cleanObjectData(personalInfo.address);
+    }
+    
+    if (personalInfo.profilePicture !== undefined && personalInfo.profilePicture !== null && personalInfo.profilePicture.trim() !== '') {
+      cleanPersonalInfo.profilePicture = personalInfo.profilePicture;
+    }
+    
+    // NEVER include displayName unless it has a real value
+    if (personalInfo.displayName !== undefined && personalInfo.displayName !== null && personalInfo.displayName.trim() !== '') {
+      cleanPersonalInfo.displayName = personalInfo.displayName;
+    }
+    
+    console.log('✨ Clean PersonalInfo result:', JSON.stringify(cleanPersonalInfo, null, 2));
+    console.log('🔍 Clean PersonalInfo keys:', Object.keys(cleanPersonalInfo));
+    console.log('🔍 displayName in clean object?', 'displayName' in cleanPersonalInfo);
+    
+    return cleanPersonalInfo as PersonalInfo;
+  };
+  const cleanObjectData = (obj: any): any => {
+    console.log('🔍 Cleaning object data:', JSON.stringify(obj, null, 2));
+    
+    if (obj === null) {
+      console.log('📝 Found null, keeping it');
+      return null;
+    }
+    
+    if (obj === undefined) {
+      console.log('❌ Found undefined, removing it');
+      return undefined;
+    }
+    
+    if (Array.isArray(obj)) {
+      console.log('📋 Processing array with length:', obj.length);
+      const cleanedArray = obj
+        .map(cleanObjectData)
+        .filter(item => item !== undefined);
+      console.log('📋 Cleaned array length:', cleanedArray.length);
+      return cleanedArray;
+    }
+    
+    if (typeof obj === 'object' && obj !== null) {
+      // Handle Date objects specially - don't try to clean them
+      if (obj instanceof Date) {
+        console.log('📅 Found Date object, returning as-is:', obj);
+        return obj;
+      }
+      
+      const cleaned: any = {};
+      console.log('🔧 Processing object with keys:', Object.keys(obj));
+      
+      for (const [key, value] of Object.entries(obj)) {
+        console.log(`  📝 Key: ${key}, Value: ${JSON.stringify(value)}, Type: ${typeof value}`);
+        
+        if (value === undefined) {
+          console.log(`  ❌ Skipping ${key} because it's undefined`);
+          continue;
+        }
+        
+        if (value === null) {
+          console.log(`  📝 Keeping ${key} with null value`);
+          cleaned[key] = null;
+          continue;
+        }
+        
+        // Recursively clean the value
+        const cleanedValue = cleanObjectData(value);
+        
+        // Only add if the cleaned value is not undefined
+        if (cleanedValue !== undefined) {
+          cleaned[key] = cleanedValue;
+          console.log(`  ✅ Added ${key} to cleaned object`);
+        } else {
+          console.log(`  ❌ Skipped ${key} because cleaned value is undefined`);
+        }
+      }
+      
+      console.log('🎯 Cleaned object result:', JSON.stringify(cleaned, null, 2));
+      return cleaned;
+    }
+    
+    console.log('📦 Returning primitive value:', obj, 'Type:', typeof obj);
+    return obj;
+  };
+
   const handleSubmit = async () => {
+    console.log('🚀 Starting profile submission...');
+    console.log('📊 Current form state:', JSON.stringify(formState, null, 2));
+    
     if (!validateFullForm()) {
+      console.log('❌ Form validation failed');
       return;
     }
 
@@ -374,39 +531,83 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
     try {
       // Prepare privacy settings with hashed password if needed
       let privacySettings = { ...formState.privacySettings };
+      console.log('🔐 Privacy settings before password hash:', JSON.stringify(privacySettings, null, 2));
       
       if (privacySettings.requirePasswordForFullAccess && profilePassword) {
         privacySettings.profilePassword = passwordService.hashPassword(profilePassword);
+        console.log('🔑 Password hashed and added to privacy settings');
       }
 
-      const profileData: Partial<UserProfile> = {
+      // Log the raw data before cleaning
+      const rawProfileData = {
         personalInfo: formState.personalInfo as PersonalInfo,
         medicalInfo: formState.medicalInfo as MedicalInfo,
         emergencyContacts: formState.emergencyContacts,
         privacySettings: privacySettings as PrivacySettings
       };
+      
+      console.log('📋 Raw profile data before cleaning:', JSON.stringify(rawProfileData, null, 2));
+      console.log('🔍 PersonalInfo keys:', Object.keys(rawProfileData.personalInfo));
+      console.log('🔍 PersonalInfo displayName value:', rawProfileData.personalInfo.displayName);
+      console.log('🔍 PersonalInfo displayName type:', typeof rawProfileData.personalInfo.displayName);
+
+      // Clean the data to remove undefined values before sending to Firestore
+      console.log('🧹 Starting data cleaning process...');
+      
+      // Use specialized cleaning for personalInfo
+      const cleanPersonalInfo = createCleanPersonalInfo(formState.personalInfo);
+      
+      const profileData: Partial<UserProfile> = {
+        personalInfo: cleanPersonalInfo,
+        medicalInfo: cleanObjectData(formState.medicalInfo as MedicalInfo),
+        emergencyContacts: cleanObjectData(formState.emergencyContacts),
+        privacySettings: cleanObjectData(privacySettings as PrivacySettings)
+      };
+      
+      console.log('✨ Final cleaned profile data:', JSON.stringify(profileData, null, 2));
+      console.log('🔍 Final personalInfo keys:', Object.keys(profileData.personalInfo || {}));
+      console.log('🗓️ Final dateOfBirth being sent to service:', profileData.personalInfo?.dateOfBirth, 'Type:', typeof profileData.personalInfo?.dateOfBirth, 'instanceof Date:', profileData.personalInfo?.dateOfBirth instanceof Date);
+      
+      // Check if displayName still exists after cleaning
+      if (profileData.personalInfo && 'displayName' in profileData.personalInfo) {
+        console.log('⚠️  WARNING: displayName still exists in cleaned data:', profileData.personalInfo.displayName);
+      } else {
+        console.log('✅ displayName successfully removed from cleaned data');
+      }
 
       let response;
       if (mode === 'create') {
+        console.log('🆕 Creating new profile...');
         response = await profileService.createProfile(userId, profileData);
       } else {
+        console.log('📝 Updating existing profile...');
         response = await profileService.updateProfile(userId, profileData);
       }
 
+      console.log('📤 Profile service response:', JSON.stringify(response, null, 2));
+
       if (response.success && response.data) {
+        console.log('✅ Profile saved successfully!');
         onSuccess?.(response.data);
       } else {
         const errorMessage = response.error?.message || 'Failed to save profile';
+        console.error('❌ Profile save failed:', errorMessage);
+        console.error('❌ Full error object:', response.error);
         setErrors({ general: errorMessage });
         onError?.(errorMessage);
       }
     } catch (error: any) {
-      console.error('Profile submission error:', error);
+      console.error('💥 Profile submission error caught:', error);
+      console.error('💥 Error name:', error.name);
+      console.error('💥 Error message:', error.message);
+      console.error('💥 Error stack:', error.stack);
+      
       const errorMessage = 'An unexpected error occurred. Please try again.';
       setErrors({ general: errorMessage });
       onError?.(errorMessage);
     } finally {
       setIsLoading(false);
+      console.log('🏁 Profile submission process completed');
     }
   };
 
@@ -494,20 +695,14 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
       </View>
 
       <View style={styles.inputGroup}>
-        <Text style={styles.label}>Date of Birth *</Text>
-        <TextInput
-          style={[styles.input, errors.dateOfBirth && styles.inputError]}
-          value={formState.personalInfo.dateOfBirth?.toISOString().split('T')[0] || ''}
-          onChangeText={(value) => {
-            if (value) {
-              updatePersonalInfo('dateOfBirth', new Date(value));
-            }
-          }}
-          placeholder="YYYY-MM-DD"
-          keyboardType={Platform.OS === 'ios' ? 'numbers-and-punctuation' : 'numeric'}
+        <DatePicker
+          label="Date of Birth"
+          value={formState.personalInfo.dateOfBirth}
+          onDateChange={(date) => updatePersonalInfo('dateOfBirth', date)}
+          placeholder="Select your date of birth"
+          required={true}
+          error={errors.dateOfBirth}
         />
-        {errors.dateOfBirth && <Text style={styles.errorText}>{errors.dateOfBirth}</Text>}
-        <Text style={styles.helperText}>Format: YYYY-MM-DD (e.g., 1990-05-15)</Text>
       </View>
 
       <View style={styles.inputGroup}>
@@ -600,6 +795,126 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
           onChangeText={(value) => updateMedicalInfo('weight', value)}
           placeholder="e.g., 150 lbs or 68 kg"
         />
+      </View>
+
+      {/* Allergies Section */}
+      <View style={styles.inputGroup}>
+        <Text style={styles.label}>Allergies</Text>
+        <Text style={styles.helperText}>Add any allergies or adverse reactions</Text>
+        
+        {formState.medicalInfo.allergies?.map((allergy, index) => (
+          <View key={index} style={styles.listItem}>
+            <TextInput
+              style={[styles.input, styles.listItemInput]}
+              value={allergy}
+              onChangeText={(value) => {
+                const newAllergies = [...(formState.medicalInfo.allergies || [])];
+                newAllergies[index] = value;
+                updateMedicalInfo('allergies', newAllergies);
+              }}
+              placeholder="e.g., Penicillin, Peanuts, Shellfish"
+            />
+            <TouchableOpacity
+              style={styles.removeButton}
+              onPress={() => {
+                const newAllergies = formState.medicalInfo.allergies?.filter((_, i) => i !== index) || [];
+                updateMedicalInfo('allergies', newAllergies);
+              }}
+            >
+              <Text style={styles.removeButtonText}>×</Text>
+            </TouchableOpacity>
+          </View>
+        ))}
+        
+        <TouchableOpacity
+          style={styles.addItemButton}
+          onPress={() => {
+            const newAllergies = [...(formState.medicalInfo.allergies || []), ''];
+            updateMedicalInfo('allergies', newAllergies);
+          }}
+        >
+          <Text style={styles.addItemButtonText}>+ Add Allergy</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Current Medications Section */}
+      <View style={styles.inputGroup}>
+        <Text style={styles.label}>Current Medications</Text>
+        <Text style={styles.helperText}>List all medications you're currently taking</Text>
+        
+        {formState.medicalInfo.medications?.map((medication, index) => (
+          <View key={index} style={styles.listItem}>
+            <TextInput
+              style={[styles.input, styles.listItemInput]}
+              value={medication}
+              onChangeText={(value) => {
+                const newMedications = [...(formState.medicalInfo.medications || [])];
+                newMedications[index] = value;
+                updateMedicalInfo('medications', newMedications);
+              }}
+              placeholder="e.g., Lisinopril 10mg daily, Aspirin 81mg"
+            />
+            <TouchableOpacity
+              style={styles.removeButton}
+              onPress={() => {
+                const newMedications = formState.medicalInfo.medications?.filter((_, i) => i !== index) || [];
+                updateMedicalInfo('medications', newMedications);
+              }}
+            >
+              <Text style={styles.removeButtonText}>×</Text>
+            </TouchableOpacity>
+          </View>
+        ))}
+        
+        <TouchableOpacity
+          style={styles.addItemButton}
+          onPress={() => {
+            const newMedications = [...(formState.medicalInfo.medications || []), ''];
+            updateMedicalInfo('medications', newMedications);
+          }}
+        >
+          <Text style={styles.addItemButtonText}>+ Add Medication</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Medical Conditions Section */}
+      <View style={styles.inputGroup}>
+        <Text style={styles.label}>Medical Conditions</Text>
+        <Text style={styles.helperText}>List any ongoing medical conditions or diagnoses</Text>
+        
+        {formState.medicalInfo.medicalConditions?.map((condition, index) => (
+          <View key={index} style={styles.listItem}>
+            <TextInput
+              style={[styles.input, styles.listItemInput]}
+              value={condition}
+              onChangeText={(value) => {
+                const newConditions = [...(formState.medicalInfo.medicalConditions || [])];
+                newConditions[index] = value;
+                updateMedicalInfo('medicalConditions', newConditions);
+              }}
+              placeholder="e.g., Diabetes Type 2, Hypertension, Asthma"
+            />
+            <TouchableOpacity
+              style={styles.removeButton}
+              onPress={() => {
+                const newConditions = formState.medicalInfo.medicalConditions?.filter((_, i) => i !== index) || [];
+                updateMedicalInfo('medicalConditions', newConditions);
+              }}
+            >
+              <Text style={styles.removeButtonText}>×</Text>
+            </TouchableOpacity>
+          </View>
+        ))}
+        
+        <TouchableOpacity
+          style={styles.addItemButton}
+          onPress={() => {
+            const newConditions = [...(formState.medicalInfo.medicalConditions || []), ''];
+            updateMedicalInfo('medicalConditions', newConditions);
+          }}
+        >
+          <Text style={styles.addItemButtonText}>+ Add Medical Condition</Text>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.inputGroup}>
@@ -1403,6 +1718,30 @@ const styles = StyleSheet.create({
   },
   passwordStrengthText: {
     fontSize: 12,
+    fontWeight: '600',
+  },
+  listItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  listItemInput: {
+    flex: 1,
+    marginRight: 10,
+  },
+  addItemButton: {
+    backgroundColor: '#f8f9fa',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 8,
+    borderWidth: 1,
+    borderColor: '#007bff',
+    borderStyle: 'dashed',
+  },
+  addItemButtonText: {
+    color: '#007bff',
+    fontSize: 14,
     fontWeight: '600',
   },
 });

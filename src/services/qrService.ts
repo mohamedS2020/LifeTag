@@ -118,14 +118,9 @@ export class QRService {
       parts.push(`NOTE:${note}`);
     }
     
-    // App profile ID (for in-app scanning)
-    if (emergencyData.profileId) {
-      parts.push(`APP:${emergencyData.profileId}`);
-    }
-    
     // Full profile available indicator
     if (emergencyData.hasFullProfile) {
-      parts.push('FULL:1');
+      parts.push('FULL access in LifeTag app');
     }
     
     // Timestamp
@@ -297,7 +292,7 @@ export class QRService {
   /**
    * Extract critical allergies for emergency display
    */
-  private static extractCriticalAllergies(allergies: MedicalCondition[]): string[] {
+  private static extractCriticalAllergies(allergies: string[]): string[] {
     // Critical allergy keywords that should always be included
     const criticalKeywords = [
       'penicillin', 'latex', 'shellfish', 'peanuts', 'tree nuts',
@@ -308,17 +303,17 @@ export class QRService {
     const normalAllergies: string[] = [];
     
     allergies.forEach(allergy => {
-      if (!allergy.isActive) return;
+      if (!allergy || !allergy.trim()) return;
       
-      const allergyName = allergy.name.toLowerCase();
+      const allergyName = allergy.toLowerCase();
       const isCritical = criticalKeywords.some(keyword => 
         allergyName.includes(keyword)
-      ) || allergy.severity === 'critical' || allergy.severity === 'severe';
+      );
       
       if (isCritical) {
-        criticalAllergies.push(allergy.name);
+        criticalAllergies.push(allergy);
       } else {
-        normalAllergies.push(allergy.name);
+        normalAllergies.push(allergy);
       }
     });
     
