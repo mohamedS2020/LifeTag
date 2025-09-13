@@ -10,3 +10,5 @@ export { ProfileDisplayScreen } from './ProfileDisplayScreen';
 export { default as EmergencyInfoScreen } from './EmergencyInfoScreen';
 export { default as VerificationStatusScreen } from './VerificationStatusScreen';
 export { default as ProfileAccessHistoryScreen } from './ProfileAccessHistoryScreen';
+export { default as MedicalProfessionalScreen } from './MedicalProfessionalScreen';
+export { default as AdminScreen } from './AdminScreen';

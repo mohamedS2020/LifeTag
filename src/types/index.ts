@@ -11,7 +11,7 @@ export * from './profileConstants';
 export interface User {
   id: string;
   email: string;
-  userType: 'individual' | 'medical_professional';
+  userType: 'individual' | 'medical_professional' | 'admin';
   isVerified?: boolean;
   profile?: UserProfile; // Link to full profile
   createdAt: Date;

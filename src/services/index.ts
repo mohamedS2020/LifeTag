@@ -17,6 +17,11 @@ export {
   type ProfileAccessLog
 } from './medicalProfessionalAccessService';
 export { 
+  AdminManagementService,
+  type AdminCreationData,
+  type AdminUser
+} from './adminManagementService';
+export { 
   EnhancedProfileValidator,
   MedicalDataValidator,
   EmergencyContactValidator,

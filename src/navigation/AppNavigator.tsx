@@ -12,12 +12,16 @@ import { Ionicons } from '@expo/vector-icons';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { LoginScreen, RegisterScreen, MedicalProfessionalRegister } from '../components/Auth';
-import { HomeScreen, ProfileFormScreen, ProfileDisplayScreen, QRTabScreen, QRDisplayScreen, QRScannerScreen, EmergencyInfoScreen } from '../screens';
+import { HomeScreen, ProfileFormScreen, ProfileDisplayScreen, QRTabScreen, QRDisplayScreen, QRScannerScreen, EmergencyInfoScreen, VerificationStatusScreen, MedicalProfessionalScreen, AdminScreen } from '../screens';
+import { MedicalProfessionalDashboard } from '../components/common';
 import { EmergencyQRData } from '../services/qrService';
 
 // Type definitions for navigation
 export type RootStackParamList = {
   MainTabs: undefined;
+  Login: undefined;
+  Register: undefined;
+  MedicalProfessionalRegister: undefined;
   QRDisplay: undefined;
   QRScanner: undefined;
   ProfileForm: {
@@ -38,9 +42,18 @@ export type RootStackParamList = {
   };
 };
 
+// Tab Navigator Type Definitions
+export type TabParamList = {
+  Home: undefined;
+  QR: undefined;
+  MedPro: undefined; // Medical Professional tab
+  Admin: undefined; // Admin tab
+  Settings: undefined;
+};
+
 // Create navigators
-const Stack = createStackNavigator();
-const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator<RootStackParamList>();
+const Tab = createBottomTabNavigator<TabParamList>();
 
 // Loading Screen Component
 const LoadingScreen: React.FC = () => {
@@ -68,8 +81,12 @@ const PlaceholderScreen = ({ title }: { title: string }) => {
 const QRPlaceholderScreen = () => <PlaceholderScreen title="QR Scanner" />;
 const SettingsPlaceholderScreen = () => <PlaceholderScreen title="Settings" />;
 
-// Authenticated Tab Navigator
+// Authenticated Tab Navigator with conditional medical professional and admin features
 const AuthenticatedTabs: React.FC = () => {
+  const { user } = useAuth();
+  const isVerifiedMedicalProfessional = user?.userType === 'medical_professional' && user?.isVerified;
+  const isAdmin = user?.userType === 'admin';
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -80,6 +97,10 @@ const AuthenticatedTabs: React.FC = () => {
             iconName = focused ? 'home' : 'home-outline';
           } else if (route.name === 'QR') {
             iconName = focused ? 'qr-code' : 'qr-code-outline';
+          } else if (route.name === 'MedPro') {
+            iconName = focused ? 'medical' : 'medical-outline';
+          } else if (route.name === 'Admin') {
+            iconName = focused ? 'shield-checkmark' : 'shield-checkmark-outline';
           } else if (route.name === 'Settings') {
             iconName = focused ? 'settings' : 'settings-outline';
           } else {
@@ -116,6 +137,31 @@ const AuthenticatedTabs: React.FC = () => {
           title: 'QR Scanner'
         }}
       />
+      
+      {/* Medical Professional Tab - Only show for verified medical professionals */}
+      {isVerifiedMedicalProfessional && (
+        <Tab.Screen 
+          name="MedPro" 
+          component={MedicalProfessionalScreen}
+          options={{ 
+            tabBarLabel: 'Medical',
+            title: 'Medical Professional Dashboard'
+          }}
+        />
+      )}
+      
+      {/* Admin Tab - Only show for admin users */}
+      {isAdmin && (
+        <Tab.Screen 
+          name="Admin" 
+          component={AdminScreen}
+          options={{ 
+            tabBarLabel: 'Admin',
+            title: 'Admin Dashboard'
+          }}
+        />
+      )}
+      
       <Tab.Screen 
         name="Settings" 
         component={SettingsPlaceholderScreen}

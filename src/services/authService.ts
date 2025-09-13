@@ -62,7 +62,7 @@ class AuthServiceImpl implements AuthService {
     try {
       // Validate medical professional registration
       if (userType === 'medical_professional') {
-        if (!additionalData?.licenseNumber || !additionalData?.name) {
+        if (!additionalData?.licenseNumber || !additionalData?.fullName) {
           throw new Error('License number and name are required for medical professional registration.');
         }
         
@@ -78,9 +78,9 @@ class AuthServiceImpl implements AuthService {
       const firebaseUser = userCredential.user;
 
       // Update display name if provided
-      if (additionalData?.name) {
+      if (additionalData?.fullName) {
         await updateProfile(firebaseUser, {
-          displayName: additionalData.name
+          displayName: additionalData.fullName
         });
       }
 
@@ -168,41 +168,36 @@ class AuthServiceImpl implements AuthService {
         updatedAt: now
       };
 
-      // Create user document
-      await setDoc(doc(db, 'users', firebaseUser.uid), {
+      // Create user document with all necessary fields
+      const userDoc: any = {
         email: firebaseUser.email,
         userType,
         isVerified: false,
         createdAt: new Date(),
         updatedAt: new Date()
-      });
+      };
 
-      // If medical professional, create medical professional document
+      // Add medical professional specific fields if applicable
       if (userType === 'medical_professional' && additionalData) {
-        const medicalProfessional: Omit<MedicalProfessional, 'id'> = {
-          userId: firebaseUser.uid,
-          personalInfo: {
-            firstName: additionalData.firstName || additionalData.name?.split(' ')[0] || '',
-            lastName: additionalData.lastName || additionalData.name?.split(' ').slice(1).join(' ') || '',
-            email: firebaseUser.email || '',
-            phoneNumber: additionalData.phoneNumber
-          },
-          professionalInfo: {
-            licenseNumber: additionalData.licenseNumber,
-            licenseState: additionalData.licenseState,
-            specialty: additionalData.specialty,
-            hospitalAffiliation: additionalData.hospitalAffiliation
-          },
-          verificationStatus: {
-            isVerified: false,
-            verificationNotes: 'Pending verification'
-          },
-          createdAt: now,
-          updatedAt: now
-        };
-
-        await setDoc(doc(db, 'medical_professionals', firebaseUser.uid), medicalProfessional);
+        userDoc.firstName = additionalData.firstName || additionalData.fullName?.split(' ')[0] || '';
+        userDoc.lastName = additionalData.lastName || additionalData.fullName?.split(' ').slice(1).join(' ') || '';
+        userDoc.licenseNumber = additionalData.licenseNumber;
+        userDoc.specialization = additionalData.specialty;
+        userDoc.institution = additionalData.institution;
+        // Only add phoneNumber if it exists
+        if (additionalData.phoneNumber) {
+          userDoc.phoneNumber = additionalData.phoneNumber;
+        }
+        // Only add other optional fields if they exist
+        if (additionalData.licenseState) {
+          userDoc.licenseState = additionalData.licenseState;
+        }
+        if (additionalData.hospitalAffiliation) {
+          userDoc.hospitalAffiliation = additionalData.hospitalAffiliation;
+        }
       }
+
+      await setDoc(doc(db, 'users', firebaseUser.uid), userDoc);
 
       return userProfile;
     } catch (error: any) {
@@ -217,8 +212,9 @@ class AuthServiceImpl implements AuthService {
   private async checkLicenseNumberExists(licenseNumber: string): Promise<boolean> {
     try {
       const q = query(
-        collection(db, 'medical_professionals'), 
-        where('professionalInfo.licenseNumber', '==', licenseNumber)
+        collection(db, 'users'), 
+        where('userType', '==', 'medical_professional'),
+        where('licenseNumber', '==', licenseNumber)
       );
       const querySnapshot = await getDocs(q);
       return !querySnapshot.empty;
