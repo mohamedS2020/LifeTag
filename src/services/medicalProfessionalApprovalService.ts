@@ -61,8 +61,9 @@ export class MedicalProfessionalApprovalService {
   static async getPendingProfessionals(): Promise<MedicalProfessional[]> {
     try {
       const q = query(
-        collection(db, 'medical_professionals'),
-        where('verificationStatus.isVerified', '==', false),
+        collection(db, 'users'),
+        where('userType', '==', 'medical_professional'),
+        where('isVerified', '==', false),
         orderBy('createdAt', 'desc')
       );
       
@@ -70,10 +71,33 @@ export class MedicalProfessionalApprovalService {
       const professionals: MedicalProfessional[] = [];
       
       querySnapshot.forEach((doc) => {
+        const data = doc.data();
         professionals.push({
           id: doc.id,
-          ...doc.data()
-        } as MedicalProfessional);
+          userId: doc.id, // Using document ID as userId
+          personalInfo: {
+            firstName: data.firstName || '',
+            lastName: data.lastName || '',
+            email: data.email || '',
+            phoneNumber: data.phoneNumber
+          },
+          professionalInfo: {
+            licenseNumber: data.licenseNumber || '',
+            licenseState: data.licenseState,
+            licenseExpiryDate: data.licenseExpiryDate?.toDate(),
+            specialty: data.specialization || data.specialty,
+            hospitalAffiliation: data.institution || data.hospitalAffiliation,
+            yearsOfExperience: data.yearsOfExperience
+          },
+          verificationStatus: {
+            isVerified: data.isVerified || false,
+            verifiedAt: data.verifiedAt?.toDate(),
+            verifiedBy: data.verifiedBy,
+            verificationNotes: data.rejectionReason || data.verificationNotes
+          },
+          createdAt: data.createdAt?.toDate() || new Date(),
+          updatedAt: data.updatedAt?.toDate() || new Date()
+        });
       });
       
       return professionals;
@@ -89,19 +113,43 @@ export class MedicalProfessionalApprovalService {
   static async getVerifiedProfessionals(): Promise<MedicalProfessional[]> {
     try {
       const q = query(
-        collection(db, 'medical_professionals'),
-        where('verificationStatus.isVerified', '==', true),
-        orderBy('verificationStatus.verifiedAt', 'desc')
+        collection(db, 'users'),
+        where('userType', '==', 'medical_professional'),
+        where('isVerified', '==', true),
+        orderBy('createdAt', 'desc')
       );
       
       const querySnapshot = await getDocs(q);
       const professionals: MedicalProfessional[] = [];
       
       querySnapshot.forEach((doc) => {
+        const data = doc.data();
         professionals.push({
           id: doc.id,
-          ...doc.data()
-        } as MedicalProfessional);
+          userId: doc.id, // Using document ID as userId
+          personalInfo: {
+            firstName: data.firstName || '',
+            lastName: data.lastName || '',
+            email: data.email || '',
+            phoneNumber: data.phoneNumber
+          },
+          professionalInfo: {
+            licenseNumber: data.licenseNumber || '',
+            licenseState: data.licenseState,
+            licenseExpiryDate: data.licenseExpiryDate?.toDate(),
+            specialty: data.specialization || data.specialty,
+            hospitalAffiliation: data.institution || data.hospitalAffiliation,
+            yearsOfExperience: data.yearsOfExperience
+          },
+          verificationStatus: {
+            isVerified: data.isVerified || false,
+            verifiedAt: data.verifiedAt?.toDate(),
+            verifiedBy: data.verifiedBy,
+            verificationNotes: data.rejectionReason || data.verificationNotes
+          },
+          createdAt: data.createdAt?.toDate() || new Date(),
+          updatedAt: data.updatedAt?.toDate() || new Date()
+        });
       });
       
       return professionals;
@@ -117,7 +165,8 @@ export class MedicalProfessionalApprovalService {
   static async getAllProfessionals(): Promise<MedicalProfessional[]> {
     try {
       const q = query(
-        collection(db, 'medical_professionals'),
+        collection(db, 'users'),
+        where('userType', '==', 'medical_professional'),
         orderBy('createdAt', 'desc')
       );
       
@@ -125,10 +174,33 @@ export class MedicalProfessionalApprovalService {
       const professionals: MedicalProfessional[] = [];
       
       querySnapshot.forEach((doc) => {
+        const data = doc.data();
         professionals.push({
           id: doc.id,
-          ...doc.data()
-        } as MedicalProfessional);
+          userId: doc.id, // Using document ID as userId
+          personalInfo: {
+            firstName: data.firstName || '',
+            lastName: data.lastName || '',
+            email: data.email || '',
+            phoneNumber: data.phoneNumber
+          },
+          professionalInfo: {
+            licenseNumber: data.licenseNumber || '',
+            licenseState: data.licenseState,
+            licenseExpiryDate: data.licenseExpiryDate?.toDate(),
+            specialty: data.specialization || data.specialty,
+            hospitalAffiliation: data.institution || data.hospitalAffiliation,
+            yearsOfExperience: data.yearsOfExperience
+          },
+          verificationStatus: {
+            isVerified: data.isVerified || false,
+            verifiedAt: data.verifiedAt?.toDate(),
+            verifiedBy: data.verifiedBy,
+            verificationNotes: data.rejectionReason || data.verificationNotes
+          },
+          createdAt: data.createdAt?.toDate() || new Date(),
+          updatedAt: data.updatedAt?.toDate() || new Date()
+        });
       });
       
       return professionals;
@@ -143,17 +215,46 @@ export class MedicalProfessionalApprovalService {
    */
   static async getProfessionalById(professionalId: string): Promise<MedicalProfessional | null> {
     try {
-      const docRef = doc(db, 'medical_professionals', professionalId);
+      const docRef = doc(db, 'users', professionalId);
       const docSnap = await getDoc(docRef);
       
       if (!docSnap.exists()) {
         return null;
       }
 
+      const data = docSnap.data();
+      
+      // Check if this user is a medical professional
+      if (data.userType !== 'medical_professional') {
+        return null;
+      }
+
       return {
         id: docSnap.id,
-        ...docSnap.data()
-      } as MedicalProfessional;
+        userId: docSnap.id,
+        personalInfo: {
+          firstName: data.firstName || '',
+          lastName: data.lastName || '',
+          email: data.email || '',
+          phoneNumber: data.phoneNumber
+        },
+        professionalInfo: {
+          licenseNumber: data.licenseNumber || '',
+          licenseState: data.licenseState,
+          licenseExpiryDate: data.licenseExpiryDate?.toDate(),
+          specialty: data.specialization || data.specialty,
+          hospitalAffiliation: data.institution || data.hospitalAffiliation,
+          yearsOfExperience: data.yearsOfExperience
+        },
+        verificationStatus: {
+          isVerified: data.isVerified || false,
+          verifiedAt: data.verifiedAt?.toDate(),
+          verifiedBy: data.verifiedBy,
+          verificationNotes: data.rejectionReason || data.verificationNotes
+        },
+        createdAt: data.createdAt?.toDate() || new Date(),
+        updatedAt: data.updatedAt?.toDate() || new Date()
+      };
     } catch (error) {
       console.error('Error getting professional by ID:', error);
       throw new Error('Failed to retrieve medical professional');
@@ -171,22 +272,22 @@ export class MedicalProfessionalApprovalService {
   ): Promise<void> {
     try {
       // Get the professional's current data
-      const professionalRef = doc(db, 'medical_professionals', professionalId);
+      const professionalRef = doc(db, 'users', professionalId);
       const professionalSnap = await getDoc(professionalRef);
       
       if (!professionalSnap.exists()) {
         throw new Error('Medical professional not found');
       }
       
-      const professionalData = professionalSnap.data() as MedicalProfessional;
-      const previousStatus = professionalData.verificationStatus.isVerified;
+      const professionalData = professionalSnap.data();
+      const previousStatus = professionalData.isVerified;
 
       // Update professional verification status
       await updateDoc(professionalRef, {
-        'verificationStatus.isVerified': true,
-        'verificationStatus.verifiedAt': serverTimestamp(),
-        'verificationStatus.verifiedBy': adminId,
-        'verificationStatus.verificationNotes': notes || '',
+        isVerified: true,
+        verifiedAt: serverTimestamp(),
+        verifiedBy: adminId,
+        verificationNotes: notes || '',
         updatedAt: serverTimestamp()
       });
 
@@ -205,8 +306,8 @@ export class MedicalProfessionalApprovalService {
       // Create notification
       await this.createApprovalNotification({
         professionalId,
-        professionalEmail: professionalData.personalInfo.email,
-        professionalName: `${professionalData.personalInfo.firstName} ${professionalData.personalInfo.lastName}`,
+        professionalEmail: professionalData.email,
+        professionalName: `${professionalData.firstName} ${professionalData.lastName}`,
         action: 'approve',
         adminId,
         adminName,
@@ -229,8 +330,8 @@ export class MedicalProfessionalApprovalService {
 
       // TODO: Send approval email notification
       await this.sendApprovalEmail(
-        professionalData.personalInfo.email,
-        `${professionalData.personalInfo.firstName} ${professionalData.personalInfo.lastName}`,
+        professionalData.email,
+        `${professionalData.firstName} ${professionalData.lastName}`,
         'approve',
         notes
       );
@@ -253,23 +354,23 @@ export class MedicalProfessionalApprovalService {
   ): Promise<void> {
     try {
       // Get the professional's current data
-      const professionalRef = doc(db, 'medical_professionals', professionalId);
+      const professionalRef = doc(db, 'users', professionalId);
       const professionalSnap = await getDoc(professionalRef);
       
       if (!professionalSnap.exists()) {
         throw new Error('Medical professional not found');
       }
       
-      const professionalData = professionalSnap.data() as MedicalProfessional;
-      const previousStatus = professionalData.verificationStatus.isVerified;
+      const professionalData = professionalSnap.data();
+      const previousStatus = professionalData.isVerified;
 
       // Update professional with rejection status
       await updateDoc(professionalRef, {
-        'verificationStatus.isVerified': false,
-        'verificationStatus.rejectedAt': serverTimestamp(),
-        'verificationStatus.rejectedBy': adminId,
-        'verificationStatus.rejectionReason': rejectionReason,
-        'verificationStatus.verificationNotes': rejectionReason,
+        isVerified: false,
+        rejectedAt: serverTimestamp(),
+        rejectedBy: adminId,
+        rejectionReason: rejectionReason,
+        verificationNotes: rejectionReason,
         updatedAt: serverTimestamp()
       });
 
@@ -288,8 +389,8 @@ export class MedicalProfessionalApprovalService {
       // Create notification
       await this.createApprovalNotification({
         professionalId,
-        professionalEmail: professionalData.personalInfo.email,
-        professionalName: `${professionalData.personalInfo.firstName} ${professionalData.personalInfo.lastName}`,
+        professionalEmail: professionalData.email,
+        professionalName: `${professionalData.firstName} ${professionalData.lastName}`,
         action: 'reject',
         adminId,
         adminName,
@@ -312,8 +413,8 @@ export class MedicalProfessionalApprovalService {
 
       // TODO: Send rejection email notification
       await this.sendApprovalEmail(
-        professionalData.personalInfo.email,
-        `${professionalData.personalInfo.firstName} ${professionalData.personalInfo.lastName}`,
+        professionalData.email,
+        `${professionalData.firstName} ${professionalData.lastName}`,
         'reject',
         rejectionReason
       );
@@ -336,23 +437,23 @@ export class MedicalProfessionalApprovalService {
   ): Promise<void> {
     try {
       // Get the professional's current data
-      const professionalRef = doc(db, 'medical_professionals', professionalId);
+      const professionalRef = doc(db, 'users', professionalId);
       const professionalSnap = await getDoc(professionalRef);
       
       if (!professionalSnap.exists()) {
         throw new Error('Medical professional not found');
       }
       
-      const professionalData = professionalSnap.data() as MedicalProfessional;
-      const previousStatus = professionalData.verificationStatus.isVerified;
+      const professionalData = professionalSnap.data();
+      const previousStatus = professionalData.isVerified;
 
       // Update professional with revocation
       await updateDoc(professionalRef, {
-        'verificationStatus.isVerified': false,
-        'verificationStatus.revokedAt': serverTimestamp(),
-        'verificationStatus.revokedBy': adminId,
-        'verificationStatus.revocationReason': revocationReason,
-        'verificationStatus.verificationNotes': revocationReason,
+        isVerified: false,
+        revokedAt: serverTimestamp(),
+        revokedBy: adminId,
+        revocationReason: revocationReason,
+        verificationNotes: revocationReason,
         updatedAt: serverTimestamp()
       });
 
@@ -371,8 +472,8 @@ export class MedicalProfessionalApprovalService {
       // Create notification
       await this.createApprovalNotification({
         professionalId,
-        professionalEmail: professionalData.personalInfo.email,
-        professionalName: `${professionalData.personalInfo.firstName} ${professionalData.personalInfo.lastName}`,
+        professionalEmail: professionalData.email,
+        professionalName: `${professionalData.firstName} ${professionalData.lastName}`,
         action: 'reject',
         adminId,
         adminName,

@@ -52,8 +52,9 @@ export const useVerificationStatusTracking = () => {
       try {
         // Listen for changes to professional data
         const professionalQuery = query(
-          collection(db, 'medical_professionals'),
-          where('userId', '==', currentUser.id)
+          collection(db, 'users'),
+          where('userType', '==', 'medical_professional'),
+          where('__name__', '==', currentUser.id)
         );
 
         unsubscribeProfessional = onSnapshot(

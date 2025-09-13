@@ -226,7 +226,9 @@ const ProfessionalVerification: React.FC<ProfessionalVerificationProps> = ({
               {professional.professionalInfo.hospitalAffiliation || 'Independent Practice'}
             </Text>
           </View>
-        </View>      <View style={styles.cardDetails}>
+        </View>
+        
+        <View style={styles.cardDetails}>
         <View style={styles.detailRow}>
           <Ionicons name="mail" size={14} color="#666666" />
           <Text style={styles.detailText}>{professional.personalInfo.email}</Text>

@@ -60,22 +60,26 @@ class AuthServiceImpl implements AuthService {
     additionalData?: any
   ): Promise<User> {
     try {
-      // Validate medical professional registration
+      // Create Firebase user first
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const firebaseUser = userCredential.user;
+
+      // Now check for duplicate license number (after authentication)
       if (userType === 'medical_professional') {
         if (!additionalData?.licenseNumber || !additionalData?.fullName) {
+          // Delete the created user if validation fails
+          await firebaseUser.delete();
           throw new Error('License number and name are required for medical professional registration.');
         }
         
-        // Check if license number is already registered
+        // Check if license number is already registered (now we're authenticated)
         const existingProfessional = await this.checkLicenseNumberExists(additionalData.licenseNumber);
         if (existingProfessional) {
+          // Delete the created user if license already exists
+          await firebaseUser.delete();
           throw new Error('This license number is already registered.');
         }
       }
-
-      // Create Firebase user
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const firebaseUser = userCredential.user;
 
       // Update display name if provided
       if (additionalData?.fullName) {

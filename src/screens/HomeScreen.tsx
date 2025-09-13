@@ -170,6 +170,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           <Text style={styles.welcomeSubtitle}>
             {user?.userType === 'medical_professional' && user?.isVerified 
               ? 'Verified Medical Professional' 
+              : user?.userType === 'medical_professional' && !user?.isVerified
+              ? 'Medical Professional - Awaiting Verification'
               : 'Emergency Medical Information System'}
           </Text>
         </View>
@@ -179,6 +181,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         <View style={styles.verifiedBadge}>
           <Ionicons name="checkmark-circle" size={16} color="#4CAF50" />
           <Text style={styles.verifiedText}>Verified Professional</Text>
+        </View>
+      )}
+      
+      {user?.userType === 'medical_professional' && !user?.isVerified && (
+        <View style={styles.unverifiedBadge}>
+          <Ionicons name="time-outline" size={16} color="#FF9800" />
+          <Text style={styles.unverifiedText}>Pending Verification</Text>
         </View>
       )}
     </View>
@@ -415,6 +424,21 @@ const styles = StyleSheet.create({
     marginLeft: 6,
     fontSize: 12,
     color: '#4CAF50',
+    fontWeight: '600',
+  },
+  unverifiedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 12,
+    padding: 8,
+    backgroundColor: '#FFF3E0',
+    borderRadius: 6,
+    alignSelf: 'flex-start',
+  },
+  unverifiedText: {
+    marginLeft: 6,
+    fontSize: 12,
+    color: '#FF9800',
     fontWeight: '600',
   },
   
