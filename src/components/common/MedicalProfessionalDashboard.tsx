@@ -16,7 +16,7 @@ import { UserProfile, MedicalProfessional } from '../../types';
 import { profileService, MedicalProfessionalAccessService } from '../../services';
 import { LoadingOverlay } from './LoadingOverlay';
 import VerifiedBadge from './VerifiedBadge';
-import MedicalProfessionalList from './MedicalProfessionalList';
+import PatientProfileList from './PatientProfileList';
 import { ProfileDisplay } from '../Profile';
 import { QRScanner } from '../QR';
 import { useMedicalProfessionalAccess } from '../../hooks';
@@ -288,12 +288,12 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
    */
   const renderProfilesTab = () => (
     <View style={styles.tabContent}>
-      <MedicalProfessionalList
-        showOnlyVerified={true}
+      <PatientProfileList
         compactView={true}
-        onProfessionalPress={(professional) => {
-          // Navigate to professional profile or show details
-          console.log('Selected professional:', professional);
+        onProfilePress={(profile) => {
+          // Navigate to patient profile
+          setScannedProfile(profile);
+          setShowProfileModal(true);
         }}
       />
     </View>
@@ -342,25 +342,11 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
       {renderTabNavigation()}
 
       {/* Tab Content */}
-      <ScrollView
-        style={styles.content}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={() => {
-              setRefreshing(true);
-              // Refresh data
-              setTimeout(() => setRefreshing(false), 1000);
-            }}
-            colors={['#FF6B6B']}
-            tintColor="#FF6B6B"
-          />
-        }
-      >
+      <View style={styles.content}>
         {activeTab === 'scanner' && renderScannerTab()}
         {activeTab === 'profiles' && renderProfilesTab()}
         {activeTab === 'history' && renderHistoryTab()}
-      </ScrollView>
+      </View>
 
       {/* QR Scanner Modal */}
       <Modal
@@ -487,6 +473,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   tabContent: {
+    flex: 1,
     padding: 20,
   },
   scannerCard: {

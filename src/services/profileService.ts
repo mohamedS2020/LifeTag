@@ -77,6 +77,7 @@ export interface ProfileService {
   // Search and Query
   searchProfiles: (criteria: ProfileSearchCriteria) => Promise<ApiResponse<UserProfile[]>>;
   getProfilesByUserType: (userType: 'individual' | 'medical_professional') => Promise<ApiResponse<UserProfile[]>>;
+  getProfilesWithMedicalAccess: () => Promise<ApiResponse<UserProfile[]>>;
   
   // Audit and Logging
   logProfileAccess: (profileId: string, accessLog: Omit<AuditLog, 'id' | 'timestamp'>) => Promise<ApiResponse<void>>;
@@ -980,6 +981,61 @@ class ProfileServiceImpl implements ProfileService {
         error: {
           code: 'DATABASE_ERROR',
           message: 'Failed to get profiles by user type',
+          details: error
+        },
+        timestamp: new Date()
+      };
+    }
+  }
+
+  /**
+   * Get profiles that have medical professional access enabled
+   */
+  async getProfilesWithMedicalAccess(): Promise<ApiResponse<UserProfile[]>> {
+    try {
+      // First get users of individual type (patients)
+      const usersQuery = query(
+        collection(db, 'users'),
+        where('userType', '==', 'individual')
+      );
+
+      const usersSnapshot = await getDocs(usersQuery);
+      const userIds = usersSnapshot.docs.map(doc => doc.id);
+
+      if (userIds.length === 0) {
+        return {
+          success: true,
+          data: [],
+          timestamp: new Date()
+        };
+      }
+
+      // Get profiles for these users and filter for medical access
+      const profiles: UserProfile[] = [];
+      for (const userId of userIds) {
+        const profileResponse = await this.getProfile(userId);
+        if (profileResponse.success && profileResponse.data) {
+          const profile = profileResponse.data;
+          // Check if medical professional access is enabled
+          if (profile.privacySettings?.allowMedicalProfessionalAccess === true) {
+            profiles.push(profile);
+          }
+        }
+      }
+
+      return {
+        success: true,
+        data: profiles,
+        timestamp: new Date()
+      };
+
+    } catch (error: any) {
+      console.error('Get profiles with medical access error:', error);
+      return {
+        success: false,
+        error: {
+          code: 'DATABASE_ERROR',
+          message: 'Failed to get profiles with medical access',
           details: error
         },
         timestamp: new Date()
