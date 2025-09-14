@@ -152,7 +152,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         subtitle: 'Verified access scanning',
         icon: 'medical',
         color: '#F44336',
-        onPress: () => navigation.navigate('MedicalProfessionalDashboard'),
+        onPress: () => navigation.navigate('MedPro'),
       });
     }
 
