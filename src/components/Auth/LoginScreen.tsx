@@ -24,7 +24,9 @@ import {
   createLoadingState,
   AuthError
 } from '../../utils';
-import { LoadingOverlay, ErrorDisplay, FieldError, SuccessDisplay } from '../../components/common';
+// Import directly to avoid require cycle via common/index barrel
+import { LoadingOverlay } from '../../components/common/LoadingOverlay';
+import { ErrorDisplay, FieldError, SuccessDisplay } from '../../components/common/ErrorDisplay';
 
 interface LoginScreenProps {
   navigation?: any; // Will be properly typed when navigation is set up
@@ -102,7 +104,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
     return true;
   };
 
-  // Handle login with enhanced security
+  // Handle login with enhanced security and clear wrong-credential UX
   const handleLogin = async (): Promise<void> => {
     // Clear previous errors
     setAuthError(null);
@@ -163,8 +165,24 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
       }, 1000);
       
     } catch (error: any) {
-      const parsedError = handleAuthError(error, 'Login');
-      setAuthError(parsedError);
+  const parsedError = handleAuthError(error, 'Login');
+  // Enhance UX for wrong credentials by attaching field-level errors
+  // We rely on error.code propagated from authService (Firebase codes like
+  // auth/wrong-password, auth/user-not-found, auth/invalid-credential)
+      const code = error?.code || parsedError.code;
+      if (code === 'auth/wrong-password' || code === 'auth/invalid-credential') {
+        setPasswordError('Incorrect password. Please try again.');
+      }
+      if (code === 'auth/user-not-found') {
+        setEmailError('No account found with this email.');
+      }
+      setAuthError({
+        ...parsedError,
+        userMessage:
+          code === 'auth/wrong-password' || code === 'auth/invalid-credential'
+            ? 'Wrong email or password. Please try again.'
+            : parsedError.userMessage,
+      });
     } finally {
       setIsSubmitting(false);
     }

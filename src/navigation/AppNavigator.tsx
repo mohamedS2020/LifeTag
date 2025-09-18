@@ -275,11 +275,11 @@ const AuthStack: React.FC = () => {
 
 // Main App Navigator Component
 const AppNavigator: React.FC = () => {
-  const { user, loading } = useAuth();
+  const { user, initializing } = useAuth();
 
   return (
     <NavigationContainer>
-      {loading ? (
+      {initializing ? (
         <LoadingScreen />
       ) : user ? (
         <AuthenticatedStack />

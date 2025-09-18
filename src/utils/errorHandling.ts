@@ -13,6 +13,12 @@ export interface AuthError {
 
 // Firebase Auth Error Codes Mapping
 const FIREBASE_ERROR_MESSAGES: Record<string, AuthError> = {
+  'auth/profile-not-found': {
+    code: 'auth/profile-not-found',
+    message: 'Authenticated but user profile not found',
+    userMessage: 'Your account is missing profile data. Please sign out and try again, or contact support.',
+    severity: 'error'
+  },
   'auth/user-not-found': {
     code: 'auth/user-not-found',
     message: 'No user found with this email address',

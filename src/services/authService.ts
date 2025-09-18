@@ -40,13 +40,19 @@ class AuthServiceImpl implements AuthService {
       const userProfile = await this.getUserProfile(firebaseUser.uid);
       
       if (!userProfile) {
-        throw new Error('User profile not found. Please contact support.');
+        const err: any = new Error('User profile not found. Please contact support.');
+        err.code = 'auth/profile-not-found';
+        throw err;
       }
       
       return userProfile;
     } catch (error: any) {
       console.error('Login error:', error);
-      throw new Error(this.getAuthErrorMessage(error.code));
+  // Preserve the original Firebase error code so the UI can provide precise messaging
+      const code = error?.code || 'auth/unknown-error';
+      const err: any = new Error(this.getAuthErrorMessage(code));
+      err.code = code;
+      throw err;
     }
   }
 
@@ -94,7 +100,10 @@ class AuthServiceImpl implements AuthService {
       return userProfile;
     } catch (error: any) {
       console.error('Registration error:', error);
-      throw new Error(this.getAuthErrorMessage(error.code) || error.message);
+      const code = error?.code || 'auth/unknown-error';
+      const err: any = new Error(this.getAuthErrorMessage(code) || error.message);
+      err.code = code;
+      throw err;
     }
   }
 
@@ -237,6 +246,8 @@ class AuthServiceImpl implements AuthService {
         return 'No account found with this email address.';
       case 'auth/wrong-password':
         return 'Incorrect password. Please try again.';
+      case 'auth/invalid-credential':
+        return 'Invalid email or password. Please try again.';
       case 'auth/email-already-in-use':
         return 'An account with this email already exists.';
       case 'auth/weak-password':
