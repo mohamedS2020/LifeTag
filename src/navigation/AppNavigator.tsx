@@ -9,10 +9,10 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity, Alert } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { LoginScreen, RegisterScreen, MedicalProfessionalRegister } from '../components/Auth';
-import { HomeScreen, ProfileFormScreen, ProfileDisplayScreen, QRTabScreen, QRDisplayScreen, QRScannerScreen, EmergencyInfoScreen, VerificationStatusScreen, MedicalProfessionalScreen, AdminScreen } from '../screens';
+import { HomeScreen, ProfileFormScreen, ProfileDisplayScreen, QRTabScreen, QRDisplayScreen, QRScannerScreen, EmergencyInfoScreen, VerificationStatusScreen, MedicalProfessionalScreen, AdminScreen, SettingsScreen } from '../screens';
 import { MedicalProfessionalDashboard } from '../components/common';
 import { EmergencyQRData } from '../services/qrService';
 
@@ -79,7 +79,6 @@ const PlaceholderScreen = ({ title }: { title: string }) => {
 
 // Separate components to avoid inline function warnings
 const QRPlaceholderScreen = () => <PlaceholderScreen title="QR Scanner" />;
-const SettingsPlaceholderScreen = () => <PlaceholderScreen title="Settings" />;
 
 // Authenticated Tab Navigator with conditional medical professional and admin features
 const AuthenticatedTabs: React.FC = () => {
@@ -164,7 +163,7 @@ const AuthenticatedTabs: React.FC = () => {
       
       <Tab.Screen 
         name="Settings" 
-        component={SettingsPlaceholderScreen}
+        component={SettingsScreen}
         options={{ 
           tabBarLabel: 'Settings',
           title: 'Settings'
@@ -337,6 +336,7 @@ const styles = StyleSheet.create({
     color: '#666',
     textAlign: 'center',
   },
+  // Settings Screen Styles
 });
 
 export default AppNavigator;

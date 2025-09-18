@@ -12,3 +12,4 @@ export { default as VerificationStatusScreen } from './VerificationStatusScreen'
 export { default as ProfileAccessHistoryScreen } from './ProfileAccessHistoryScreen';
 export { default as MedicalProfessionalScreen } from './MedicalProfessionalScreen';
 export { default as AdminScreen } from './AdminScreen';
+export { SettingsScreen } from './SettingsScreen';
