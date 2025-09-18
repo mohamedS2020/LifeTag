@@ -15,6 +15,7 @@ import { LoginScreen, RegisterScreen, MedicalProfessionalRegister } from '../com
 import { HomeScreen, ProfileFormScreen, ProfileDisplayScreen, QRTabScreen, QRDisplayScreen, QRScannerScreen, EmergencyInfoScreen, VerificationStatusScreen, MedicalProfessionalScreen, AdminScreen, SettingsScreen } from '../screens';
 import { MedicalProfessionalDashboard } from '../components/common';
 import { EmergencyQRData } from '../services/qrService';
+import { StatusBar } from 'expo-status-bar';
 
 // Type definitions for navigation
 export type RootStackParamList = {
@@ -216,7 +217,8 @@ const AuthenticatedStack: React.FC = () => {
         component={ProfileDisplayScreen}
         options={{ 
           headerShown: false,
-          presentation: 'modal'
+          presentation: 'modal',
+          gestureEnabled: false
         }}
       />
       <Stack.Screen 
@@ -286,6 +288,7 @@ const AppNavigator: React.FC = () => {
       ) : (
         <AuthStack />
       )}
+      <StatusBar style="auto" />
     </NavigationContainer>
   );
 };

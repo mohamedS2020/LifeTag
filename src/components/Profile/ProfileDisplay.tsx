@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
-  ScrollView,
   StyleSheet,
   TouchableOpacity,
   Alert,
@@ -620,68 +619,7 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
 
   return (
     <View style={styles.container}>
-      <ScrollView
-        style={styles.scrollView}
-        refreshControl={
-          <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />
-        }
-      >
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={styles.headerContent}>
-            <Text style={styles.profileName}>
-              {profile.personalInfo?.firstName && profile.personalInfo?.lastName
-                ? `${profile.personalInfo.firstName} ${profile.personalInfo.lastName}`
-                : 'User Profile'}
-            </Text>
-            <Text style={styles.lastUpdated}>
-              Last updated: {profile.updatedAt?.toLocaleDateString() || 'Unknown'}
-            </Text>
-          </View>
-
-          {showEditButton && onEdit && (
-            <TouchableOpacity style={styles.editButton} onPress={onEdit}>
-              <Ionicons name="create" size={20} color="white" />
-              <Text style={styles.editButtonText}>Edit</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-
-        {/* Medical Professional Access Indicator */}
-        {hasMedicalProfessionalAccess && medicalProfessionalData && (
-          <View style={styles.medicalAccessBanner}>
-            <View style={styles.medicalAccessContent}>
-              <VerifiedProfessionalIndicator 
-                isVerified={true}
-                compact={true}
-              />
-              <View style={styles.medicalAccessText}>
-                <Text style={styles.medicalAccessTitle}>
-                  Medical Professional Access
-                </Text>
-                <Text style={styles.medicalAccessSubtitle}>
-                  Accessed by: {MedicalProfessionalAccessService.formatProfessionalCredentials(medicalProfessionalData)}
-                </Text>
-              </View>
-            </View>
-            <Ionicons name="shield-checkmark" size={20} color="#28A745" />
-          </View>
-        )}
-
-        {/* Content */}
-        {needsPasswordAccess ? (
-          renderPasswordProtectionScreen()
-        ) : (
-          <>
-            {renderPersonalInfo()}
-            {renderMedicalInfo()}
-            {renderEmergencyContacts()}
-            {renderPrivacyStatus()}
-          </>
-        )}
-      </ScrollView>
-
-      {/* Password Modal */}
+      <LoadingOverlay visible={isLoading} />
       <PasswordVerificationModal
         visible={showPasswordModal}
         onVerified={handlePasswordVerified}
@@ -689,17 +627,90 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
         profilePassword={profile.privacySettings?.profilePassword || ''}
         userFirstName={profile.personalInfo?.firstName}
       />
+
+      {/* Header */}
+      <View style={styles.header}>
+        <View style={styles.headerContent}>
+          <Text style={styles.profileName}>
+            {profile.personalInfo?.firstName && profile.personalInfo?.lastName
+              ? `${profile.personalInfo.firstName} ${profile.personalInfo.lastName}`
+              : 'User Profile'}
+          </Text>
+          <Text style={styles.lastUpdated}>
+            Last updated: {profile.updatedAt?.toLocaleDateString() || 'Unknown'}
+          </Text>
+        </View>
+
+        {showEditButton && onEdit && (
+          <TouchableOpacity style={styles.editButton} onPress={onEdit}>
+            <Ionicons name="create" size={20} color="white" />
+            <Text style={styles.editButtonText}>Edit</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+
+      {/* Medical Professional Access Indicator */}
+      {hasMedicalProfessionalAccess && medicalProfessionalData && (
+        <View style={styles.medicalAccessBanner}>
+          <View style={styles.medicalAccessContent}>
+            <VerifiedProfessionalIndicator 
+              isVerified={true}
+              compact={true}
+            />
+            <View style={styles.medicalAccessText}>
+              <Text style={styles.medicalAccessTitle}>
+                Medical Professional Access
+              </Text>
+              <Text style={styles.medicalAccessSubtitle}>
+                Accessed by: {MedicalProfessionalAccessService.formatProfessionalCredentials(medicalProfessionalData)}
+              </Text>
+            </View>
+          </View>
+          <Ionicons name="shield-checkmark" size={20} color="#28A745" />
+        </View>
+      )}
+
+      {/* Content */}
+      {!needsPasswordAccess ? (
+        <>
+          {renderPersonalInfo()}
+          {renderMedicalInfo()}
+          {renderEmergencyContacts()}
+          {renderPrivacyStatus()}
+        </>
+      ) : (
+        renderPasswordProtectionScreen()
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#f9f9f9',
   },
-  scrollView: {
-    flex: 1,
+  accessBanner: {
+    padding: 15,
+    backgroundColor: '#e8f4fd',
+    borderRadius: 8,
+    marginBottom: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderLeftWidth: 4,
+    borderLeftColor: '#4ECDC4',
+  },
+  bannerIcon: {
+    marginRight: 12,
+  },
+  accessTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+  },
+  accessSubtitle: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 4,
   },
   header: {
     backgroundColor: 'white',
