@@ -7,7 +7,8 @@ import {
   TouchableOpacity,
   Alert
 } from 'react-native';
-import AuditLogViewer from '../components/Profile/AuditLogViewer';
+import { Ionicons } from '@expo/vector-icons';
+import { UserAuditLogViewer } from '../components/Profile';
 import { useAuth } from '../context/AuthContext';
 
 interface ProfileAccessHistoryScreenProps {
@@ -22,18 +23,18 @@ export const ProfileAccessHistoryScreen: React.FC<ProfileAccessHistoryScreenProp
   title
 }) => {
   const { user } = useAuth();
-  const finalProfileId = profileId || user?.id;
+  const finalProfileId = profileId || user?.profile?.id || user?.id;
   const screenTitle = title || 'Profile Access History';
 
   const showInfoAlert = () => {
     Alert.alert(
       'About Access Logs',
       'This shows everyone who has accessed your medical profile information, including:\n\n' +
-      '• QR code scans\n' +
-      '• Emergency access\n' +
-      '• Medical professional access\n' +
-      '• Profile modifications\n\n' +
-      'All access is logged for your security and privacy.',
+      '• QR code scans by medical professionals 👨‍⚕️\n' +
+      '• Emergency access situations 🚨\n' +
+      '• Full profile views 👁️\n' +
+      '• Profile modifications ✏️\n\n' +
+      'Medical professionals are marked with a green badge. All access is logged for your security and privacy.',
       [{ text: 'OK' }]
     );
   };
@@ -54,21 +55,21 @@ export const ProfileAccessHistoryScreen: React.FC<ProfileAccessHistoryScreenProp
           style={styles.infoButton}
           onPress={showInfoAlert}
         >
-          <Text style={styles.infoButtonText}>ℹ️</Text>
+          <Ionicons name="information-circle-outline" size={24} color="#007AFF" />
         </TouchableOpacity>
       </View>
 
-      <View style={styles.description}>
-        <Text style={styles.descriptionText}>
-          View all access to your medical profile for transparency and security monitoring.
-        </Text>
-      </View>
-
-      <AuditLogViewer 
-        profileId={finalProfileId}
-        showFilters={true}
-        maxItems={200}
-      />
+      {finalProfileId ? (
+        <UserAuditLogViewer profileId={finalProfileId} />
+      ) : (
+        <View style={styles.errorContainer}>
+          <Ionicons name="warning-outline" size={64} color="#DC3545" />
+          <Text style={styles.errorTitle}>Profile Not Found</Text>
+          <Text style={styles.errorText}>
+            Unable to load profile access history.
+          </Text>
+        </View>
+      )}
     </SafeAreaView>
   );
 };
@@ -120,7 +121,26 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#1976d2',
     textAlign: 'center'
-  }
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 40,
+  },
+  errorTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#DC3545',
+    marginTop: 20,
+    marginBottom: 12,
+  },
+  errorText: {
+    fontSize: 16,
+    color: '#666666',
+    textAlign: 'center',
+    lineHeight: 22,
+  },
 });
 
 export default ProfileAccessHistoryScreen;

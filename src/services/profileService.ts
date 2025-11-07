@@ -91,6 +91,7 @@ export interface ProfileService {
     logsByAccessorType: Record<string, number>;
   }>>;
   getMedicalProfessionalAccessHistory: (medicalProfessionalUserId: string) => Promise<ApiResponse<AuditLog[]>>;
+  getProfileByUserId: (userId: string) => Promise<ApiResponse<UserProfile | null>>;
 }
 
 // =============================================
@@ -1370,6 +1371,62 @@ class ProfileServiceImpl implements ProfileService {
         error: {
           code: 'DATABASE_ERROR',
           message: 'Failed to get medical professional access history',
+          details: error
+        },
+        timestamp: new Date()
+      };
+    }
+  }
+
+  /**
+   * Get user profile by user ID
+   */
+  async getProfileByUserId(userId: string): Promise<ApiResponse<UserProfile | null>> {
+    try {
+      const q = query(
+        collection(db, 'user_profiles'),
+        where('userId', '==', userId),
+        limit(1)
+      );
+
+      const querySnapshot = await getDocs(q);
+      
+      if (querySnapshot.empty) {
+        return {
+          success: true,
+          data: null,
+          timestamp: new Date()
+        };
+      }
+
+      const doc = querySnapshot.docs[0];
+      const data = doc.data();
+      
+      const profile: UserProfile = {
+        ...data,
+        id: doc.id,
+        personalInfo: {
+          ...data.personalInfo,
+          dateOfBirth: data.personalInfo.dateOfBirth?.toDate() || new Date()
+        },
+        createdAt: data.createdAt?.toDate() || new Date(),
+        updatedAt: data.updatedAt?.toDate() || new Date(),
+        lastAccessedAt: data.lastAccessedAt?.toDate()
+      } as UserProfile;
+
+      return {
+        success: true,
+        data: profile,
+        timestamp: new Date()
+      };
+
+    } catch (error: any) {
+      console.error('Get profile by user ID error:', error);
+      return {
+        success: false,
+        error: {
+          code: 'DATABASE_ERROR',
+          message: 'Failed to get profile by user ID',
           details: error
         },
         timestamp: new Date()

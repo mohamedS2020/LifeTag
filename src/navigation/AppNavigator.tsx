@@ -13,7 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity, Alert } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { LoginScreen, RegisterScreen, MedicalProfessionalRegister } from '../components/Auth';
-import { HomeScreen, ProfileFormScreen, ProfileDisplayScreen, QRTabScreen, QRDisplayScreen, QRScannerScreen, EmergencyInfoScreen, VerificationStatusScreen, MedicalProfessionalScreen, AdminScreen, SettingsScreen } from '../screens';
+import { HomeScreen, ProfileFormScreen, ProfileDisplayScreen, QRTabScreen, QRDisplayScreen, QRScannerScreen, EmergencyInfoScreen, VerificationStatusScreen, MedicalProfessionalScreen, AdminScreen, SettingsScreen, ProfileAccessHistoryScreen } from '../screens';
 import { MedicalProfessionalDashboard } from '../components/common';
 import { EmergencyQRData } from '../services/qrService';
 import { StatusBar } from 'expo-status-bar';
@@ -42,6 +42,7 @@ export type RootStackParamList = {
     scannedBy?: string;
     medicalProfessionalAccess?: boolean;
   };
+  ProfileAccessHistory: undefined;
 };
 
 // Tab Navigator Type Definitions
@@ -225,6 +226,14 @@ const AuthenticatedStack: React.FC = () => {
       <Stack.Screen 
         name="EmergencyInfoScreen" 
         component={EmergencyInfoScreen}
+        options={{ 
+          headerShown: false,
+          presentation: 'modal'
+        }}
+      />
+      <Stack.Screen 
+        name="ProfileAccessHistory" 
+        component={ProfileAccessHistoryScreen}
         options={{ 
           headerShown: false,
           presentation: 'modal'

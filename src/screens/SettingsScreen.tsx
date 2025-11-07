@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
+import { useNavigation } from '@react-navigation/native';
 
 /**
  * Settings Screen Component
@@ -17,6 +18,7 @@ import { useAuth } from '../context/AuthContext';
  */
 export const SettingsScreen: React.FC = () => {
   const { logout } = useAuth();
+  const navigation = useNavigation();
 
   /**
    * Handle user sign out
@@ -67,9 +69,20 @@ export const SettingsScreen: React.FC = () => {
           </Text>
         </View>
 
-        {/* Settings Sections Placeholder */}
+        {/* Settings Sections */}
         <View style={styles.settingsSection}>
           <Text style={styles.sectionTitle}>Account & Privacy</Text>
+          
+          {/* Profile Access History - Active */}
+          <TouchableOpacity 
+            style={styles.settingItem}
+            onPress={() => navigation.navigate('ProfileAccessHistory' as never)}
+          >
+            <Ionicons name="eye-outline" size={24} color="#007AFF" />
+            <Text style={styles.settingTextActive}>Profile Access History</Text>
+            <Ionicons name="chevron-forward" size={20} color="#007AFF" />
+          </TouchableOpacity>
+          
           <View style={styles.settingItem}>
             <Ionicons name="person-outline" size={24} color="#666" />
             <Text style={styles.settingText}>Profile Settings</Text>
@@ -197,6 +210,13 @@ const styles = StyleSheet.create({
     color: '#333',
     marginLeft: 12,
     flex: 1,
+  },
+  settingTextActive: {
+    fontSize: 16,
+    color: '#007AFF',
+    marginLeft: 12,
+    flex: 1,
+    fontWeight: '500',
   },
   comingSoonLabel: {
     fontSize: 12,
