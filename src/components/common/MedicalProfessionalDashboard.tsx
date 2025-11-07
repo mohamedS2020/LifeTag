@@ -380,14 +380,20 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
             <View style={{ width: 24 }} />
           </View>
           
-          {scannedProfile && (
-            <ProfileDisplay
-              userId={scannedProfile.userId}
-              profile={scannedProfile}
-              showEditButton={false}
-              showPasswordProtection={false} // Medical professional has privileged access
-            />
-          )}
+          <ScrollView 
+            style={styles.profileModalContent}
+            showsVerticalScrollIndicator={false}
+            bounces={true}
+          >
+            {scannedProfile && (
+              <ProfileDisplay
+                userId={scannedProfile.userId}
+                profile={scannedProfile}
+                showEditButton={false}
+                showPasswordProtection={false} // Medical professional has privileged access
+              />
+            )}
+          </ScrollView>
         </SafeAreaView>
       </Modal>
 
@@ -579,6 +585,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     color: '#333333',
+  },
+  profileModalContent: {
+    flex: 1,
   },
 });
 
