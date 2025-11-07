@@ -140,7 +140,7 @@ export const ProfileDisplayScreen: React.FC = () => {
   };
 
   const renderHeader = () => (
-    <View style={[styles.header, { paddingTop: insets.top + 15 }]}>
+    <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
       <View style={styles.headerContent}>
         <Text style={styles.headerTitle}>
           {isViewingOtherProfile ? 'Patient Profile' : 'My Profile'}
@@ -223,7 +223,7 @@ export const ProfileDisplayScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={[]}>
       {renderHeader()}
       {renderContent()}
     </SafeAreaView>
@@ -241,9 +241,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    backgroundColor: '#2196F3',
+    borderBottomWidth: 0,
   },
   headerContent: {
     flexDirection: 'row',
@@ -253,7 +252,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#fff',
     marginRight: 10,
   },
   verifiedBadge: {

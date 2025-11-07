@@ -103,7 +103,7 @@ const QRDisplayScreen: React.FC<QRDisplayScreenProps> = ({ navigation, route }) 
 
   if (error || !profile) {
     return (
-      <SafeAreaView style={styles.container} edges={['top']}>
+      <SafeAreaView style={styles.container} edges={[]}>
         
         <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
           <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
@@ -139,7 +139,7 @@ const QRDisplayScreen: React.FC<QRDisplayScreenProps> = ({ navigation, route }) 
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={[]}>
       
       <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
         <TouchableOpacity style={styles.closeButton} onPress={handleClose}>

@@ -168,7 +168,7 @@ const ProfileFormScreen: React.FC<ProfileFormScreenProps> = ({ navigation, route
 
   if (error && mode === 'edit') {
     return (
-      <SafeAreaView style={styles.container} edges={['top']}>
+      <SafeAreaView style={styles.container} edges={[]}>
         
         <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
           <TouchableOpacity style={styles.closeButton} onPress={() => navigation.goBack()}>
@@ -204,7 +204,7 @@ const ProfileFormScreen: React.FC<ProfileFormScreenProps> = ({ navigation, route
 
   if (!targetUserId) {
     return (
-      <SafeAreaView style={styles.container} edges={['top']}>
+      <SafeAreaView style={styles.container} edges={[]}>
         <View style={styles.errorContainer}>
           <Ionicons name="person-remove" size={48} color="#F44336" />
           <Text style={styles.errorTitle}>No User Available</Text>
@@ -220,7 +220,7 @@ const ProfileFormScreen: React.FC<ProfileFormScreenProps> = ({ navigation, route
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={[]}>
       
       <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
         <TouchableOpacity style={styles.closeButton} onPress={handleCancel}>

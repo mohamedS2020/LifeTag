@@ -177,9 +177,9 @@ const EmergencyInfoScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={[]}>
       {/* Header */}
-      <View style={[styles.header, { paddingTop: insets.top + 15 }]}>
+      <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
           <Ionicons name="close" size={24} color="white" />
         </TouchableOpacity>

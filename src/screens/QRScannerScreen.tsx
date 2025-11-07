@@ -129,7 +129,7 @@ const QRScannerScreen: React.FC<QRScannerScreenProps> = ({ navigation, route }) 
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={[]}>
       
       <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
         <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
