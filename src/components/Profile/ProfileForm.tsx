@@ -707,7 +707,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
       <View style={styles.inputGroup}>
         <Text style={styles.label}>First Name *</Text>
         <TextInput
-          style={[styles.input, errors.firstName && styles.inputError]}
+          style={[styles.input, errors.firstName ? styles.inputError : undefined]}
           value={formState.personalInfo.firstName || ''}
           onChangeText={(value) => updatePersonalInfo('firstName', value)}
           placeholder="Enter your first name"
@@ -719,7 +719,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
       <View style={styles.inputGroup}>
         <Text style={styles.label}>Last Name *</Text>
         <TextInput
-          style={[styles.input, errors.lastName && styles.inputError]}
+          style={[styles.input, errors.lastName ? styles.inputError : undefined]}
           value={formState.personalInfo.lastName || ''}
           onChangeText={(value) => updatePersonalInfo('lastName', value)}
           placeholder="Enter your last name"
@@ -1020,7 +1020,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Name *</Text>
             <TextInput
-              style={[styles.input, errors[`contact_${index}_name`] && styles.inputError]}
+              style={[styles.input, errors[`contact_${index}_name`] ? styles.inputError : undefined]}
               value={contact.name}
               onChangeText={(value) => updateEmergencyContact(index, 'name', value)}
               placeholder="Contact name"
@@ -1034,7 +1034,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Phone Number *</Text>
             <TextInput
-              style={[styles.input, errors[`contact_${index}_phone`] && styles.inputError]}
+              style={[styles.input, errors[`contact_${index}_phone`] ? styles.inputError : undefined]}
               value={contact.phoneNumber}
               onChangeText={(value) => updateEmergencyContact(index, 'phoneNumber', value)}
               placeholder="Phone number"

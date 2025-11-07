@@ -1,5 +1,7 @@
 import { User, MedicalProfessional, AuditLog } from '../types';
 import { MedicalProfessionalApprovalService } from './medicalProfessionalApprovalService';
+import { db } from '../config/firebase.config';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 /**
  * Medical Professional Access Service
@@ -124,10 +126,6 @@ export class MedicalProfessionalAccessService {
    */
   static async logProfileAccess(accessDetails: ProfileAccessLog): Promise<void> {
     try {
-      // Import Firebase functions dynamically to avoid circular dependencies
-      const { db } = await import('../config/firebase.config');
-      const { collection, addDoc, serverTimestamp } = await import('firebase/firestore');
-
       // Create audit log entry compatible with the AuditLog interface
       const auditLog: Omit<AuditLog, 'id'> = {
         profileId: accessDetails.accessedProfileId,

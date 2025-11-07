@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createStackNavigator, StackScreenProps } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -26,10 +26,14 @@ export type RootStackParamList = {
   Login: undefined;
   Register: undefined;
   MedicalProfessionalRegister: undefined;
-  QRDisplay: undefined;
-  QRScanner: undefined;
+  QRDisplay: {
+    profileId?: string;
+  };
+  QRScanner: {
+    fromScreen?: string;
+  };
   ProfileForm: {
-    mode: 'create' | 'edit';
+    mode?: 'create' | 'edit';
     profileId?: string;
   };
   ProfileDisplay: {
@@ -199,7 +203,7 @@ const AuthenticatedStack: React.FC = () => {
       />
       <Stack.Screen 
         name="QRDisplay" 
-        component={QRDisplayScreen}
+        component={QRDisplayScreen as any}
         options={{ 
           headerShown: false,
           presentation: 'modal'
@@ -207,7 +211,7 @@ const AuthenticatedStack: React.FC = () => {
       />
       <Stack.Screen 
         name="QRScanner" 
-        component={QRScannerScreen}
+        component={QRScannerScreen as any}
         options={{ 
           headerShown: false,
           presentation: 'modal'
@@ -215,7 +219,7 @@ const AuthenticatedStack: React.FC = () => {
       />
       <Stack.Screen 
         name="ProfileForm" 
-        component={ProfileFormScreen}
+        component={ProfileFormScreen as any}
         options={{ 
           headerShown: false,
           presentation: 'modal'
