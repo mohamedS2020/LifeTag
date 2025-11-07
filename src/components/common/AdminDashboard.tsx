@@ -15,6 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { ProfessionalVerification, AuditCleanupAdmin } from '../Admin';
 import { useAuth } from '../../context/AuthContext';
 import { AdminManagementService } from '../../services/adminManagementService';
+import { useNavigation } from '@react-navigation/native';
 
 /**
  * Admin Dashboard Props
@@ -23,6 +24,10 @@ interface AdminDashboardProps {
   onNavigateToProfile?: (profileId: string) => void;
   onError?: (error: string) => void;
 }
+
+type AdminNavigationProp = {
+  navigate: (screen: string, params?: any) => void;
+};
 
 /**
  * Admin Dashboard Component
@@ -38,6 +43,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
   onError,
 }) => {
   const { user } = useAuth();
+  const navigation = useNavigation<AdminNavigationProp>();
   const [activeModal, setActiveModal] = useState<'verification' | 'audit' | 'createAdmin' | null>(null);
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState({
@@ -201,6 +207,23 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <Text style={styles.actionTitle}>Medical Professional Verification</Text>
               <Text style={styles.actionDescription}>
                 Review and approve medical professional registrations
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={24} color="#666" />
+          </TouchableOpacity>
+
+          {/* History - Admin Audit Logs */}
+          <TouchableOpacity
+            style={styles.actionCard}
+            onPress={() => navigation.navigate('AdminAuditLogs')}
+          >
+            <View style={styles.actionIcon}>
+              <Ionicons name="time" size={28} color="#FF9800" />
+            </View>
+            <View style={styles.actionContent}>
+              <Text style={styles.actionTitle}>History</Text>
+              <Text style={styles.actionDescription}>
+                View all system audit logs and activity history
               </Text>
             </View>
             <Ionicons name="chevron-forward" size={24} color="#666" />

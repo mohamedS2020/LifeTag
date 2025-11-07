@@ -3,13 +3,14 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
   Alert
 } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { UserAuditLogViewer } from '../components/Profile';
 import { useAuth } from '../context/AuthContext';
+import { useNavigation } from '@react-navigation/native';
 
 interface ProfileAccessHistoryScreenProps {
   onBack?: () => void;
@@ -23,6 +24,8 @@ export const ProfileAccessHistoryScreen: React.FC<ProfileAccessHistoryScreenProp
   title
 }) => {
   const { user } = useAuth();
+  const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
   const finalProfileId = profileId || user?.profile?.id || user?.id;
   const screenTitle = title || 'Profile Access History';
 
@@ -40,13 +43,13 @@ export const ProfileAccessHistoryScreen: React.FC<ProfileAccessHistoryScreenProp
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
+    <SafeAreaView style={styles.container} edges={[]}>
+      <View style={[styles.header, { paddingTop: insets.top }]}>
         <TouchableOpacity 
           style={styles.backButton}
-          onPress={onBack || (() => console.log('Back pressed'))}
+          onPress={onBack || (() => navigation.goBack())}
         >
-          <Text style={styles.backButtonText}>← Back</Text>
+          <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
         </TouchableOpacity>
         
         <Text style={styles.title}>{screenTitle}</Text>
@@ -55,21 +58,23 @@ export const ProfileAccessHistoryScreen: React.FC<ProfileAccessHistoryScreenProp
           style={styles.infoButton}
           onPress={showInfoAlert}
         >
-          <Ionicons name="information-circle-outline" size={24} color="#007AFF" />
+          <Ionicons name="information-circle-outline" size={24} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
 
-      {finalProfileId ? (
-        <UserAuditLogViewer profileId={finalProfileId} />
-      ) : (
-        <View style={styles.errorContainer}>
-          <Ionicons name="warning-outline" size={64} color="#DC3545" />
-          <Text style={styles.errorTitle}>Profile Not Found</Text>
-          <Text style={styles.errorText}>
-            Unable to load profile access history.
-          </Text>
-        </View>
-      )}
+      <View style={styles.content}>
+        {finalProfileId ? (
+          <UserAuditLogViewer profileId={finalProfileId} />
+        ) : (
+          <View style={styles.errorContainer}>
+            <Ionicons name="warning-outline" size={64} color="#DC3545" />
+            <Text style={styles.errorTitle}>Profile Not Found</Text>
+            <Text style={styles.errorText}>
+              Unable to load profile access history.
+            </Text>
+          </View>
+        )}
+      </View>
     </SafeAreaView>
   );
 };
@@ -79,33 +84,43 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f5f5f5'
   },
+  content: {
+    flex: 1,
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: '#fff',
+    backgroundColor: '#2196F3',
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0'
+    borderBottomColor: '#1976D2'
   },
   backButton: {
-    padding: 5
-  },
-  backButtonText: {
-    fontSize: 16,
-    color: '#2196F3',
-    fontWeight: '600'
+    padding: 5,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   title: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#FFFFFF',
     flex: 1,
     textAlign: 'center'
   },
   infoButton: {
-    padding: 5
+    padding: 5,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   infoButtonText: {
     fontSize: 18

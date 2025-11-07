@@ -92,6 +92,7 @@ export interface ProfileService {
   }>>;
   getMedicalProfessionalAccessHistory: (medicalProfessionalUserId: string) => Promise<ApiResponse<AuditLog[]>>;
   getProfileByUserId: (userId: string) => Promise<ApiResponse<UserProfile | null>>;
+  getAllAuditLogs: (logLimit?: number) => Promise<ApiResponse<AuditLog[]>>;
 }
 
 // =============================================
@@ -1427,6 +1428,50 @@ class ProfileServiceImpl implements ProfileService {
         error: {
           code: 'DATABASE_ERROR',
           message: 'Failed to get profile by user ID',
+          details: error
+        },
+        timestamp: new Date()
+      };
+    }
+  }
+
+  /**
+   * Get all audit logs for admin purposes
+   * Returns all audit logs across all profiles with optional limit
+   */
+  async getAllAuditLogs(logLimit: number = 100): Promise<ApiResponse<AuditLog[]>> {
+    try {
+      const q = query(
+        collection(db, 'audit_logs'),
+        orderBy('timestamp', 'desc'),
+        limit(logLimit)
+      );
+
+      const querySnapshot = await getDocs(q);
+      const logs: AuditLog[] = [];
+
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        logs.push({
+          ...data,
+          id: doc.id,
+          timestamp: data.timestamp?.toDate() || new Date()
+        } as AuditLog);
+      });
+
+      return {
+        success: true,
+        data: logs,
+        timestamp: new Date()
+      };
+
+    } catch (error: any) {
+      console.error('Get all audit logs error:', error);
+      return {
+        success: false,
+        error: {
+          code: 'DATABASE_ERROR',
+          message: 'Failed to get all audit logs',
           details: error
         },
         timestamp: new Date()

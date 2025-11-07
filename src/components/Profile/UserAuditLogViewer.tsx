@@ -258,6 +258,7 @@ const UserAuditLogViewer: React.FC<UserAuditLogViewerProps> = ({ profileId }) =>
             tintColor="#007AFF"
           />
         }
+        contentContainerStyle={styles.listContent}
         style={styles.logsList}
       />
     </View>
@@ -267,7 +268,6 @@ const UserAuditLogViewer: React.FC<UserAuditLogViewerProps> = ({ profileId }) =>
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
     backgroundColor: '#F8F9FA',
   },
   title: {
@@ -275,15 +275,22 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#333333',
     marginBottom: 8,
+    paddingHorizontal: 16,
+    paddingTop: 16,
   },
   subtitle: {
     fontSize: 14,
     color: '#666666',
     marginBottom: 20,
     lineHeight: 20,
+    paddingHorizontal: 16,
   },
   logsList: {
     flex: 1,
+  },
+  listContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 16,
   },
   auditLogItem: {
     backgroundColor: '#FFFFFF',

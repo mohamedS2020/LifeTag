@@ -278,7 +278,7 @@ export interface AuditLog {
   id: string;
   profileId: string;
   accessedBy: string; // User ID or "anonymous"
-  accessorType: 'medical_professional' | 'individual' | 'anonymous' | 'emergency_responder';
+  accessorType: 'medical_professional' | 'individual' | 'anonymous' | 'emergency_responder' | 'admin';
   accessType: 'qr_scan' | 'full_profile' | 'emergency_access' | 'profile_edit';
   accessMethod: 'qr_code' | 'app_interface' | 'api';
   

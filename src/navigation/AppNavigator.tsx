@@ -14,6 +14,8 @@ import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity, Alert } fr
 import { useAuth } from '../context/AuthContext';
 import { LoginScreen, RegisterScreen, MedicalProfessionalRegister } from '../components/Auth';
 import { HomeScreen, ProfileFormScreen, ProfileDisplayScreen, QRTabScreen, QRDisplayScreen, QRScannerScreen, EmergencyInfoScreen, VerificationStatusScreen, MedicalProfessionalScreen, AdminScreen, SettingsScreen, ProfileAccessHistoryScreen } from '../screens';
+import AdminAuditLogsScreen from '../screens/AdminAuditLogsScreen';
+import AdminAuditLogDetailScreen from '../screens/AdminAuditLogDetailScreen';
 import { MedicalProfessionalDashboard } from '../components/common';
 import { EmergencyQRData } from '../services/qrService';
 import { StatusBar } from 'expo-status-bar';
@@ -43,6 +45,11 @@ export type RootStackParamList = {
     medicalProfessionalAccess?: boolean;
   };
   ProfileAccessHistory: undefined;
+  AdminAuditLogs: undefined;
+  AdminAuditLogDetail: {
+    logId: string;
+    logData: any;
+  };
 };
 
 // Tab Navigator Type Definitions
@@ -236,7 +243,26 @@ const AuthenticatedStack: React.FC = () => {
         component={ProfileAccessHistoryScreen}
         options={{ 
           headerShown: false,
-          presentation: 'modal'
+          presentation: 'modal',
+          gestureEnabled: false
+        }}
+      />
+      <Stack.Screen 
+        name="AdminAuditLogs" 
+        component={AdminAuditLogsScreen}
+        options={{ 
+          headerShown: false,
+          presentation: 'modal',
+          gestureEnabled: false
+        }}
+      />
+      <Stack.Screen 
+        name="AdminAuditLogDetail" 
+        component={AdminAuditLogDetailScreen}
+        options={{ 
+          headerShown: false,
+          presentation: 'modal',
+          gestureEnabled: false
         }}
       />
     </Stack.Navigator>

@@ -13,3 +13,5 @@ export { default as ProfileAccessHistoryScreen } from './ProfileAccessHistoryScr
 export { default as MedicalProfessionalScreen } from './MedicalProfessionalScreen';
 export { default as AdminScreen } from './AdminScreen';
 export { SettingsScreen } from './SettingsScreen';
+export { default as AdminAuditLogsScreen } from './AdminAuditLogsScreen';
+export { default as AdminAuditLogDetailScreen } from './AdminAuditLogDetailScreen';
