@@ -211,7 +211,17 @@ export const ProfileDisplayScreen: React.FC = () => {
     }
 
     return (
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        style={styles.content}
+        showsVerticalScrollIndicator={true}
+        scrollEnabled={true}
+        bounces={true}
+        pointerEvents="auto"
+        onScroll={() => console.log('📜 ProfileDisplayScreen: Scrolling...')}
+        scrollEventThrottle={16}
+        onTouchStart={() => console.log('👆 ProfileDisplayScreen: Touch started on ScrollView')}
+        onTouchEnd={() => console.log('👆 ProfileDisplayScreen: Touch ended on ScrollView')}
+      >
         <ProfileDisplay
           userId={profile.id}
           profile={profile}
@@ -225,7 +235,9 @@ export const ProfileDisplayScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container} edges={[]}>
       {renderHeader()}
-      {renderContent()}
+      <View style={styles.contentWrapper}>
+        {renderContent()}
+      </View>
     </SafeAreaView>
   );
 };
@@ -271,6 +283,13 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+  },
+  contentWrapper: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 20,
   },
   errorContainer: {
     margin: 20,

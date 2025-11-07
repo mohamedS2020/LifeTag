@@ -688,6 +688,8 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#f9f9f9',
+    paddingBottom: 20,
+    minHeight: '100%',
   },
   accessBanner: {
     padding: 15,

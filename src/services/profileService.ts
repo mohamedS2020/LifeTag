@@ -324,7 +324,14 @@ class ProfileServiceImpl implements ProfileService {
         id: userId,
         createdAt: profileData.createdAt?.toDate() || new Date(),
         updatedAt: profileData.updatedAt?.toDate() || new Date(),
-        lastAccessedAt: profileData.lastAccessedAt?.toDate() || new Date()
+        lastAccessedAt: profileData.lastAccessedAt?.toDate() || new Date(),
+        // Convert dateOfBirth from Firestore Timestamp to Date
+        personalInfo: profileData.personalInfo ? {
+          ...profileData.personalInfo,
+          dateOfBirth: profileData.personalInfo.dateOfBirth?.toDate ? 
+            profileData.personalInfo.dateOfBirth.toDate() : 
+            profileData.personalInfo.dateOfBirth
+        } : profileData.personalInfo
       } as UserProfile;
 
       // Update last accessed time
