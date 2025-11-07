@@ -296,6 +296,7 @@ export interface AuditLog {
   // Additional Notes
   notes?: string;
   sessionId?: string;
+  patientName?: string; // Name of the patient whose profile was accessed
 }
 
 // Geographic location

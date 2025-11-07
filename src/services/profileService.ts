@@ -90,6 +90,7 @@ export interface ProfileService {
     logsByType: Record<string, number>;
     logsByAccessorType: Record<string, number>;
   }>>;
+  getMedicalProfessionalAccessHistory: (medicalProfessionalUserId: string) => Promise<ApiResponse<AuditLog[]>>;
 }
 
 // =============================================
@@ -1323,6 +1324,52 @@ class ProfileServiceImpl implements ProfileService {
         error: {
           code: 'DATABASE_ERROR',
           message: 'Failed to get audit log statistics',
+          details: error
+        },
+        timestamp: new Date()
+      };
+    }
+  }
+
+  /**
+   * Get access history for a specific medical professional
+   * Returns all audit logs where the specified user ID was the accessor
+   */
+  async getMedicalProfessionalAccessHistory(medicalProfessionalUserId: string): Promise<ApiResponse<AuditLog[]>> {
+    try {
+      const q = query(
+        collection(db, 'audit_logs'),
+        where('accessedBy', '==', medicalProfessionalUserId),
+        where('accessorType', '==', 'medical_professional'),
+        orderBy('timestamp', 'desc'),
+        limit(100) // Limit to last 100 accesses
+      );
+
+      const querySnapshot = await getDocs(q);
+      const logs: AuditLog[] = [];
+
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        logs.push({
+          ...data,
+          id: doc.id,
+          timestamp: data.timestamp?.toDate() || new Date()
+        } as AuditLog);
+      });
+
+      return {
+        success: true,
+        data: logs,
+        timestamp: new Date()
+      };
+
+    } catch (error: any) {
+      console.error('Get medical professional access history error:', error);
+      return {
+        success: false,
+        error: {
+          code: 'DATABASE_ERROR',
+          message: 'Failed to get medical professional access history',
           details: error
         },
         timestamp: new Date()

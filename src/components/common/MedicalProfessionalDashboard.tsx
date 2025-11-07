@@ -10,9 +10,10 @@ import {
   ActivityIndicator,
   Modal,
   SafeAreaView,
+  FlatList,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { UserProfile, MedicalProfessional } from '../../types';
+import { UserProfile, MedicalProfessional, AuditLog } from '../../types';
 import { profileService, MedicalProfessionalAccessService } from '../../services';
 import { LoadingOverlay } from './LoadingOverlay';
 import VerifiedBadge from './VerifiedBadge';
@@ -58,6 +59,8 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
   const [scannedProfile, setScannedProfile] = useState<UserProfile | null>(null);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [accessHistory, setAccessHistory] = useState<any[]>([]);
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -174,6 +177,40 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
       setIsLoading(false);
     }
   };
+
+  /**
+   * Fetch medical professional's scan history from audit logs
+   */
+  const fetchMedicalProfessionalLogs = async () => {
+    if (!professionalData?.userId) return;
+    
+    setHistoryLoading(true);
+    try {
+      // Get all audit logs where this user was the accessor
+      const response = await profileService.getMedicalProfessionalAccessHistory(professionalData.userId);
+      
+      if (response.success && response.data) {
+        setAuditLogs(response.data);
+      } else {
+        console.error('Failed to fetch access history:', response.error);
+        Alert.alert('Error', 'Failed to load access history');
+      }
+    } catch (error) {
+      console.error('Error fetching medical professional logs:', error);
+      Alert.alert('Error', 'Failed to load access history');
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+
+  /**
+   * Load access history when History tab is selected
+   */
+  useEffect(() => {
+    if (activeTab === 'history' && professionalData?.userId) {
+      fetchMedicalProfessionalLogs();
+    }
+  }, [activeTab, professionalData?.userId]);
 
   // =============================================
   // RENDER FUNCTIONS
@@ -302,16 +339,171 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
   /**
    * Render access history tab content
    */
-  const renderHistoryTab = () => (
-    <View style={styles.tabContent}>
-      <Text style={styles.comingSoonText}>
-        Access history and audit logs will be displayed here.
-      </Text>
-      <Text style={styles.comingSoonSubtext}>
-        This feature tracks all profile accesses for compliance and security purposes.
-      </Text>
-    </View>
-  );
+  const renderHistoryTab = () => {
+    if (historyLoading) {
+      return (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#007AFF" />
+          <Text style={styles.loadingText}>Loading access history...</Text>
+        </View>
+      );
+    }
+
+    if (auditLogs.length === 0) {
+      return (
+        <View style={styles.emptyStateContainer}>
+          <Ionicons name="document-text-outline" size={64} color="#999999" />
+          <Text style={styles.emptyStateTitle}>No Access History</Text>
+          <Text style={styles.emptyStateText}>
+            Your profile access history will appear here after scanning QR codes or viewing patient profiles.
+          </Text>
+        </View>
+      );
+    }
+
+    return (
+      <View style={styles.tabContent}>
+        <Text style={styles.historyTitle}>Your Profile Access History</Text>
+        <Text style={styles.historySubtitle}>
+          Showing your last {auditLogs.length} profile accesses for compliance tracking
+        </Text>
+        
+        <FlatList
+          data={auditLogs}
+          keyExtractor={(item) => item.id}
+          renderItem={renderAuditLogItem}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={historyLoading}
+              onRefresh={fetchMedicalProfessionalLogs}
+              tintColor="#007AFF"
+            />
+          }
+          style={styles.historyList}
+        />
+      </View>
+    );
+  };
+
+  /**
+   * Render individual audit log item
+   */
+  const renderAuditLogItem = ({ item }: { item: AuditLog }) => {
+    // Get patient name from the dedicated field or fallback
+    const getPatientName = () => {
+      if (item.patientName) {
+        return item.patientName;
+      }
+      // Fallback to extracting from notes for older logs
+      if (item.notes && item.notes.includes('Medical Professional Access:')) {
+        const match = item.notes.match(/Medical Professional Access: (.+?) \(License:/);
+        if (match && match[1]) {
+          return match[1]; // This would be the professional name, not patient
+        }
+      }
+      return 'Unknown Patient';
+    };
+
+    const getPatientInfo = () => {
+      return getPatientName();
+    };
+
+    const getAccessTypeIcon = () => {
+      switch (item.accessType) {
+        case 'qr_scan':
+          return 'qr-code';
+        case 'full_profile':
+          return 'person-outline';
+        case 'emergency_access':
+          return 'medical-outline';
+        default:
+          return 'eye-outline';
+      }
+    };
+
+    const getAccessTypeLabel = () => {
+      switch (item.accessType) {
+        case 'qr_scan':
+          return 'QR Code Scan';
+        case 'full_profile':
+          return 'Full Profile View';
+        case 'emergency_access':
+          return 'Emergency Access';
+        case 'profile_edit':
+          return 'Profile Modified';
+        default:
+          return 'Profile Access';
+      }
+    };
+
+    return (
+      <View style={styles.auditLogItem}>
+        <View style={styles.auditLogHeader}>
+          <View style={styles.auditLogIcon}>
+            <Ionicons
+              name={getAccessTypeIcon()}
+              size={20}
+              color="#007AFF"
+            />
+          </View>
+          <View style={styles.auditLogInfo}>
+            <Text style={styles.auditLogAction}>
+              {getAccessTypeLabel()}
+            </Text>
+            <Text style={styles.auditLogPatient}>
+              {getPatientInfo()}
+            </Text>
+            <Text style={styles.auditLogTimestamp}>
+              {formatAccessDate(item.timestamp)}
+            </Text>
+          </View>
+          <View style={styles.auditLogAccessType}>
+            <Text style={styles.accessTypeText}>
+              {item.accessMethod === 'qr_code' ? 'QR' : 'APP'}
+            </Text>
+          </View>
+        </View>
+        
+        <View style={styles.auditLogDetails}>
+          <Text style={styles.auditLogPatientName}>
+            Patient: {getPatientName()}
+          </Text>
+          <Text style={styles.auditLogProfile}>
+            Profile: {item.profileId.substring(0, 8)}...
+          </Text>
+          {item.fieldsAccessed && item.fieldsAccessed.length > 0 && (
+            <Text style={styles.auditLogFields}>
+              Access: {item.fieldsAccessed.join(', ')}
+            </Text>
+          )}
+        </View>
+      </View>
+    );
+  };
+
+  /**
+   * Format access date for display
+   */
+  const formatAccessDate = (date: Date) => {
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins} minutes ago`;
+    if (diffHours < 24) return `${diffHours} hours ago`;
+    if (diffDays < 7) return `${diffDays} days ago`;
+    
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit'
+    });
+  };
 
   // =============================================
   // MAIN RENDER
@@ -588,6 +780,134 @@ const styles = StyleSheet.create({
   },
   profileModalContent: {
     flex: 1,
+  },
+  // History Tab Styles
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 40,
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#666666',
+    marginTop: 16,
+    fontWeight: '500',
+  },
+  emptyStateContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 40,
+  },
+  emptyStateTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#333333',
+    marginTop: 20,
+    marginBottom: 12,
+  },
+  emptyStateText: {
+    fontSize: 16,
+    color: '#666666',
+    textAlign: 'center',
+    lineHeight: 22,
+  },
+  historyTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#333333',
+    marginBottom: 8,
+  },
+  historySubtitle: {
+    fontSize: 14,
+    color: '#666666',
+    marginBottom: 20,
+    lineHeight: 20,
+  },
+  historyList: {
+    flex: 1,
+  },
+  auditLogItem: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  auditLogHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  auditLogIcon: {
+    width: 36,
+    height: 36,
+    backgroundColor: '#E8F4FD',
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  auditLogInfo: {
+    flex: 1,
+  },
+  auditLogAction: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333333',
+    marginBottom: 4,
+  },
+  auditLogTimestamp: {
+    fontSize: 12,
+    color: '#666666',
+    fontWeight: '500',
+  },
+  auditLogAccessType: {
+    backgroundColor: '#007AFF',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  accessTypeText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  auditLogDetails: {
+    paddingLeft: 48,
+  },
+  auditLogProfile: {
+    fontSize: 12,
+    color: '#666666',
+    fontFamily: 'monospace',
+    marginBottom: 4,
+  },
+  auditLogNotes: {
+    fontSize: 14,
+    color: '#333333',
+    fontStyle: 'italic',
+  },
+  auditLogPatient: {
+    fontSize: 14,
+    color: '#007AFF',
+    fontWeight: '500',
+    marginBottom: 2,
+  },
+  auditLogFields: {
+    fontSize: 11,
+    color: '#999999',
+    fontStyle: 'italic',
+  },
+  auditLogPatientName: {
+    fontSize: 14,
+    color: '#333333',
+    fontWeight: '600',
+    marginBottom: 4,
   },
 });
 

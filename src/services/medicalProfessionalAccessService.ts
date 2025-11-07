@@ -1,4 +1,4 @@
-import { User, MedicalProfessional } from '../types';
+import { User, MedicalProfessional, AuditLog } from '../types';
 import { MedicalProfessionalApprovalService } from './medicalProfessionalApprovalService';
 
 /**
@@ -124,26 +124,34 @@ export class MedicalProfessionalAccessService {
    */
   static async logProfileAccess(accessDetails: ProfileAccessLog): Promise<void> {
     try {
-      // TODO: Implement audit logging to Firestore
-      // This would store access logs for compliance and security
-      console.log('Medical Professional Profile Access:', {
-        timestamp: new Date().toISOString(),
-        professionalId: accessDetails.professionalId,
-        professionalName: accessDetails.professionalName,
-        professionalLicense: accessDetails.professionalLicense,
-        accessedProfileId: accessDetails.accessedProfileId,
-        accessedProfileName: accessDetails.accessedProfileName,
-        accessType: accessDetails.accessType,
-        reason: accessDetails.reason
+      // Import Firebase functions dynamically to avoid circular dependencies
+      const { db } = await import('../config/firebase.config');
+      const { collection, addDoc, serverTimestamp } = await import('firebase/firestore');
+
+      // Create audit log entry compatible with the AuditLog interface
+      const auditLog: Omit<AuditLog, 'id'> = {
+        profileId: accessDetails.accessedProfileId,
+        accessedBy: accessDetails.professionalUserId,
+        accessorType: 'medical_professional',
+        accessType: accessDetails.accessType === 'qr_scan_access' ? 'qr_scan' : 'full_profile',
+        accessMethod: accessDetails.accessType === 'qr_scan_access' ? 'qr_code' : 'app_interface',
+        timestamp: accessDetails.timestamp,
+        patientName: accessDetails.accessedProfileName, // Store patient name in dedicated field
+        notes: `Medical Professional Access: ${accessDetails.professionalName} (License: ${accessDetails.professionalLicense}) - ${accessDetails.reason}`,
+        fieldsAccessed: ['full_profile'], // Medical professionals get full access
+        dataModified: false
+      };
+
+      // Save to Firestore audit_logs collection
+      await addDoc(collection(db, 'audit_logs'), {
+        ...auditLog,
+        timestamp: serverTimestamp() // Use server timestamp for consistency
       });
 
-      // In a real implementation, this would save to Firestore:
-      // await addDoc(collection(db, 'profile_access_logs'), {
-      //   ...accessDetails,
-      //   timestamp: serverTimestamp()
-      // });
+
+
     } catch (error) {
-      console.error('Error logging profile access:', error);
+      console.error('Error logging medical professional profile access:', error);
       // Don't throw error - logging failure shouldn't break access
     }
   }
