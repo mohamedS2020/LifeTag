@@ -221,14 +221,9 @@ export const ProfileDisplayScreen: React.FC = () => {
     return (
       <ScrollView 
         style={styles.content}
-        showsVerticalScrollIndicator={true}
+        showsVerticalScrollIndicator={false}
         scrollEnabled={true}
         bounces={true}
-        pointerEvents="auto"
-        onScroll={() => console.log('📜 ProfileDisplayScreen: Scrolling...')}
-        scrollEventThrottle={16}
-        onTouchStart={() => console.log('👆 ProfileDisplayScreen: Touch started on ScrollView')}
-        onTouchEnd={() => console.log('👆 ProfileDisplayScreen: Touch ended on ScrollView')}
       >
         <ProfileDisplay
           userId={profile.id}

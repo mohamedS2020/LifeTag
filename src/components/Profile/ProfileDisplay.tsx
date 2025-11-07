@@ -30,17 +30,14 @@ const formatFirestoreDate = (date: any): string => {
   if (!date) return 'Not provided';
   
   try {
-    console.log('🗓️ ProfileDisplay: Formatting date:', date, 'Type:', typeof date, 'Keys:', Object.keys(date || {}));
-    
-    // Check if it's an empty object
-    if (typeof date === 'object' && Object.keys(date).length === 0) {
-      console.log('❌ ProfileDisplay: Empty object detected');
-      return 'Date not set';
-    }
-    
-    // If it's already a Date object and valid
+    // If it's already a Date object and valid - CHECK THIS FIRST!
     if (date instanceof Date && !isNaN(date.getTime())) {
       return date.toLocaleDateString();
+    }
+    
+    // Check if it's an empty object (after checking for Date)
+    if (typeof date === 'object' && Object.keys(date).length === 0) {
+      return 'Date not set';
     }
     
     // If it's a Firestore timestamp object with seconds
@@ -64,10 +61,8 @@ const formatFirestoreDate = (date: any): string => {
       return new Date(date._seconds * 1000).toLocaleDateString();
     }
     
-    console.log('🗓️ ProfileDisplay: Unknown date format:', date, 'Type:', typeof date);
     return 'Invalid date format';
   } catch (error) {
-    console.error('❌ ProfileDisplay: Error formatting date:', error);
     return 'Invalid date';
   }
 };

@@ -185,32 +185,12 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
   };
 
   const populateForm = (profile: UserProfile) => {
-    console.log('🔄 Populating form with profile data:', JSON.stringify(profile, null, 2));
-    console.log('🔍 Profile personalInfo keys:', Object.keys(profile.personalInfo || {}));
-    
-    if (profile.personalInfo) {
-      Object.entries(profile.personalInfo).forEach(([key, value]) => {
-        console.log(`  📝 ${key}: ${JSON.stringify(value)} (type: ${typeof value})`);
-        if (key === 'dateOfBirth') {
-          console.log(`  🗓️ DATEOFBIRTH DETAILS:`, value);
-          console.log(`  🗓️ Is Date?`, value instanceof Date);
-          console.log(`  🗓️ Has toDate?`, value && typeof value === 'object' && 'toDate' in value);
-          console.log(`  🗓️ Has seconds?`, value && typeof value === 'object' && 'seconds' in value);
-        }
-        if (value === undefined) {
-          console.warn(`  ⚠️  WARNING: ${key} is undefined in profile.personalInfo`);
-        }
-      });
-    }
-    
     setFormState({
       personalInfo: { ...profile.personalInfo },
       medicalInfo: { ...profile.medicalInfo },
       emergencyContacts: [...profile.emergencyContacts],
       privacySettings: { ...profile.privacySettings }
     });
-    
-    console.log('✅ Form populated successfully');
   };
 
   // =============================================
@@ -218,23 +198,11 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
   // =============================================
 
   const updatePersonalInfo = useCallback((field: keyof PersonalInfo, value: any) => {
-    console.log(`📝 Updating personal info field: ${field}, value:`, value, 'type:', typeof value);
-    
     setFormState(prev => {
       const newPersonalInfo = {
         ...prev.personalInfo,
         [field]: value
       };
-      
-      console.log('📋 Updated personalInfo:', JSON.stringify(newPersonalInfo, null, 2));
-      console.log('🔍 All personalInfo keys after update:', Object.keys(newPersonalInfo));
-      
-      // Check for undefined values
-      Object.entries(newPersonalInfo).forEach(([key, val]) => {
-        if (val === undefined) {
-          console.warn(`⚠️  WARNING: ${key} is undefined in personalInfo`);
-        }
-      });
       
       return {
         ...prev,
@@ -416,7 +384,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
 
   // Helper function to create clean PersonalInfo object
   const createCleanPersonalInfo = (personalInfo: Partial<PersonalInfo>): PersonalInfo => {
-    console.log('🧹 Creating clean PersonalInfo from:', JSON.stringify(personalInfo, null, 2));
+
     
     const cleanPersonalInfo: any = {};
     
@@ -430,53 +398,39 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
     }
     
     if (personalInfo.dateOfBirth !== undefined && personalInfo.dateOfBirth !== null) {
-      console.log('🗓️ ProfileForm: Processing dateOfBirth:', personalInfo.dateOfBirth, 'Type:', typeof personalInfo.dateOfBirth);
-      
       let dateToSave = null;
       
       // Handle different date formats (similar to DatePicker's getValidDate function)
       if (personalInfo.dateOfBirth instanceof Date) {
         dateToSave = personalInfo.dateOfBirth;
-        console.log('✅ ProfileForm: Valid Date object');
       } else if (typeof personalInfo.dateOfBirth === 'object' && personalInfo.dateOfBirth !== null) {
         try {
           const dateObj = personalInfo.dateOfBirth as any;
           // Handle Firestore Timestamp objects
           if ('seconds' in dateObj) {
             dateToSave = new Date(dateObj.seconds * 1000);
-            console.log('✅ ProfileForm: Converted from Firestore timestamp (seconds)');
           } else if ('toDate' in dateObj && typeof dateObj.toDate === 'function') {
             dateToSave = dateObj.toDate();
-            console.log('✅ ProfileForm: Converted using toDate() method');
           } else if ('_seconds' in dateObj) {
             dateToSave = new Date(dateObj._seconds * 1000);
-            console.log('✅ ProfileForm: Converted from _seconds property');
           }
         } catch (error) {
-          console.error('❌ ProfileForm: Error converting date object:', error);
+          // Ignore conversion errors
         }
       } else if (typeof personalInfo.dateOfBirth === 'string') {
         try {
           dateToSave = new Date(personalInfo.dateOfBirth);
           if (isNaN(dateToSave.getTime())) {
             dateToSave = null;
-            console.log('❌ ProfileForm: Invalid date string');
-          } else {
-            console.log('✅ ProfileForm: Converted from string');
           }
         } catch (error) {
-          console.error('❌ ProfileForm: Error parsing date string:', error);
+          // Ignore parsing errors
         }
       }
       
       if (dateToSave && !isNaN(dateToSave.getTime())) {
         cleanPersonalInfo.dateOfBirth = dateToSave;
-        console.log('✅ ProfileForm: Final date assigned:', dateToSave);
-      } else {
-        console.log('❌ ProfileForm: Could not convert dateOfBirth, skipping');
       }
-    } else {
-      console.log('❌ ProfileForm: dateOfBirth is undefined or null');
     }
     
     if (personalInfo.gender !== undefined && personalInfo.gender !== null) {
@@ -500,9 +454,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
       cleanPersonalInfo.displayName = personalInfo.displayName;
     }
     
-    console.log('✨ Clean PersonalInfo result:', JSON.stringify(cleanPersonalInfo, null, 2));
-    console.log('🔍 Clean PersonalInfo keys:', Object.keys(cleanPersonalInfo));
-    console.log('🔍 displayName in clean object?', 'displayName' in cleanPersonalInfo);
+
     
     return cleanPersonalInfo as PersonalInfo;
   };
@@ -625,7 +577,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
         privacySettings: cleanObjectData(privacySettings as PrivacySettings)
       };
       
-      console.log('✨ Final cleaned profile data:', JSON.stringify(profileData, null, 2));
+
       console.log('🔍 Final personalInfo keys:', Object.keys(profileData.personalInfo || {}));
       console.log('🗓️ Final dateOfBirth being sent to service:', profileData.personalInfo?.dateOfBirth, 'Type:', typeof profileData.personalInfo?.dateOfBirth, 'instanceof Date:', profileData.personalInfo?.dateOfBirth instanceof Date);
       
@@ -665,25 +617,17 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
       
       const undefinedPaths = checkForUndefined(profileData);
       if (undefinedPaths.length > 0) {
-        console.error('❌ FOUND UNDEFINED VALUES AT PATHS:', undefinedPaths);
         throw new Error(`Cannot save profile: undefined values found at ${undefinedPaths.join(', ')}`);
-      } else {
-        console.log('✅ No undefined values found in final data');
       }
 
       let response;
       if (mode === 'create') {
-        console.log('🆕 Creating new profile...');
         response = await profileService.createProfile(userId, profileData);
       } else {
-        console.log('📝 Updating existing profile...');
         response = await profileService.updateProfile(userId, profileData);
       }
 
-      console.log('📤 Profile service response:', JSON.stringify(response, null, 2));
-
       if (response.success && response.data) {
-        console.log('✅ Profile saved successfully!');
         onSuccess?.(response.data);
       } else {
         const errorMessage = response.error?.message || 'Failed to save profile';
@@ -693,17 +637,11 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
         onError?.(errorMessage);
       }
     } catch (error: any) {
-      console.error('💥 Profile submission error caught:', error);
-      console.error('💥 Error name:', error.name);
-      console.error('💥 Error message:', error.message);
-      console.error('💥 Error stack:', error.stack);
-      
       const errorMessage = 'An unexpected error occurred. Please try again.';
       setErrors({ general: errorMessage });
       onError?.(errorMessage);
     } finally {
       setIsLoading(false);
-      console.log('🏁 Profile submission process completed');
     }
   };
 
