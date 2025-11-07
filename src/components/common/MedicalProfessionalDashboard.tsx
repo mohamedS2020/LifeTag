@@ -60,6 +60,7 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [accessHistory, setAccessHistory] = useState<any[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
+  const [patientNames, setPatientNames] = useState<{ [profileId: string]: string }>({});
   const [historyLoading, setHistoryLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -179,6 +180,40 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
   };
 
   /**
+   * Fetch patient names for audit logs that don't have them
+   */
+  const fetchPatientNames = async (logs: AuditLog[]) => {
+    const namesToFetch = logs
+      .filter(log => !log.patientName && !patientNames[log.profileId])
+      .map(log => log.profileId);
+
+    if (namesToFetch.length === 0) return;
+
+    try {
+      const namePromises = namesToFetch.map(async (profileId) => {
+        const response = await profileService.getProfile(profileId);
+        if (response.success && response.data) {
+          const profile = response.data;
+          const fullName = `${profile.personalInfo.firstName} ${profile.personalInfo.lastName}`;
+          return { profileId, name: fullName };
+        }
+        return { profileId, name: `Patient (${profileId.substring(0, 8)}...)` };
+      });
+
+      const results = await Promise.all(namePromises);
+      const newNames: { [key: string]: string } = {};
+      
+      results.forEach(({ profileId, name }) => {
+        newNames[profileId] = name;
+      });
+
+      setPatientNames(prev => ({ ...prev, ...newNames }));
+    } catch (error) {
+      console.error('Error fetching patient names:', error);
+    }
+  };
+
+  /**
    * Fetch medical professional's scan history from audit logs
    */
   const fetchMedicalProfessionalLogs = async () => {
@@ -191,6 +226,8 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
       
       if (response.success && response.data) {
         setAuditLogs(response.data);
+        // Fetch patient names for logs that don't have them
+        await fetchPatientNames(response.data);
       } else {
         console.error('Failed to fetch access history:', response.error);
         Alert.alert('Error', 'Failed to load access history');
@@ -390,19 +427,29 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
    * Render individual audit log item
    */
   const renderAuditLogItem = ({ item }: { item: AuditLog }) => {
-    // Get patient name from the dedicated field or fallback
+    // Get patient name from the dedicated field, fetched names, or fallback
     const getPatientName = () => {
+      // First check if the audit log has the patient name
       if (item.patientName) {
         return item.patientName;
       }
-      // Fallback to extracting from notes for older logs
-      if (item.notes && item.notes.includes('Medical Professional Access:')) {
-        const match = item.notes.match(/Medical Professional Access: (.+?) \(License:/);
-        if (match && match[1]) {
-          return match[1]; // This would be the professional name, not patient
+      
+      // Check if we've fetched the name for this profile
+      if (patientNames[item.profileId]) {
+        return patientNames[item.profileId];
+      }
+      
+      // Try to extract from current notes format
+      if (item.notes) {
+        // Check if it has the new format: "Patient: [Name] | Professional: ..."
+        const patientMatch = item.notes.match(/Patient: (.+?) \|/);
+        if (patientMatch && patientMatch[1]) {
+          return patientMatch[1];
         }
       }
-      return 'Unknown Patient';
+      
+      // Final fallback
+      return `Patient (${item.profileId.substring(0, 8)}...)`;
     };
 
     const getPatientInfo = () => {
