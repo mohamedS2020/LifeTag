@@ -11,9 +11,8 @@ import {
   StyleSheet,
   Alert,
   TouchableOpacity,
-  StatusBar,
-  SafeAreaView,
 } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 import { UserProfile } from '../types';
@@ -33,6 +32,7 @@ interface QRDisplayScreenProps {
 
 const QRDisplayScreen: React.FC<QRDisplayScreenProps> = ({ navigation, route }) => {
   const { user } = useAuth();
+  const insets = useSafeAreaInsets();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -103,10 +103,9 @@ const QRDisplayScreen: React.FC<QRDisplayScreenProps> = ({ navigation, route }) 
 
   if (error || !profile) {
     return (
-      <SafeAreaView style={styles.container}>
-        <StatusBar barStyle="light-content" backgroundColor="#F44336" />
+      <SafeAreaView style={styles.container} edges={['top']}>
         
-        <View style={styles.header}>
+        <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
           <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
             <Ionicons name="close" size={24} color="#fff" />
           </TouchableOpacity>
@@ -140,10 +139,9 @@ const QRDisplayScreen: React.FC<QRDisplayScreenProps> = ({ navigation, route }) 
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#2196F3" />
+    <SafeAreaView style={styles.container} edges={['top']}>
       
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
         <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
           <Ionicons name="close" size={24} color="#fff" />
         </TouchableOpacity>
@@ -177,7 +175,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#2196F3',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    paddingTop: 16,
   },
   closeButton: {
     padding: 8,

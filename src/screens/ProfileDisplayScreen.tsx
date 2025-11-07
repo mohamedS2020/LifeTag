@@ -8,6 +8,7 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { ProfileDisplay } from '../components/Profile/ProfileDisplay';
@@ -44,6 +45,7 @@ export const ProfileDisplayScreen: React.FC = () => {
   const navigation = useNavigation<ProfileDisplayScreenNavigationProp>();
   const route = useRoute<ProfileDisplayScreenRouteProp>();
   const { user } = useAuth();
+  const insets = useSafeAreaInsets();
   
   const { profileId, isViewingOtherProfile = false } = route.params || {};
   
@@ -138,7 +140,7 @@ export const ProfileDisplayScreen: React.FC = () => {
   };
 
   const renderHeader = () => (
-    <View style={styles.header}>
+    <View style={[styles.header, { paddingTop: insets.top + 15 }]}>
       <View style={styles.headerContent}>
         <Text style={styles.headerTitle}>
           {isViewingOtherProfile ? 'Patient Profile' : 'My Profile'}
@@ -221,10 +223,10 @@ export const ProfileDisplayScreen: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       {renderHeader()}
       {renderContent()}
-    </View>
+    </SafeAreaView>
   );
 };
 

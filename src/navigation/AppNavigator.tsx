@@ -8,6 +8,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity, Alert } from 'react-native';
 import { useAuth } from '../context/AuthContext';
@@ -280,16 +281,18 @@ const AppNavigator: React.FC = () => {
   const { user, initializing } = useAuth();
 
   return (
-    <NavigationContainer>
-      {initializing ? (
-        <LoadingScreen />
-      ) : user ? (
-        <AuthenticatedStack />
-      ) : (
-        <AuthStack />
-      )}
-      <StatusBar style="auto" />
-    </NavigationContainer>
+    <SafeAreaProvider>
+      <NavigationContainer>
+        {initializing ? (
+          <LoadingScreen />
+        ) : user ? (
+          <AuthenticatedStack />
+        ) : (
+          <AuthStack />
+        )}
+        <StatusBar style="light" />
+      </NavigationContainer>
+    </SafeAreaProvider>
   );
 };
 

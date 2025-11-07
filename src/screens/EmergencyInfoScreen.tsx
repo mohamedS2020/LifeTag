@@ -5,11 +5,11 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  SafeAreaView,
   Alert,
   Linking,
   Platform
 } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
@@ -55,6 +55,7 @@ const EmergencyInfoScreen: React.FC = () => {
   // Navigation hooks
   const navigation = useNavigation<any>();
   const route = useRoute<EmergencyInfoScreenRouteProp>();
+  const insets = useSafeAreaInsets();
   
   // Extract data from route params
   const { emergencyData, qrCodeString, scannedBy, medicalProfessionalAccess } = route.params;
@@ -176,9 +177,9 @@ const EmergencyInfoScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 15 }]}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
           <Ionicons name="close" size={24} color="white" />
         </TouchableOpacity>

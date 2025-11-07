@@ -10,11 +10,10 @@ import {
   Text,
   StyleSheet,
   Alert,
-  SafeAreaView,
-  StatusBar,
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 import { UserProfile } from '../types';
@@ -35,6 +34,7 @@ interface ProfileFormScreenProps {
 
 const ProfileFormScreen: React.FC<ProfileFormScreenProps> = ({ navigation, route }) => {
   const { user } = useAuth();
+  const insets = useSafeAreaInsets();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -168,10 +168,9 @@ const ProfileFormScreen: React.FC<ProfileFormScreenProps> = ({ navigation, route
 
   if (error && mode === 'edit') {
     return (
-      <SafeAreaView style={styles.container}>
-        <StatusBar barStyle="light-content" backgroundColor="#F44336" />
+      <SafeAreaView style={styles.container} edges={['top']}>
         
-        <View style={styles.header}>
+        <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
           <TouchableOpacity style={styles.closeButton} onPress={() => navigation.goBack()}>
             <Ionicons name="close" size={24} color="#fff" />
           </TouchableOpacity>
@@ -205,7 +204,7 @@ const ProfileFormScreen: React.FC<ProfileFormScreenProps> = ({ navigation, route
 
   if (!targetUserId) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container} edges={['top']}>
         <View style={styles.errorContainer}>
           <Ionicons name="person-remove" size={48} color="#F44336" />
           <Text style={styles.errorTitle}>No User Available</Text>
@@ -221,10 +220,9 @@ const ProfileFormScreen: React.FC<ProfileFormScreenProps> = ({ navigation, route
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#2196F3" />
+    <SafeAreaView style={styles.container} edges={['top']}>
       
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
         <TouchableOpacity style={styles.closeButton} onPress={handleCancel}>
           <Ionicons name="close" size={24} color="#fff" />
         </TouchableOpacity>
@@ -263,7 +261,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#2196F3',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    paddingTop: 16,
   },
   closeButton: {
     padding: 8,
