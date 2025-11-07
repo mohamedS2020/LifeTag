@@ -191,13 +191,15 @@ export class QRService {
       });
     }
     
-    // Emergency Contact
+    // Emergency Contact - Modified to prevent iPhone auto-detection
     if (emergencyData.emergencyContact) {
       const contact = emergencyData.emergencyContact;
       lines.push('');
       lines.push('📞 EMERGENCY CONTACT:');
       lines.push(`   ${contact.name} (${contact.relationship})`);
-      lines.push(`   📱 ${contact.phone}`);
+      // Format phone to prevent auto-detection: add spaces and text
+      const formattedPhone = contact.phone.replace(/(\d{3})(\d{4})(\d{4})/, '$1 $2 $3');
+      lines.push(`   Phone: ${formattedPhone}`);
     }
     
     // Emergency Medical Notes
@@ -249,7 +251,9 @@ export class QRService {
     if (emergencyData.allergies.length > 0) techData.push(`ALG:${emergencyData.allergies.join(',')}`);
     if (emergencyData.emergencyContact) {
       const c = emergencyData.emergencyContact;
-      techData.push(`EC:${c.name}-${c.phone}-${c.relationship}`);
+      // Encode phone number to prevent iPhone detection
+      const encodedPhone = btoa(c.phone); // Base64 encode the phone number
+      techData.push(`EC:${c.name}-${encodedPhone}-${c.relationship}`);
     }
     if (emergencyData.emergencyNote) {
       const note = emergencyData.emergencyNote.length > 100 
@@ -265,7 +269,7 @@ export class QRService {
     
     // Add technical data at the end (separated)
     lines.push('');
-    lines.push(`DATA: ${techData.join(';')}`);
+    lines.push(`APP_DATA: ${techData.join(';')}`);
     
     const qrString = lines.join('\n');
     
@@ -307,10 +311,10 @@ export class QRService {
         hasFullProfile: false
       };
 
-      // Extract technical data from DATA: line
-      const dataLine = lines.find(line => line.startsWith('DATA:'));
+      // Extract technical data from APP_DATA: or DATA: line (backward compatibility)
+      const dataLine = lines.find(line => line.startsWith('APP_DATA:') || line.startsWith('DATA:'));
       if (dataLine) {
-        const techData = dataLine.replace('DATA:', '').trim();
+        const techData = dataLine.replace(/^(APP_DATA:|DATA:)/, '').trim();
         const decoded = this.decodeTechnicalFormat(techData);
         if (decoded) {
           Object.assign(data, decoded);
@@ -370,7 +374,15 @@ export class QRService {
             data.allergies = value ? value.split(',') : [];
             break;
           case 'EC':
-            const [name, phone, relationship] = value.split('-');
+            const [name, encodedPhone, relationship] = value.split('-');
+            // Try to decode base64 phone, fallback to plain text for backward compatibility
+            let phone = encodedPhone;
+            try {
+              phone = atob(encodedPhone);
+            } catch (error) {
+              // If decoding fails, assume it's plain text (old format)
+              phone = encodedPhone;
+            }
             data.emergencyContact = { name, phone, relationship };
             break;
           case 'NOTE':

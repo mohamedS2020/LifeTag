@@ -91,11 +91,19 @@ export const ProfileDisplayScreen: React.FC = () => {
 
       setProfile(profileResponse.data);
 
-      // Check if medical professional access is needed
-      if (isViewingOtherProfile && isMedicalProfessional && user?.id) {
-        await checkMedicalAccess(targetProfileId);
-      } else if (!isViewingOtherProfile || targetProfileId === user?.id) {
+      // Check access permissions
+      if (!isViewingOtherProfile || targetProfileId === user?.id) {
+        // Viewing own profile - always allow
         setAccessGranted(true);
+      } else if (isViewingOtherProfile) {
+        // Viewing other's profile
+        if (isMedicalProfessional && user?.id) {
+          // Medical professional - check medical access
+          await checkMedicalAccess(targetProfileId);
+        } else {
+          // Regular user - allow access (ProfileDisplay will handle password protection)
+          setAccessGranted(true);
+        }
       }
     } catch (err) {
       console.error('Error loading profile:', err);

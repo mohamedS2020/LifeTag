@@ -92,21 +92,12 @@ const QRScannerScreen: React.FC<QRScannerScreenProps> = ({ navigation, route }) 
   };
 
   const navigateToFullProfile = (profileId: string) => {
-    // Navigate to full profile display (medical professional access)
-    if (user?.userType === 'medical_professional' && user?.isVerified) {
-      navigation.navigate('ProfileDisplay', {
-        profileId,
-        accessType: 'medical_professional',
-        scannedBy: user.id,
-      });
-    } else {
-      // Regular users get emergency info only
-      Alert.alert(
-        'Access Limited',
-        'Full profile access requires verified medical professional credentials. Showing emergency information only.',
-        [{ text: 'OK', onPress: () => setScanResult(null) }]
-      );
-    }
+    // Navigate to ProfileDisplay - same logic as EmergencyInfoScreen
+    // The ProfileDisplay screen will handle access control and password prompts
+    navigation.navigate('ProfileDisplay', {
+      profileId,
+      isViewingOtherProfile: true
+    });
   };
 
   const handleError = (error: string) => {
