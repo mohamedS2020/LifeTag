@@ -96,7 +96,6 @@ ehthumbs.db
 firebase-debug.log
 firestore-debug.log
 ui-debug.log
-google-services.json
 GoogleService-Info.plist
 
 # EAS Build - contains sensitive environment variables
