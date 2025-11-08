@@ -48,7 +48,6 @@
     },
     "plugins": [
       "expo-camera",
-      "react-native-reanimated",
       [
         "expo-media-library",
         {
