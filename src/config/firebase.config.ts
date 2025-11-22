@@ -6,43 +6,17 @@ import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
 import { 
   getAuth, 
   initializeAuth, 
-  Auth,
-  browserLocalPersistence,
-  inMemoryPersistence
+  Auth
 } from 'firebase/auth';
 import { getFirestore, Firestore } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Platform } from 'react-native';
-
-// Custom AsyncStorage-based persistence for React Native
-// This wraps AsyncStorage to match Firebase's Persistence interface
-const getAsyncStoragePersistence = () => {
-  if (Platform.OS === 'web') {
-    return browserLocalPersistence;
-  }
-  
-  // For React Native, create a custom persistence using AsyncStorage
-  return {
-    type: 'LOCAL' as const,
-    async get(key: string) {
-      const value = await AsyncStorage.getItem(key);
-      return value ? JSON.parse(value) : null;
-    },
-    async set(key: string, value: any) {
-      await AsyncStorage.setItem(key, JSON.stringify(value));
-    },
-    async remove(key: string) {
-      await AsyncStorage.removeItem(key);
-    }
-  };
-};
 
 // Firebase configuration with fallback values for production builds
 const firebaseConfig = {
   apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN ,
-  projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID ,
-  storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET ,
+  authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID
 };
@@ -53,30 +27,54 @@ let auth!: Auth;
 let db!: Firestore;
 
 /**
+ * Custom AsyncStorage persistence for React Native
+ * Firebase v12 requires this format
+ */
+const asyncStoragePersistence = {
+  type: 'LOCAL' as const,
+  async get(key: string) {
+    try {
+      const value = await AsyncStorage.getItem(key);
+      return value ? JSON.parse(value) : null;
+    } catch (error) {
+      console.error('AsyncStorage.getItem error:', error);
+      return null;
+    }
+  },
+  async set(key: string, value: any) {
+    try {
+      await AsyncStorage.setItem(key, JSON.stringify(value));
+    } catch (error) {
+      console.error('AsyncStorage.setItem error:', error);
+    }
+  },
+  async remove(key: string) {
+    try {
+      await AsyncStorage.removeItem(key);
+    } catch (error) {
+      console.error('AsyncStorage.removeItem error:', error);
+    }
+  }
+};
+
+/**
  * Initialize Firebase with proper error handling and persistence
  */
 const initializeFirebase = (): void => {
   try {
     if (getApps().length === 0) {
-      console.log('🔥 Initializing Firebase for platform:', Platform.OS);
+      console.log('🔥 Initializing Firebase');
       
       // Initialize Firebase App
       app = initializeApp(firebaseConfig);
+      console.log('✅ Firebase app initialized');
       
-      // Initialize Auth with platform-specific persistence
-      if (Platform.OS === 'web') {
-        // Web: Use browser localStorage
-        auth = initializeAuth(app, {
-          persistence: browserLocalPersistence
-        });
-        console.log('✅ Firebase Auth initialized with browser persistence');
-      } else {
-        // React Native (Android/iOS): Use custom AsyncStorage persistence
-        // Note: Firebase JS SDK v12 doesn't have built-in RN persistence,
-        // so we rely on the SDK's default behavior which uses AsyncStorage internally
-        auth = initializeAuth(app);
-        console.log('✅ Firebase Auth initialized with React Native persistence');
-      }
+      // Initialize Auth with AsyncStorage persistence for React Native
+      // For Firebase SDK v12, pass the persistence object directly
+      auth = initializeAuth(app, {
+        persistence: asyncStoragePersistence as any
+      });
+      console.log('✅ Firebase Auth initialized with AsyncStorage persistence');
       
       // Initialize Firestore
       db = getFirestore(app);
