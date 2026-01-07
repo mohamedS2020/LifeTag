@@ -9,6 +9,7 @@ import {
   doc, 
   setDoc, 
   getDoc, 
+  updateDoc,
   collection,
   query,
   where,
@@ -159,6 +160,8 @@ class AuthServiceImpl implements AuthService {
         email: userData.email,
         userType: userData.userType,
         isVerified: userData.isVerified || false,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
         createdAt: userData.createdAt?.toDate() || new Date(),
         updatedAt: userData.updatedAt?.toDate() || new Date()
       };
@@ -196,10 +199,21 @@ class AuthServiceImpl implements AuthService {
         updatedAt: new Date()
       };
 
+      // Add firstName and lastName for ALL user types if provided
+      if (additionalData?.firstName) {
+        userDoc.firstName = additionalData.firstName;
+      }
+      if (additionalData?.lastName) {
+        userDoc.lastName = additionalData.lastName;
+      }
+      // Also handle fullName for backwards compatibility
+      if (!userDoc.firstName && additionalData?.fullName) {
+        userDoc.firstName = additionalData.fullName.split(' ')[0] || '';
+        userDoc.lastName = additionalData.fullName.split(' ').slice(1).join(' ') || '';
+      }
+
       // Add medical professional specific fields if applicable
       if (userType === 'medical_professional' && additionalData) {
-        userDoc.firstName = additionalData.firstName || additionalData.fullName?.split(' ')[0] || '';
-        userDoc.lastName = additionalData.lastName || additionalData.fullName?.split(' ').slice(1).join(' ') || '';
         userDoc.licenseNumber = additionalData.licenseNumber;
         userDoc.specialization = additionalData.specialty;
         userDoc.institution = additionalData.institution;
@@ -266,6 +280,47 @@ class AuthServiceImpl implements AuthService {
         return 'Network error. Please check your internet connection.';
       default:
         return 'An error occurred. Please try again.';
+    }
+  }
+
+  /**
+   * Get user basic info (firstName, lastName) from users collection
+   * This is useful when a user hasn't created a profile yet
+   */
+  async getUserBasicInfo(userId: string): Promise<{ firstName?: string; lastName?: string } | null> {
+    try {
+      const userDoc = await getDoc(doc(db, 'users', userId));
+      
+      if (!userDoc.exists()) {
+        return null;
+      }
+      
+      const userData = userDoc.data();
+      return {
+        firstName: userData.firstName,
+        lastName: userData.lastName
+      };
+    } catch (error: any) {
+      console.error('Get user basic info error:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Update user basic info (firstName, lastName) in users collection
+   * Called when user updates their profile to keep data in sync
+   */
+  async updateUserBasicInfo(userId: string, firstName: string, lastName: string): Promise<void> {
+    try {
+      const userRef = doc(db, 'users', userId);
+      await updateDoc(userRef, {
+        firstName,
+        lastName,
+        updatedAt: new Date()
+      });
+    } catch (error: any) {
+      console.error('Update user basic info error:', error);
+      // Don't throw - this is a non-critical sync operation
     }
   }
 }

@@ -12,6 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
 import { AuditLog, User, MedicalProfessional } from '../../types';
 import { profileService } from '../../services';
+import authService from '../../services/authService';
 import { MedicalProfessionalApprovalService } from '../../services/medicalProfessionalApprovalService';
 
 interface UserAuditLogViewerProps {
@@ -64,7 +65,7 @@ const UserAuditLogViewer: React.FC<UserAuditLogViewerProps> = ({ profileId }) =>
             },
           };
         } else {
-          // Regular user - get name from their profile
+          // Regular user - first try to get name from their profile
           const userProfileResponse = await profileService.getProfileByUserId(userId);
           if (userProfileResponse.success && userProfileResponse.data) {
             const profile = userProfileResponse.data;
@@ -73,11 +74,20 @@ const UserAuditLogViewer: React.FC<UserAuditLogViewerProps> = ({ profileId }) =>
               isMedicalProfessional: false,
             };
           } else {
-            // Fallback if profile not found
-            newAccessorInfos[userId] = {
-              name: `User (${userId.substring(0, 8)}...)`,
-              isMedicalProfessional: false,
-            };
+            // Fallback: try to get name from users collection (set during registration)
+            const userBasicInfo = await authService.getUserBasicInfo(userId);
+            if (userBasicInfo?.firstName || userBasicInfo?.lastName) {
+              newAccessorInfos[userId] = {
+                name: `${userBasicInfo.firstName || ''} ${userBasicInfo.lastName || ''}`.trim() || `User (${userId.substring(0, 8)}...)`,
+                isMedicalProfessional: false,
+              };
+            } else {
+              // Final fallback if no name found anywhere
+              newAccessorInfos[userId] = {
+                name: `User (${userId.substring(0, 8)}...)`,
+                isMedicalProfessional: false,
+              };
+            }
           }
         }
       }

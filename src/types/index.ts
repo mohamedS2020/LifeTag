@@ -13,6 +13,8 @@ export interface User {
   email: string;
   userType: 'individual' | 'medical_professional' | 'admin';
   isVerified?: boolean;
+  firstName?: string; // Basic name stored at registration
+  lastName?: string;  // Basic name stored at registration
   profile?: UserProfile; // Link to full profile
   createdAt: Date;
   updatedAt: Date;

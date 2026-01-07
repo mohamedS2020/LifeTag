@@ -264,6 +264,21 @@ class ProfileServiceImpl implements ProfileService {
           lastAccessedAt: serverTimestamp()
         });
         console.log('✅ ProfileService: setDoc completed successfully');
+
+        // Sync firstName and lastName to users collection
+        if (profile.personalInfo?.firstName || profile.personalInfo?.lastName) {
+          try {
+            await updateDoc(doc(db, 'users', userId), {
+              firstName: profile.personalInfo.firstName || '',
+              lastName: profile.personalInfo.lastName || '',
+              updatedAt: serverTimestamp()
+            });
+            console.log('✅ ProfileService: Name synced to users collection');
+          } catch (syncError) {
+            // Log but don't fail profile creation if sync fails
+            console.warn('⚠️ ProfileService: Failed to sync name to users collection:', syncError);
+          }
+        }
       } catch (firestoreError: any) {
         console.error('❌ ProfileService: setDoc failed:', firestoreError);
         console.error('❌ ProfileService: Error message:', firestoreError.message);
@@ -407,6 +422,24 @@ class ProfileServiceImpl implements ProfileService {
         isComplete: completionStatus.isComplete,
         updatedAt: serverTimestamp()
       });
+
+      // Sync firstName and lastName to users collection if personalInfo was updated
+      if (sanitizedUpdates.personalInfo?.firstName || sanitizedUpdates.personalInfo?.lastName) {
+        const firstName = mergedProfile.personalInfo?.firstName || '';
+        const lastName = mergedProfile.personalInfo?.lastName || '';
+        
+        // Update users collection to keep name in sync
+        try {
+          await updateDoc(doc(db, 'users', userId), {
+            firstName,
+            lastName,
+            updatedAt: serverTimestamp()
+          });
+        } catch (syncError) {
+          // Log but don't fail the profile update if sync fails
+          console.warn('Failed to sync name to users collection:', syncError);
+        }
+      }
 
       // Log profile update
       await this.logProfileAccess(userId, {
