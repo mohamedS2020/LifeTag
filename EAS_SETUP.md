@@ -33,18 +33,6 @@ Get these values from:
 1. **Firebase Console** → Project Settings → General
 2. Or from your `google-services.json` file
 
-Example values (replace with yours):
-```json
-{
-  "EXPO_PUBLIC_FIREBASE_API_KEY": "AIzaSyD9rxZSU3-dnv7JI66blBm07XjlAtqP96g",
-  "EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN": "lifetag-420c7.firebaseapp.com",
-  "EXPO_PUBLIC_FIREBASE_PROJECT_ID": "lifetag-420c7",
-  "EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET": "lifetag-420c7.firebasestorage.app",
-  "EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID": "561936542421",
-  "EXPO_PUBLIC_FIREBASE_APP_ID": "1:561936542421:web:455e1856b020a07de1d05c",
-  "EXPO_PUBLIC_ADMIN_EMAIL": "msharaf.gta@gmail.com"
-}
-```
 
 ### 4. Protected Files
 

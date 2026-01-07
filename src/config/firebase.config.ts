@@ -1,6 +1,6 @@
 // Firebase Configuration
 // This file contains the Firebase configuration for the LifeTag app
-// Optimized for Expo + Firebase JS SDK v12 with proper AsyncStorage persistence
+// Optimized for Expo + Firebase JS SDK v9 with proper AsyncStorage persistence
 
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
 import { 
@@ -8,6 +8,7 @@ import {
   initializeAuth, 
   Auth
 } from 'firebase/auth';
+import { getReactNativePersistence } from 'firebase/auth/react-native';
 import { getFirestore, Firestore } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -27,37 +28,6 @@ let auth!: Auth;
 let db!: Firestore;
 
 /**
- * Custom AsyncStorage persistence for React Native
- * Firebase v12 requires this format
- */
-const asyncStoragePersistence = {
-  type: 'LOCAL' as const,
-  async get(key: string) {
-    try {
-      const value = await AsyncStorage.getItem(key);
-      return value ? JSON.parse(value) : null;
-    } catch (error) {
-      console.error('AsyncStorage.getItem error:', error);
-      return null;
-    }
-  },
-  async set(key: string, value: any) {
-    try {
-      await AsyncStorage.setItem(key, JSON.stringify(value));
-    } catch (error) {
-      console.error('AsyncStorage.setItem error:', error);
-    }
-  },
-  async remove(key: string) {
-    try {
-      await AsyncStorage.removeItem(key);
-    } catch (error) {
-      console.error('AsyncStorage.removeItem error:', error);
-    }
-  }
-};
-
-/**
  * Initialize Firebase with proper error handling and persistence
  */
 const initializeFirebase = (): void => {
@@ -70,9 +40,9 @@ const initializeFirebase = (): void => {
       console.log('✅ Firebase app initialized');
       
       // Initialize Auth with AsyncStorage persistence for React Native
-      // For Firebase SDK v12, pass the persistence object directly
+      // Using getReactNativePersistence from Firebase SDK v9
       auth = initializeAuth(app, {
-        persistence: asyncStoragePersistence as any
+        persistence: getReactNativePersistence(AsyncStorage)
       });
       console.log('✅ Firebase Auth initialized with AsyncStorage persistence');
       
