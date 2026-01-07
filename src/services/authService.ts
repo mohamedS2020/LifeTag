@@ -33,8 +33,10 @@ class AuthServiceImpl implements AuthService {
    */
   async login(email: string, password: string): Promise<User> {
     try {
+      console.log('🔐 Attempting login for:', email);
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const firebaseUser = userCredential.user;
+      console.log('✅ Firebase auth successful');
       
       // Get user profile from Firestore
       const userProfile = await this.getUserProfile(firebaseUser.uid);
@@ -48,9 +50,13 @@ class AuthServiceImpl implements AuthService {
       return userProfile;
     } catch (error: any) {
       console.error('Login error:', error);
-  // Preserve the original Firebase error code so the UI can provide precise messaging
+      console.error('Error code:', error?.code);
+      console.error('Error message:', error?.message);
+      
+      // TEMPORARY: Show actual error for debugging
       const code = error?.code || 'auth/unknown-error';
-      const err: any = new Error(this.getAuthErrorMessage(code));
+      const actualMessage = error?.message || 'Unknown error';
+      const err: any = new Error(`${this.getAuthErrorMessage(code)} (Debug: ${actualMessage})`);
       err.code = code;
       throw err;
     }
