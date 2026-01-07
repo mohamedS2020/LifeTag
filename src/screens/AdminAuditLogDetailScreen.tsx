@@ -13,6 +13,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { AuditLog } from '../types';
 import profileService from '../services/profileService';
+import authService from '../services/authService';
 import { MedicalProfessionalApprovalService } from '../services/medicalProfessionalApprovalService';
 import { RootStackParamList } from '../navigation/AppNavigator';
 
@@ -71,6 +72,24 @@ const AdminAuditLogDetailScreen: React.FC = () => {
               type: logData.accessorType === 'admin' ? 'Administrator' : 'Regular User',
               details: `User ID: ${logData.accessedBy.substring(0, 8)}...`
             });
+          } else {
+            // Fallback: try to get name from users collection (set during registration)
+            const userBasicInfo = await authService.getUserBasicInfo(logData.accessedBy);
+            if (userBasicInfo?.firstName || userBasicInfo?.lastName) {
+              const name = `${userBasicInfo.firstName || ''} ${userBasicInfo.lastName || ''}`.trim();
+              setAccessorInfo({
+                name: name || `User (${logData.accessedBy.substring(0, 8)}...)`,
+                type: logData.accessorType === 'admin' ? 'Administrator' : 'Regular User',
+                details: 'No profile created yet'
+              });
+            } else {
+              // Final fallback if no name found anywhere
+              setAccessorInfo({
+                name: `User (${logData.accessedBy.substring(0, 8)}...)`,
+                type: logData.accessorType === 'admin' ? 'Administrator' : 'Regular User',
+                details: 'No profile created yet'
+              });
+            }
           }
         }
       } else {
