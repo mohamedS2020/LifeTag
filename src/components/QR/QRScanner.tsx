@@ -110,7 +110,7 @@ const QRScanner: React.FC<QRScannerProps> = ({
       const auditLog: Omit<AuditLog, 'id' | 'timestamp'> = {
         profileId: profileId || 'unknown', // Use scanned profile ID or 'unknown' for non-LifeTag QRs
         accessedBy: user.id,
-        accessorType: user.userType === 'medical_professional' ? 'medical_professional' : 'individual',
+        accessorType: user.userType === 'admin' ? 'admin' : user.userType === 'medical_professional' ? 'medical_professional' : 'individual',
         accessType: 'qr_scan',
         accessMethod: 'qr_code',
         dataModified: false,

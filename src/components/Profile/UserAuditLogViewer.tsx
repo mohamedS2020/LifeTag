@@ -51,6 +51,16 @@ const UserAuditLogViewer: React.FC<UserAuditLogViewerProps> = ({ profileId }) =>
       const newAccessorInfos: { [key: string]: AccessorInfo } = {};
 
       for (const userId of userIds) {
+        // Check if this is an admin access
+        const logEntry = logs.find(log => log.accessedBy === userId);
+        if (logEntry?.accessorType === 'admin') {
+          newAccessorInfos[userId] = {
+            name: 'Admin',
+            isMedicalProfessional: false,
+          };
+          continue;
+        }
+
         // Check if user is a medical professional
         const medicalProfessional = medicalProfessionals.find(prof => prof.userId === userId);
         

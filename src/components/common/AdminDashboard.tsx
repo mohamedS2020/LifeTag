@@ -42,7 +42,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
   onNavigateToProfile,
   onError,
 }) => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const navigation = useNavigation<AdminNavigationProp>();
   const [activeModal, setActiveModal] = useState<'verification' | 'audit' | 'createAdmin' | null>(null);
   const [loading, setLoading] = useState(false);
@@ -143,6 +143,34 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const handleError = (error: string) => {
     onError?.(error);
     Alert.alert('Error', error, [{ text: 'OK' }]);
+  };
+
+  /**
+   * Handle admin sign out
+   */
+  const handleSignOut = async () => {
+    Alert.alert(
+      'Sign Out',
+      'Are you sure you want to sign out?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Sign Out',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await logout();
+            } catch (error) {
+              console.error('Error signing out:', error);
+              Alert.alert('Error', 'Failed to sign out. Please try again.');
+            }
+          },
+        },
+      ]
+    );
   };
 
   return (
@@ -312,6 +340,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </Text>
             </View>
             <Ionicons name="chevron-forward" size={24} color="#ccc" />
+          </TouchableOpacity>
+        </View>
+
+        {/* Sign Out Button */}
+        <View style={styles.signOutSection}>
+          <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
+            <Ionicons name="log-out-outline" size={24} color="#FF3B30" />
+            <Text style={styles.signOutText}>Sign Out</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -612,6 +648,32 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: '600',
+    marginLeft: 8,
+  },
+  signOutSection: {
+    marginHorizontal: 16,
+    marginTop: 8,
+    marginBottom: 40,
+  },
+  signOutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFF',
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 2,
+    borderColor: '#FF3B30',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  signOutText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FF3B30',
     marginLeft: 8,
   },
 });

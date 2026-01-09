@@ -19,7 +19,7 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 
 interface RouteParams {
   logId: string;
-  logData: AuditLog;
+  logData: AuditLog & { timestamp: string | Date };
 }
 
 type AdminAuditLogDetailNavigationProp = StackNavigationProp<RootStackParamList>;
@@ -32,7 +32,15 @@ const AdminAuditLogDetailScreen: React.FC = () => {
   const navigation = useNavigation<AdminAuditLogDetailNavigationProp>();
   const route = useRoute();
   const insets = useSafeAreaInsets();
-  const { logData } = route.params as RouteParams;
+  const routeParams = route.params as RouteParams;
+  
+  // Deserialize timestamp if it was passed as string
+  const logData: AuditLog = {
+    ...routeParams.logData,
+    timestamp: typeof routeParams.logData.timestamp === 'string'
+      ? new Date(routeParams.logData.timestamp)
+      : routeParams.logData.timestamp
+  };
   
   const [accessorInfo, setAccessorInfo] = useState<{
     name: string;

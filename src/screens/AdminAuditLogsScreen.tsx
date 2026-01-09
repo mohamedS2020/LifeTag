@@ -65,7 +65,14 @@ const AdminAuditLogsScreen: React.FC = () => {
    * Navigate to detailed log view
    */
   const handleLogPress = (log: AuditLog) => {
-    navigation.navigate('AdminAuditLogDetail', { logId: log.id, logData: log });
+    // Serialize timestamp to avoid non-serializable value warning
+    const serializedLog = {
+      ...log,
+      timestamp: log.timestamp instanceof Date 
+        ? log.timestamp.toISOString() 
+        : log.timestamp
+    };
+    navigation.navigate('AdminAuditLogDetail', { logId: log.id, logData: serializedLog });
   };
 
   useEffect(() => {

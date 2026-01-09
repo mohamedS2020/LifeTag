@@ -151,7 +151,7 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
       const auditLog: Omit<AuditLog, 'id' | 'timestamp'> = {
         profileId: profile.id,
         accessedBy: currentUser.id,
-        accessorType: currentUser.userType === 'medical_professional' ? 'medical_professional' : 'individual',
+        accessorType: currentUser.userType === 'admin' ? 'admin' : currentUser.userType === 'medical_professional' ? 'medical_professional' : 'individual',
         accessType: 'full_profile', // Key distinction: full profile access
         accessMethod: 'app_interface',
         fieldsAccessed: ['personalInfo', 'medicalInfo', 'emergencyContacts', 'privacySettings'], // All profile fields
