@@ -195,6 +195,23 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
         <View style={styles.actionsContainer}>
           <Text style={styles.sectionTitle}>Administration Tools</Text>
           
+          {/* Scan QR Code */}
+          <TouchableOpacity
+            style={styles.actionCard}
+            onPress={() => navigation.navigate('QRScanner')}
+          >
+            <View style={styles.actionIcon}>
+              <Ionicons name="scan-outline" size={28} color="#2196F3" />
+            </View>
+            <View style={styles.actionContent}>
+              <Text style={styles.actionTitle}>Scan QR Code</Text>
+              <Text style={styles.actionDescription}>
+                Scan a patient's emergency QR code
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={24} color="#666" />
+          </TouchableOpacity>
+
           {/* Medical Professional Verification */}
           <TouchableOpacity
             style={styles.actionCard}

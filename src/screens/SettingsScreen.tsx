@@ -73,16 +73,6 @@ export const SettingsScreen: React.FC = () => {
         <View style={styles.settingsSection}>
           <Text style={styles.sectionTitle}>Account & Privacy</Text>
           
-          {/* Profile Access History - Active */}
-          <TouchableOpacity 
-            style={styles.settingItem}
-            onPress={() => navigation.navigate('ProfileAccessHistory' as never)}
-          >
-            <Ionicons name="eye-outline" size={24} color="#007AFF" />
-            <Text style={styles.settingTextActive}>Profile Access History</Text>
-            <Ionicons name="chevron-forward" size={20} color="#007AFF" />
-          </TouchableOpacity>
-          
           <View style={styles.settingItem}>
             <Ionicons name="person-outline" size={24} color="#666" />
             <Text style={styles.settingText}>Profile Settings</Text>

@@ -134,22 +134,27 @@ const AuthenticatedTabs: React.FC = () => {
         },
       })}
     >
-      <Tab.Screen 
-        name="Home" 
-        component={HomeScreen}
-        options={{ 
-          tabBarLabel: 'Home',
-          title: 'LifeTag'
-        }}
-      />
-      <Tab.Screen 
-        name="QR" 
-        component={QRTabScreen}
-        options={{ 
-          tabBarLabel: 'QR Code',
-          title: 'QR Scanner'
-        }}
-      />
+      {/* Home and QR tabs - Hide for admin users */}
+      {!isAdmin && (
+        <Tab.Screen 
+          name="Home" 
+          component={HomeScreen}
+          options={{ 
+            tabBarLabel: 'Home',
+            title: 'LifeTag'
+          }}
+        />
+      )}
+      {!isAdmin && (
+        <Tab.Screen 
+          name="QR" 
+          component={QRTabScreen}
+          options={{ 
+            tabBarLabel: 'QR Code',
+            title: 'QR Scanner'
+          }}
+        />
+      )}
       
       {/* Medical Professional Tab - Only show for verified medical professionals */}
       {isVerifiedMedicalProfessional && (
@@ -175,14 +180,17 @@ const AuthenticatedTabs: React.FC = () => {
         />
       )}
       
-      <Tab.Screen 
-        name="Settings" 
-        component={SettingsScreen}
-        options={{ 
-          tabBarLabel: 'Settings',
-          title: 'Settings'
-        }}
-      />
+      {/* Settings tab - Hide for admin users */}
+      {!isAdmin && (
+        <Tab.Screen 
+          name="Settings" 
+          component={SettingsScreen}
+          options={{ 
+            tabBarLabel: 'Settings',
+            title: 'Settings'
+          }}
+        />
+      )}
     </Tab.Navigator>
   );
 };

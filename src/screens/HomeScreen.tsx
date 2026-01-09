@@ -111,20 +111,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const getQuickActions = (): QuickAction[] => {
     const actions: QuickAction[] = [
       {
-        id: 'qr-display',
-        title: 'Show My QR Code',
-        subtitle: 'Display emergency QR code',
-        icon: 'qr-code',
-        color: '#4CAF50',
-        onPress: () => navigation.navigate('QRDisplay'),
-      },
-      {
-        id: 'scan-qr',
-        title: 'Scan QR Code',
-        subtitle: 'Scan emergency information',
-        icon: 'scan',
-        color: '#2196F3',
-        onPress: () => navigation.navigate('QRScanner'),
+        id: 'view-profile',
+        title: 'View Full Profile',
+        subtitle: 'See complete information',
+        icon: 'document-text',
+        color: '#9C27B0',
+        onPress: () => navigation.navigate('ProfileDisplay'),
       },
       {
         id: 'edit-profile',
@@ -135,12 +127,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         onPress: () => navigation.navigate('ProfileForm'),
       },
       {
-        id: 'view-profile',
-        title: 'View Full Profile',
-        subtitle: 'See complete information',
-        icon: 'document-text',
-        color: '#9C27B0',
-        onPress: () => navigation.navigate('ProfileDisplay'),
+        id: 'access-history',
+        title: 'Profile Access History',
+        subtitle: 'View who accessed your profile',
+        icon: 'eye-outline',
+        color: '#007AFF',
+        onPress: () => navigation.navigate('ProfileAccessHistory'),
       },
     ];
 
@@ -193,8 +185,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     </View>
   );
 
-  const renderProfileStatus = () => (
-    <View style={styles.statusCard}>
+  const renderProfileStatus = () => {
+    if (profileCompletion === 100) return null;
+    
+    return (
+      <View style={styles.statusCard}>
       <View style={styles.statusHeader}>
         <Text style={styles.statusTitle}>Profile Status</Text>
         <Text style={styles.completionPercentage}>{profileCompletion}%</Text>
@@ -229,7 +224,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         </TouchableOpacity>
       )}
     </View>
-  );
+    );
+  };
 
   const renderQuickActions = () => {
     const actions = getQuickActions();
@@ -338,8 +334,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         
         {renderWelcomeCard()}
         {renderProfileStatus()}
-        {renderQuickActions()}
         {renderEmergencyInfo()}
+        {renderQuickActions()}
         
         <View style={styles.bottomSpacing} />
       </ScrollView>
