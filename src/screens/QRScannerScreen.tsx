@@ -17,6 +17,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 import { QRScanner } from '../components/QR';
 import { EmergencyQRData } from '../services/qrService';
+import { colors, spacing } from '../theme';
 
 interface QRScannerScreenProps {
   navigation: any;
@@ -124,7 +125,7 @@ const QRScannerScreen: React.FC<QRScannerScreenProps> = ({ navigation, route }) 
       
       <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
         <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
-          <Ionicons name="close" size={24} color="#fff" />
+          <Ionicons name="close" size={24} color={colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>
           {medicalProfessionalMode ? 'Medical Scanner' : 'Scan QR Code'}
@@ -134,7 +135,7 @@ const QRScannerScreen: React.FC<QRScannerScreenProps> = ({ navigation, route }) 
 
       {user?.userType === 'medical_professional' && user?.isVerified && (
         <View style={styles.professionalBanner}>
-          <Ionicons name="medical" size={20} color="#4CAF50" />
+          <Ionicons name="medical" size={20} color={colors.status.success.main} />
           <Text style={styles.professionalText}>Verified Medical Professional Access</Text>
         </View>
       )}
@@ -160,7 +161,7 @@ const QRScannerScreen: React.FC<QRScannerScreenProps> = ({ navigation, route }) 
 
       <View style={styles.footer}>
         <View style={styles.footerContent}>
-          <Ionicons name="shield-checkmark" size={16} color="#666" />
+          <Ionicons name="shield-checkmark" size={16} color={colors.text.secondary} />
           <Text style={styles.footerText}>
             Scan results are logged for security and audit purposes
           </Text>
@@ -171,7 +172,7 @@ const QRScannerScreen: React.FC<QRScannerScreenProps> = ({ navigation, route }) 
             style={styles.historyButton}
             onPress={() => navigation.navigate('ProfileAccessHistoryScreen')}
           >
-            <Ionicons name="time" size={16} color="#2196F3" />
+            <Ionicons name="time" size={16} color={colors.primary.main} />
             <Text style={styles.historyButtonText}>View Scan History</Text>
           </TouchableOpacity>
         )}
@@ -183,79 +184,89 @@ const QRScannerScreen: React.FC<QRScannerScreenProps> = ({ navigation, route }) 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: colors.background.primary,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#2196F3',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    backgroundColor: colors.background.secondary,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border.default,
   },
   closeButton: {
-    padding: 8,
+    padding: spacing.xs,
+    borderRadius: spacing.borderRadius.full,
+    backgroundColor: colors.background.elevated,
   },
   headerTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#fff',
+    color: colors.text.primary,
     flex: 1,
     textAlign: 'center',
   },
   placeholder: {
-    width: 40, // Same width as close button to center title
+    width: 40,
   },
   
   professionalBanner: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#E8F5E8',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+    backgroundColor: `${colors.medical.verified}15`,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border.light,
   },
   professionalText: {
-    marginLeft: 8,
+    marginLeft: spacing.sm,
     fontSize: 14,
-    color: '#4CAF50',
+    color: colors.medical.verified,
     fontWeight: '600',
   },
   
   instructionsContainer: {
-    backgroundColor: '#fff',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    backgroundColor: colors.background.secondary,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border.default,
   },
   instructionsTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
+    color: colors.text.primary,
+    marginBottom: spacing.sm,
     textAlign: 'center',
   },
   instructionsText: {
     fontSize: 14,
-    color: '#666',
+    color: colors.text.secondary,
     textAlign: 'center',
     lineHeight: 20,
   },
   
   footer: {
-    backgroundColor: '#fff',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    backgroundColor: colors.background.secondary,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: colors.border.default,
   },
   footerContent: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 12,
+    marginBottom: spacing.sm,
   },
   footerText: {
-    marginLeft: 8,
+    marginLeft: spacing.sm,
     fontSize: 12,
-    color: '#666',
+    color: colors.text.tertiary,
     textAlign: 'center',
   },
   historyButton: {
@@ -264,15 +275,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: '#2196F3',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 6,
+    borderColor: colors.primary.main,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: spacing.borderRadius.md,
   },
   historyButtonText: {
-    marginLeft: 6,
+    marginLeft: spacing.xs,
     fontSize: 14,
-    color: '#2196F3',
+    color: colors.primary.main,
     fontWeight: '600',
   },
 });

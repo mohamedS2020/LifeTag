@@ -8,10 +8,12 @@ import {
   ActivityIndicator,
   RefreshControl,
 } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { MedicalProfessional } from '../../types';
 import { MedicalProfessionalApprovalService } from '../../services/medicalProfessionalApprovalService';
 import VerifiedBadge, { VerifiedProfessionalIndicator } from './VerifiedBadge';
+import { colors, spacing } from '../../theme';
 
 /**
  * Props for MedicalProfessionalList component
@@ -175,7 +177,7 @@ const MedicalProfessionalList: React.FC<MedicalProfessionalListProps> = ({
         )}
       </View>
       
-      <Ionicons name="chevron-forward" size={16} color="#CCCCCC" />
+      <Ionicons name="chevron-forward" size={16} color={colors.text.tertiary} />
     </TouchableOpacity>
   );
 
@@ -202,7 +204,7 @@ const MedicalProfessionalList: React.FC<MedicalProfessionalListProps> = ({
 
       <View style={styles.detailedContent}>
         <View style={styles.detailRow}>
-          <Ionicons name="medical" size={16} color="#666666" />
+          <Ionicons name="medical" size={16} color={colors.text.secondary} />
           <Text style={styles.detailText}>
             {item.professionalInfo.specialty || 'General Practice'}
           </Text>
@@ -210,7 +212,7 @@ const MedicalProfessionalList: React.FC<MedicalProfessionalListProps> = ({
 
         {item.professionalInfo.hospitalAffiliation && (
           <View style={styles.detailRow}>
-            <Ionicons name="business" size={16} color="#666666" />
+            <Ionicons name="business" size={16} color={colors.text.secondary} />
             <Text style={styles.detailText}>
               {item.professionalInfo.hospitalAffiliation}
             </Text>
@@ -218,7 +220,7 @@ const MedicalProfessionalList: React.FC<MedicalProfessionalListProps> = ({
         )}
 
         <View style={styles.detailRow}>
-          <Ionicons name="document-text" size={16} color="#666666" />
+          <Ionicons name="document-text" size={16} color={colors.text.secondary} />
           <Text style={styles.detailText}>
             License: {item.professionalInfo.licenseNumber}
             {item.professionalInfo.licenseState && ` (${item.professionalInfo.licenseState})`}
@@ -227,7 +229,7 @@ const MedicalProfessionalList: React.FC<MedicalProfessionalListProps> = ({
 
         {item.professionalInfo.yearsOfExperience && (
           <View style={styles.detailRow}>
-            <Ionicons name="time" size={16} color="#666666" />
+            <Ionicons name="time" size={16} color={colors.text.secondary} />
             <Text style={styles.detailText}>
               {formatExperience(item.professionalInfo.yearsOfExperience)}
             </Text>
@@ -251,7 +253,7 @@ const MedicalProfessionalList: React.FC<MedicalProfessionalListProps> = ({
    */
   const renderEmptyState = () => (
     <View style={styles.emptyState}>
-      <Ionicons name="people-outline" size={64} color="#CCCCCC" />
+      <Ionicons name="people-outline" size={64} color={colors.text.tertiary} />
       <Text style={styles.emptyTitle}>
         {searchQuery 
           ? 'No professionals found' 
@@ -277,7 +279,7 @@ const MedicalProfessionalList: React.FC<MedicalProfessionalListProps> = ({
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#FF6B6B" />
+        <ActivityIndicator size="large" color={colors.primary.main} />
         <Text style={styles.loadingText}>Loading professionals...</Text>
       </View>
     );
@@ -289,7 +291,7 @@ const MedicalProfessionalList: React.FC<MedicalProfessionalListProps> = ({
   if (error) {
     return (
       <View style={styles.errorContainer}>
-        <Ionicons name="alert-circle" size={48} color="#DC3545" />
+        <Ionicons name="alert-circle" size={48} color={colors.status.error.main} />
         <Text style={styles.errorTitle}>Error Loading Professionals</Text>
         <Text style={styles.errorText}>{error}</Text>
         <TouchableOpacity style={styles.retryButton} onPress={loadProfessionals}>
@@ -310,8 +312,8 @@ const MedicalProfessionalList: React.FC<MedicalProfessionalListProps> = ({
           <RefreshControl
             refreshing={refreshing}
             onRefresh={handleRefresh}
-            colors={['#FF6B6B']}
-            tintColor="#FF6B6B"
+            colors={[colors.primary.main]}
+            tintColor={colors.primary.main}
           />
         }
         ListEmptyComponent={renderEmptyState}
@@ -327,16 +329,16 @@ const MedicalProfessionalList: React.FC<MedicalProfessionalListProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.background.primary,
   },
   listContainer: {
-    padding: 16,
+    padding: spacing.md,
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 40,
+    padding: spacing['2xl'],
   },
   loadingContainer: {
     flex: 1,
@@ -345,48 +347,48 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 16,
-    color: '#666666',
-    marginTop: 10,
+    color: colors.text.secondary,
+    marginTop: spacing.sm,
   },
   errorContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 40,
+    padding: spacing['2xl'],
   },
   errorTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#DC3545',
-    marginTop: 16,
-    marginBottom: 8,
+    color: colors.status.error.main,
+    marginTop: spacing.md,
+    marginBottom: spacing.sm,
   },
   errorText: {
     fontSize: 14,
-    color: '#666666',
+    color: colors.text.secondary,
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: spacing.lg,
   },
   retryButton: {
-    backgroundColor: '#FF6B6B',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 8,
+    backgroundColor: colors.primary.main,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: spacing.sm,
   },
   retryButtonText: {
-    color: 'white',
+    color: colors.text.inverse,
     fontSize: 16,
     fontWeight: '600',
   },
   compactItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 8,
+    backgroundColor: colors.background.card,
+    borderRadius: spacing.sm,
+    padding: spacing.md,
+    marginBottom: spacing.sm,
     borderWidth: 1,
-    borderColor: '#F0F0F0',
+    borderColor: colors.border.default,
   },
   compactContent: {
     flex: 1,
@@ -394,51 +396,51 @@ const styles = StyleSheet.create({
   compactHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: spacing.xs,
   },
   compactName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333333',
+    color: colors.text.primary,
     flex: 1,
-    marginRight: 8,
+    marginRight: spacing.sm,
   },
   compactSpecialty: {
     fontSize: 14,
-    color: '#666666',
+    color: colors.text.secondary,
     marginBottom: 2,
   },
   compactHospital: {
     fontSize: 12,
-    color: '#999999',
+    color: colors.text.tertiary,
   },
   detailedItem: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
+    backgroundColor: colors.background.card,
+    borderRadius: spacing.md,
+    padding: spacing.md,
+    marginBottom: spacing.md,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
     borderWidth: 1,
-    borderColor: '#F0F0F0',
+    borderColor: colors.border.default,
   },
   detailedHeader: {
-    marginBottom: 12,
+    marginBottom: spacing.md,
   },
   professionalNameSection: {
-    marginBottom: 8,
+    marginBottom: spacing.sm,
   },
   detailedName: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333333',
-    marginBottom: 8,
+    color: colors.text.primary,
+    marginBottom: spacing.sm,
   },
   detailedContent: {
-    gap: 8,
+    gap: spacing.sm,
   },
   detailRow: {
     flexDirection: 'row',
@@ -446,19 +448,19 @@ const styles = StyleSheet.create({
   },
   detailText: {
     fontSize: 14,
-    color: '#666666',
-    marginLeft: 8,
+    color: colors.text.secondary,
+    marginLeft: spacing.sm,
     flex: 1,
   },
   verificationInfo: {
-    marginTop: 8,
-    paddingTop: 8,
+    marginTop: spacing.sm,
+    paddingTop: spacing.sm,
     borderTopWidth: 1,
-    borderTopColor: '#F0F0F0',
+    borderTopColor: colors.border.default,
   },
   verificationText: {
     fontSize: 12,
-    color: '#28A745',
+    color: colors.status.success.main,
     fontStyle: 'italic',
   },
   emptyState: {
@@ -468,13 +470,13 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333333',
-    marginTop: 16,
-    marginBottom: 8,
+    color: colors.text.primary,
+    marginTop: spacing.md,
+    marginBottom: spacing.sm,
   },
   emptyText: {
     fontSize: 14,
-    color: '#666666',
+    color: colors.text.secondary,
     textAlign: 'center',
     lineHeight: 20,
   },

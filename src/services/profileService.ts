@@ -82,7 +82,7 @@ export interface ProfileService {
   // Audit and Logging
   logProfileAccess: (profileId: string, accessLog: Omit<AuditLog, 'id' | 'timestamp'>) => Promise<ApiResponse<void>>;
   getProfileAccessLogs: (profileId: string, limit?: number) => Promise<ApiResponse<AuditLog[]>>;
-  cleanupAuditLogs: (profileId?: string) => Promise<ApiResponse<{ deletedCount: number }>>;
+  cleanupAuditLogs: (profileId?: string) => Promise<ApiResponse<{ deletedCount: number; profilesProcessed: number }>>;
   getAuditLogStatistics: (profileId?: string) => Promise<ApiResponse<{
     totalLogs: number;
     oldestLog?: Date;
@@ -1191,31 +1191,34 @@ class ProfileServiceImpl implements ProfileService {
   /**
    * Clean up old audit logs based on retention policies
    */
-  async cleanupAuditLogs(profileId?: string): Promise<ApiResponse<{ deletedCount: number }>> {
+  async cleanupAuditLogs(profileId?: string): Promise<ApiResponse<{ deletedCount: number; profilesProcessed: number }>> {
     try {
       const { RETENTION_DAYS, MAX_LOGS_PER_PROFILE } = CONFIG.AUDIT;
       let totalDeleted = 0;
+      let profilesProcessed = 0;
 
       if (profileId) {
         // Clean up logs for specific profile
         totalDeleted = await this.cleanupProfileAuditLogs(profileId, RETENTION_DAYS, MAX_LOGS_PER_PROFILE);
+        profilesProcessed = 1;
       } else {
         // Clean up logs for all profiles (admin operation)
-        const profilesQuery = query(collection(db, 'user_profiles'));
+        const profilesQuery = query(collection(db, 'profiles'));
         const profilesSnapshot = await getDocs(profilesQuery);
         
         for (const profileDoc of profilesSnapshot.docs) {
           const profileIdToClean = profileDoc.id;
           const deleted = await this.cleanupProfileAuditLogs(profileIdToClean, RETENTION_DAYS, MAX_LOGS_PER_PROFILE);
           totalDeleted += deleted;
+          profilesProcessed++;
         }
       }
 
-      console.log(`Audit cleanup completed: ${totalDeleted} logs deleted`);
+      console.log(`Audit cleanup completed: ${totalDeleted} logs deleted, ${profilesProcessed} profiles processed`);
       
       return {
         success: true,
-        data: { deletedCount: totalDeleted },
+        data: { deletedCount: totalDeleted, profilesProcessed },
         timestamp: new Date()
       };
 

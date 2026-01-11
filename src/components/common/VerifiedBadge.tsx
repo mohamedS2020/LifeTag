@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { colors, spacing, borderRadius, typography } from '../../theme';
 
 /**
  * Props for VerifiedBadge component
@@ -61,24 +62,24 @@ const VerifiedBadge: React.FC<VerifiedBadgeProps> = ({
   };
 
   /**
-   * Get badge color scheme
+   * Get badge color scheme - using theme colors
    */
   const getColorScheme = () => {
     if (isVerified) {
       return {
-        backgroundColor: '#D4EDDA',
-        borderColor: '#28A745',
-        textColor: '#155724',
-        iconColor: '#28A745',
+        backgroundColor: colors.medical.verifiedBackground,
+        borderColor: colors.status.success.border,
+        textColor: colors.status.success.main,
+        iconColor: colors.status.success.main,
         iconName: 'checkmark-circle' as const,
         label: 'Verified',
       };
     } else {
       return {
-        backgroundColor: '#FFF3CD',
-        borderColor: '#FFC107',
-        textColor: '#856404',
-        iconColor: '#FFC107',
+        backgroundColor: colors.medical.pendingBackground,
+        borderColor: colors.status.warning.border,
+        textColor: colors.status.warning.main,
+        iconColor: colors.status.warning.main,
         iconName: 'time' as const,
         label: 'Pending',
       };
@@ -267,87 +268,88 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderRadius: 12,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    borderRadius: borderRadius.md,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
   },
   smallContainer: {
-    borderRadius: 8,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
+    borderRadius: borderRadius.sm,
+    paddingHorizontal: spacing.xs,
+    paddingVertical: spacing.xxs,
   },
   mediumContainer: {
-    borderRadius: 10,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    borderRadius: borderRadius.sm,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
   },
   largeContainer: {
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    borderRadius: borderRadius.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
   },
   smallText: {
-    fontSize: 10,
+    ...typography.caption,
     fontWeight: '600',
-    marginLeft: 4,
+    marginLeft: spacing.xs,
   },
   mediumText: {
-    fontSize: 12,
+    ...typography.label,
     fontWeight: '600',
-    marginLeft: 6,
+    marginLeft: spacing.sm,
   },
   largeText: {
-    fontSize: 14,
+    ...typography.labelLarge,
     fontWeight: '600',
-    marginLeft: 8,
+    marginLeft: spacing.sm,
   },
   iconOnlyContainer: {
     alignItems: 'center',
     justifyContent: 'center',
   },
   verificationDetails: {
-    fontSize: 10,
-    marginLeft: 8,
+    ...typography.caption,
+    marginLeft: spacing.sm,
     fontStyle: 'italic',
   },
   compactIndicator: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginLeft: 8,
+    marginLeft: spacing.sm,
   },
   compactText: {
-    fontSize: 12,
-    color: '#28A745',
+    ...typography.label,
+    color: colors.status.success.main,
     fontWeight: '500',
-    marginLeft: 4,
+    marginLeft: spacing.xs,
   },
   professionalIndicator: {
-    backgroundColor: '#F8F9FA',
-    borderRadius: 8,
-    padding: 12,
-    marginVertical: 8,
+    backgroundColor: colors.background.elevated,
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+    marginVertical: spacing.sm,
+    borderWidth: 1,
+    borderColor: colors.border.default,
   },
   professionalDetails: {
-    marginTop: 8,
-    marginLeft: 4,
+    marginTop: spacing.sm,
+    marginLeft: spacing.xs,
   },
   specialtyText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333333',
-    marginBottom: 2,
+    ...typography.labelLarge,
+    color: colors.text.primary,
+    marginBottom: spacing.xxs,
   },
   licenseText: {
-    fontSize: 12,
-    color: '#666666',
-    marginBottom: 2,
+    ...typography.bodySmall,
+    color: colors.text.secondary,
+    marginBottom: spacing.xxs,
   },
   affiliationText: {
-    fontSize: 12,
-    color: '#666666',
+    ...typography.bodySmall,
+    color: colors.text.secondary,
   },
   profileHeaderBadge: {
-    marginTop: 8,
+    marginTop: spacing.sm,
     alignSelf: 'flex-start',
   },
 });

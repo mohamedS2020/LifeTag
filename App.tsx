@@ -1,6 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { AuthProvider } from './src/context';
 import { AppNavigator } from './src/navigation';
+import { ThemeProvider } from './src/theme';
 
 /**
  * Main App Component
@@ -9,9 +10,11 @@ import { AppNavigator } from './src/navigation';
  */
 export default function App() {
   return (
-    <AuthProvider>
-      <AppNavigator />
-      <StatusBar style="auto" />
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <AppNavigator />
+        <StatusBar style="light" />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

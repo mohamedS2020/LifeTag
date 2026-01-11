@@ -9,10 +9,12 @@ import {
   RefreshControl,
   Alert,
 } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { UserProfile } from '../../types';
 import { profileService } from '../../services';
 import { useMedicalProfessionalAccess } from '../../hooks';
+import { colors, spacing } from '../../theme';
 
 /**
  * Props for PatientProfileList component
@@ -146,15 +148,15 @@ const PatientProfileList: React.FC<PatientProfileListProps> = ({
           <View style={styles.accessIndicators}>
             {hasEmergencyContacts && (
               <View style={styles.indicator}>
-                <Ionicons name="people" size={16} color="#28A745" />
+                <Ionicons name="people" size={16} color={colors.status.success.main} />
               </View>
             )}
             {hasMedicalInfo && (
               <View style={styles.indicator}>
-                <Ionicons name="medical" size={16} color="#FF6B6B" />
+                <Ionicons name="medical" size={16} color={colors.status.error.main} />
               </View>
             )}
-            <Ionicons name="chevron-forward" size={20} color="#666666" />
+            <Ionicons name="chevron-forward" size={20} color={colors.text.secondary} />
           </View>
         </View>
 
@@ -186,7 +188,7 @@ const PatientProfileList: React.FC<PatientProfileListProps> = ({
    */
   const renderEmptyState = () => (
     <View style={styles.emptyContainer}>
-      <Ionicons name="people-outline" size={64} color="#CCCCCC" />
+      <Ionicons name="people-outline" size={64} color={colors.text.tertiary} />
       <Text style={styles.emptyTitle}>No Patient Profiles</Text>
       <Text style={styles.emptyText}>
         {searchQuery 
@@ -202,7 +204,7 @@ const PatientProfileList: React.FC<PatientProfileListProps> = ({
    */
   const renderErrorState = () => (
     <View style={styles.errorContainer}>
-      <Ionicons name="alert-circle-outline" size={64} color="#DC3545" />
+      <Ionicons name="alert-circle-outline" size={64} color={colors.status.error.main} />
       <Text style={styles.errorTitle}>Error Loading Profiles</Text>
       <Text style={styles.errorText}>{error}</Text>
       <TouchableOpacity style={styles.retryButton} onPress={loadPatientProfiles}>
@@ -220,7 +222,7 @@ const PatientProfileList: React.FC<PatientProfileListProps> = ({
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#FF6B6B" />
+        <ActivityIndicator size="large" color={colors.primary.main} />
         <Text style={styles.loadingText}>Loading patient profiles...</Text>
       </View>
     );
@@ -242,8 +244,8 @@ const PatientProfileList: React.FC<PatientProfileListProps> = ({
           <RefreshControl
             refreshing={refreshing}
             onRefresh={handleRefresh}
-            colors={['#FF6B6B']}
-            tintColor="#FF6B6B"
+            colors={[colors.primary.main]}
+            tintColor={colors.primary.main}
           />
         }
         showsVerticalScrollIndicator={false}
@@ -258,29 +260,29 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   listContainer: {
-    paddingBottom: 20,
+    paddingBottom: spacing.lg,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: spacing.lg,
   },
   loadingText: {
-    marginTop: 10,
+    marginTop: spacing.sm,
     fontSize: 16,
-    color: '#666666',
+    color: colors.text.secondary,
   },
   emptyListContainer: {
     flexGrow: 1,
   },
   profileCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
+    backgroundColor: colors.background.card,
+    borderRadius: spacing.md,
+    padding: spacing.md,
+    marginBottom: spacing.md,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: colors.border.default,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -291,8 +293,8 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   compactCard: {
-    padding: 12,
-    marginBottom: 8,
+    padding: spacing.md,
+    marginBottom: spacing.sm,
   },
   profileHeader: {
     flexDirection: 'row',
@@ -305,63 +307,63 @@ const styles = StyleSheet.create({
   profileName: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333333',
-    marginBottom: 4,
+    color: colors.text.primary,
+    marginBottom: spacing.xs,
   },
   profileContact: {
     fontSize: 14,
-    color: '#666666',
-    marginBottom: 4,
+    color: colors.text.secondary,
+    marginBottom: spacing.xs,
   },
   profileDetail: {
     fontSize: 13,
-    color: '#888888',
+    color: colors.text.tertiary,
   },
   accessIndicators: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: spacing.sm,
   },
   indicator: {
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: '#F0F0F0',
+    backgroundColor: colors.background.tertiary,
     justifyContent: 'center',
     alignItems: 'center',
   },
   profileDetails: {
-    marginTop: 12,
-    paddingTop: 12,
+    marginTop: spacing.md,
+    paddingTop: spacing.md,
     borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
+    borderTopColor: colors.border.default,
   },
   profileStat: {
     fontSize: 13,
-    color: '#666666',
-    marginBottom: 4,
+    color: colors.text.secondary,
+    marginBottom: spacing.xs,
   },
   alertText: {
     fontSize: 13,
-    color: '#FF6B6B',
+    color: colors.status.error.main,
     fontWeight: '500',
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 40,
+    padding: spacing['2xl'],
   },
   emptyTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#333333',
-    marginTop: 16,
-    marginBottom: 8,
+    color: colors.text.primary,
+    marginTop: spacing.md,
+    marginBottom: spacing.sm,
   },
   emptyText: {
     fontSize: 16,
-    color: '#666666',
+    color: colors.text.secondary,
     textAlign: 'center',
     lineHeight: 22,
   },
@@ -369,30 +371,30 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 40,
+    padding: spacing['2xl'],
   },
   errorTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#DC3545',
-    marginTop: 16,
-    marginBottom: 8,
+    color: colors.status.error.main,
+    marginTop: spacing.md,
+    marginBottom: spacing.sm,
   },
   errorText: {
     fontSize: 16,
-    color: '#666666',
+    color: colors.text.secondary,
     textAlign: 'center',
     lineHeight: 22,
-    marginBottom: 20,
+    marginBottom: spacing.lg,
   },
   retryButton: {
-    backgroundColor: '#FF6B6B',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 8,
+    backgroundColor: colors.primary.main,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: spacing.sm,
   },
   retryButtonText: {
-    color: '#FFFFFF',
+    color: colors.text.inverse,
     fontSize: 16,
     fontWeight: '600',
   },

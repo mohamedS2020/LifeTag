@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createStackNavigator, StackScreenProps } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -19,6 +19,22 @@ import AdminAuditLogDetailScreen from '../screens/AdminAuditLogDetailScreen';
 import { MedicalProfessionalDashboard } from '../components/common';
 import { EmergencyQRData } from '../services/qrService';
 import { StatusBar } from 'expo-status-bar';
+import { colors, spacing, typography, borderRadius } from '../theme';
+
+// Dark Navigation Theme
+const DarkNavigationTheme = {
+  ...DefaultTheme,
+  dark: true,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: colors.primary.main,
+    background: colors.background.primary,
+    card: colors.background.secondary,
+    text: colors.text.primary,
+    border: colors.border.default,
+    notification: colors.status.error.main,
+  },
+};
 
 // Type definitions for navigation
 export type RootStackParamList = {
@@ -75,7 +91,7 @@ const LoadingScreen: React.FC = () => {
     <View style={styles.loadingContainer}>
       <Text style={styles.appTitle}>LifeTag</Text>
       <Text style={styles.appSubtitle}>Emergency Medical Information System</Text>
-      <ActivityIndicator size="large" color="#2196F3" style={styles.spinner} />
+      <ActivityIndicator size="large" color={colors.primary.main} style={styles.spinner} />
       <Text style={styles.loadingText}>Loading...</Text>
     </View>
   );
@@ -122,15 +138,32 @@ const AuthenticatedTabs: React.FC = () => {
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: '#2196F3',
-        tabBarInactiveTintColor: 'gray',
+        tabBarActiveTintColor: colors.primary.main,
+        tabBarInactiveTintColor: colors.text.tertiary,
+        tabBarStyle: {
+          backgroundColor: colors.background.secondary,
+          borderTopColor: colors.border.default,
+          borderTopWidth: 1,
+          paddingTop: spacing.xs,
+          paddingBottom: spacing.sm,
+          height: 60,
+        },
+        tabBarLabelStyle: {
+          ...typography.caption,
+          marginTop: 2,
+        },
         headerShown: true,
         headerStyle: {
-          backgroundColor: '#2196F3',
+          backgroundColor: colors.background.primary,
+          shadowColor: 'transparent',
+          elevation: 0,
+          borderBottomWidth: 1,
+          borderBottomColor: colors.border.default,
         },
-        headerTintColor: '#fff',
+        headerTintColor: colors.text.primary,
         headerTitleStyle: {
-          fontWeight: 'bold',
+          ...typography.h4,
+          color: colors.text.primary,
         },
       })}
     >
@@ -329,7 +362,7 @@ const AppNavigator: React.FC = () => {
 
   return (
     <SafeAreaProvider>
-      <NavigationContainer>
+      <NavigationContainer theme={DarkNavigationTheme}>
         {initializing ? (
           <LoadingScreen />
         ) : user ? (
@@ -349,44 +382,43 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-    padding: 20,
+    backgroundColor: colors.background.primary,
+    padding: spacing.xl,
   },
   appTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#2196F3',
-    marginBottom: 8,
+    ...typography.displayMedium,
+    color: colors.primary.main,
+    marginBottom: spacing.sm,
   },
   appSubtitle: {
-    fontSize: 16,
-    color: '#666',
+    ...typography.body,
+    color: colors.text.secondary,
     textAlign: 'center',
-    marginBottom: 30,
+    marginBottom: spacing['3xl'],
   },
   spinner: {
-    marginBottom: 16,
+    marginBottom: spacing.lg,
   },
   loadingText: {
-    fontSize: 16,
-    color: '#666',
+    ...typography.body,
+    color: colors.text.tertiary,
   },
   placeholder: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-    padding: 20,
+    backgroundColor: colors.background.primary,
+    padding: spacing.xl,
   },
   placeholderText: {
-    fontSize: 18,
-    color: '#333',
+    ...typography.h3,
+    color: colors.text.primary,
     textAlign: 'center',
-    marginBottom: 8,
+    marginBottom: spacing.sm,
   },
   placeholderSubtext: {
-    fontSize: 14,
-    color: '#666',
+    ...typography.body,
+    color: colors.text.secondary,
     textAlign: 'center',
   },
   // Settings Screen Styles

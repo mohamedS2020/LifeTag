@@ -9,6 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { colors, spacing } from '../../theme';
 import { useAuth } from '../../context/AuthContext';
 import { AuditLog, User, MedicalProfessional } from '../../types';
 import { profileService } from '../../services';
@@ -201,7 +202,7 @@ const UserAuditLogViewer: React.FC<UserAuditLogViewerProps> = ({ profileId }) =>
             <Ionicons
               name={getAccessTypeIcon()}
               size={20}
-              color="#007AFF"
+              color={colors.primary.main}
             />
           </View>
           <View style={styles.auditLogInfo}>
@@ -211,7 +212,7 @@ const UserAuditLogViewer: React.FC<UserAuditLogViewerProps> = ({ profileId }) =>
               </Text>
               {accessorInfo.isMedicalProfessional && (
                 <View style={styles.medicalBadge}>
-                  <Ionicons name="medical" size={12} color="#FFFFFF" />
+                  <Ionicons name="medical" size={12} color={colors.text.inverse} />
                   <Text style={styles.medicalBadgeText}>MD</Text>
                 </View>
               )}
@@ -241,7 +242,7 @@ const UserAuditLogViewer: React.FC<UserAuditLogViewerProps> = ({ profileId }) =>
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#007AFF" />
+        <ActivityIndicator size="large" color={colors.primary.main} />
         <Text style={styles.loadingText}>Loading access history...</Text>
       </View>
     );
@@ -250,7 +251,7 @@ const UserAuditLogViewer: React.FC<UserAuditLogViewerProps> = ({ profileId }) =>
   if (auditLogs.length === 0) {
     return (
       <View style={styles.emptyStateContainer}>
-        <Ionicons name="shield-checkmark-outline" size={64} color="#28A745" />
+        <Ionicons name="shield-checkmark-outline" size={64} color={colors.status.success.main} />
         <Text style={styles.emptyStateTitle}>No Profile Access Yet</Text>
         <Text style={styles.emptyStateText}>
           Your profile access history will appear here when others view your profile.
@@ -275,7 +276,7 @@ const UserAuditLogViewer: React.FC<UserAuditLogViewerProps> = ({ profileId }) =>
           <RefreshControl
             refreshing={loading}
             onRefresh={fetchAuditLogs}
-            tintColor="#007AFF"
+            tintColor={colors.primary.main}
           />
         }
         contentContainerStyle={styles.listContent}
@@ -288,35 +289,35 @@ const UserAuditLogViewer: React.FC<UserAuditLogViewerProps> = ({ profileId }) =>
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: colors.background.secondary,
   },
   title: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#333333',
-    marginBottom: 8,
-    paddingHorizontal: 16,
-    paddingTop: 16,
+    color: colors.text.primary,
+    marginBottom: spacing.xs,
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.md,
   },
   subtitle: {
     fontSize: 14,
-    color: '#666666',
-    marginBottom: 20,
+    color: colors.text.secondary,
+    marginBottom: spacing.lg,
     lineHeight: 20,
-    paddingHorizontal: 16,
+    paddingHorizontal: spacing.md,
   },
   logsList: {
     flex: 1,
   },
   listContent: {
-    paddingHorizontal: 16,
-    paddingBottom: 16,
+    paddingHorizontal: spacing.md,
+    paddingBottom: spacing.md,
   },
   auditLogItem: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.text.inverse,
     borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
+    padding: spacing.md,
+    marginBottom: spacing.sm,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
@@ -330,11 +331,11 @@ const styles = StyleSheet.create({
   auditLogIcon: {
     width: 36,
     height: 36,
-    backgroundColor: '#E8F4FD',
+    backgroundColor: colors.primary.main + '20',
     borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: spacing.sm,
   },
   auditLogInfo: {
     flex: 1,
@@ -347,13 +348,13 @@ const styles = StyleSheet.create({
   accessorName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333333',
-    marginRight: 8,
+    color: colors.text.primary,
+    marginRight: spacing.xs,
   },
   medicalBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#28A745',
+    backgroundColor: colors.status.success.main,
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 8,
@@ -361,65 +362,65 @@ const styles = StyleSheet.create({
   medicalBadgeText: {
     fontSize: 10,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: colors.text.inverse,
     marginLeft: 2,
   },
   accessType: {
     fontSize: 14,
-    color: '#007AFF',
+    color: colors.primary.main,
     fontWeight: '500',
     marginBottom: 2,
   },
   accessTime: {
     fontSize: 12,
-    color: '#666666',
+    color: colors.text.secondary,
     fontWeight: '500',
   },
   medicalSpecialty: {
     fontSize: 12,
-    color: '#28A745',
+    color: colors.status.success.main,
     fontStyle: 'italic',
     marginTop: 2,
   },
   accessMethodBadge: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 8,
+    backgroundColor: colors.primary.main,
+    paddingHorizontal: spacing.xs,
     paddingVertical: 4,
     borderRadius: 6,
   },
   accessMethodText: {
     fontSize: 10,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: colors.text.inverse,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 40,
+    padding: spacing.xl,
   },
   loadingText: {
     fontSize: 16,
-    color: '#666666',
-    marginTop: 16,
+    color: colors.text.secondary,
+    marginTop: spacing.md,
     fontWeight: '500',
   },
   emptyStateContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 40,
+    padding: spacing.xl,
   },
   emptyStateTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#333333',
-    marginTop: 20,
-    marginBottom: 12,
+    color: colors.text.primary,
+    marginTop: spacing.lg,
+    marginBottom: spacing.sm,
   },
   emptyStateText: {
     fontSize: 16,
-    color: '#666666',
+    color: colors.text.secondary,
     textAlign: 'center',
     lineHeight: 22,
   },

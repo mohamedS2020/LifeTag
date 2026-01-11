@@ -24,6 +24,7 @@ import * as FileSystem from 'expo-file-system';
 import { UserProfile } from '../../types';
 import { QRService, QRCodeGenerator, EmergencyQRData } from '../../services/qrService';
 import { BackupTextDisplay } from './BackupTextDisplay';
+import { colors, spacing } from '../../theme';
 
 /**
  * QR Display Screen Props
@@ -504,15 +505,15 @@ export const QRDisplay: React.FC<QRDisplayProps> = ({
   return (
     <SafeAreaView style={[containerStyle, backgroundStyle]}>
       <StatusBar 
-        barStyle="dark-content" 
-        backgroundColor="#FFFFFF" 
+        barStyle="light-content" 
+        backgroundColor={colors.background.primary} 
         translucent={false}
       />
       
       {/* Header Controls */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.shareButton} onPress={() => setShowShareModal(true)}>
-          <Ionicons name="share-outline" size={26} color="#007AFF" />
+          <Ionicons name="share-outline" size={26} color={colors.primary.main} />
         </TouchableOpacity>
         
         <View style={styles.headerCenter}>
@@ -527,11 +528,11 @@ export const QRDisplay: React.FC<QRDisplayProps> = ({
         <View style={styles.headerRight}>
           {onClose && (
             <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-              <Ionicons name="close" size={26} color="#333333" />
+              <Ionicons name="close" size={26} color={colors.text.primary} />
             </TouchableOpacity>
           )}
           <TouchableOpacity style={styles.helpButton} onPress={showEmergencyInstructions}>
-            <Ionicons name="help-circle" size={26} color="#007AFF" />
+            <Ionicons name="help-circle" size={26} color={colors.primary.main} />
           </TouchableOpacity>
         </View>
       </View>
@@ -549,7 +550,7 @@ export const QRDisplay: React.FC<QRDisplayProps> = ({
           <Ionicons 
             name={showBackupText ? "qr-code" : "text"} 
             size={20} 
-            color="#007AFF" 
+            color={colors.primary.main} 
           />
           <Text style={styles.toggleButtonText}>
             {showBackupText ? 'Show QR Code' : 'Show Backup Text'}
@@ -574,7 +575,7 @@ export const QRDisplay: React.FC<QRDisplayProps> = ({
           <View style={styles.qrContainer}>
             {isGenerating ? (
               <View style={[styles.qrPlaceholder, { width: qrSize, height: qrSize }]}>
-                <ActivityIndicator size="large" color="#007AFF" />
+                <ActivityIndicator size="large" color={colors.primary.main} />
                 <Text style={styles.loadingText}>Generating QR Code...</Text>
               </View>
             ) : qrData ? (
@@ -606,7 +607,7 @@ export const QRDisplay: React.FC<QRDisplayProps> = ({
               </View>
             ) : (
               <View style={[styles.qrPlaceholder, { width: qrSize, height: qrSize }]}>
-                <Ionicons name="alert-circle" size={60} color="#FF3B30" />
+                <Ionicons name="alert-circle" size={60} color={colors.status.error.main} />
                 <Text style={styles.errorText}>Failed to generate QR code</Text>
                 <TouchableOpacity 
                   style={styles.fallbackButton} 
@@ -691,7 +692,7 @@ export const QRDisplay: React.FC<QRDisplayProps> = ({
           <Ionicons 
             name={isMaxBrightness ? "sunny" : "sunny-outline"} 
             size={24} 
-            color="#007AFF" 
+            color={colors.primary.main} 
           />
           <Text style={styles.controlButtonText}>
             {isMaxBrightness ? 'Normal' : 'Bright'}
@@ -703,7 +704,7 @@ export const QRDisplay: React.FC<QRDisplayProps> = ({
           onPress={() => generateQRCode(true)}
           disabled={isGenerating}
         >
-          <Ionicons name="refresh" size={24} color="#007AFF" />
+          <Ionicons name="refresh" size={24} color={colors.primary.main} />
           <Text style={styles.controlButtonText}>Refresh</Text>
         </TouchableOpacity>
 
@@ -711,7 +712,7 @@ export const QRDisplay: React.FC<QRDisplayProps> = ({
           style={styles.controlButton} 
           onPress={showEmergencyInstructions}
         >
-          <Ionicons name="information-circle" size={24} color="#007AFF" />
+          <Ionicons name="information-circle" size={24} color={colors.primary.main} />
           <Text style={styles.controlButtonText}>Help</Text>
         </TouchableOpacity>
       </View>
@@ -726,7 +727,7 @@ export const QRDisplay: React.FC<QRDisplayProps> = ({
         <SafeAreaView style={styles.modalContainer}>
           <View style={styles.modalHeader}>
             <TouchableOpacity onPress={() => setShowShareModal(false)}>
-              <Ionicons name="close" size={24} color="#333333" />
+              <Ionicons name="close" size={24} color={colors.text.primary} />
             </TouchableOpacity>
             <Text style={styles.modalTitle}>Share & Export QR Code</Text>
             <View style={{ width: 24 }} />
@@ -747,13 +748,13 @@ export const QRDisplay: React.FC<QRDisplayProps> = ({
                 }}
               >
                 <View style={styles.optionIcon}>
-                  <Ionicons name="share-outline" size={24} color="#007AFF" />
+                  <Ionicons name="share-outline" size={24} color={colors.primary.main} />
                 </View>
                 <View style={styles.optionText}>
                   <Text style={styles.optionTitle}>Share QR Code</Text>
                   <Text style={styles.optionDescription}>Share via messages, email, or social media</Text>
                 </View>
-                <Ionicons name="chevron-forward" size={20} color="#666666" />
+                <Ionicons name="chevron-forward" size={20} color={colors.text.tertiary} />
               </TouchableOpacity>
 
               {/* Export as PNG */}
@@ -767,9 +768,9 @@ export const QRDisplay: React.FC<QRDisplayProps> = ({
               >
                 <View style={styles.optionIcon}>
                   {isExporting ? (
-                    <ActivityIndicator size="small" color="#28A745" />
+                    <ActivityIndicator size="small" color={colors.status.success.main} />
                   ) : (
-                    <Ionicons name="image-outline" size={24} color="#28A745" />
+                    <Ionicons name="image-outline" size={24} color={colors.status.success.main} />
                   )}
                 </View>
                 <View style={styles.optionText}>
@@ -778,7 +779,7 @@ export const QRDisplay: React.FC<QRDisplayProps> = ({
                     {isExporting ? 'Saving image...' : 'Save as high-quality image to your photos'}
                   </Text>
                 </View>
-                <Ionicons name="chevron-forward" size={20} color="#666666" />
+                <Ionicons name="chevron-forward" size={20} color={colors.text.tertiary} />
               </TouchableOpacity>
 
               {/* Export as Document */}
@@ -792,9 +793,9 @@ export const QRDisplay: React.FC<QRDisplayProps> = ({
               >
                 <View style={styles.optionIcon}>
                   {isExporting ? (
-                    <ActivityIndicator size="small" color="#FF6B6B" />
+                    <ActivityIndicator size="small" color={colors.status.error.main} />
                   ) : (
-                    <Ionicons name="document-outline" size={24} color="#FF6B6B" />
+                    <Ionicons name="document-outline" size={24} color={colors.status.error.main} />
                   )}
                 </View>
                 <View style={styles.optionText}>
@@ -803,7 +804,7 @@ export const QRDisplay: React.FC<QRDisplayProps> = ({
                     {isExporting ? 'Preparing document...' : 'Create printable text document'}
                   </Text>
                 </View>
-                <Ionicons name="chevron-forward" size={20} color="#666666" />
+                <Ionicons name="chevron-forward" size={20} color={colors.text.tertiary} />
               </TouchableOpacity>
             </View>
           </View>
@@ -816,12 +817,14 @@ export const QRDisplay: React.FC<QRDisplayProps> = ({
 const styles = StyleSheet.create({
   fullScreenContainer: {
     flex: 1,
+    backgroundColor: colors.background.primary,
   },
   normalContainer: {
     flex: 1,
+    backgroundColor: colors.background.primary,
   },
   normalBackground: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.background.primary,
   },
   maxBrightnessBackground: {
     backgroundColor: '#FFFFFF',
@@ -831,14 +834,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    backgroundColor: '#F8F9FA',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    backgroundColor: colors.background.secondary,
     borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
+    borderBottomColor: colors.border.default,
   },
   closeButton: {
-    padding: 5,
+    padding: spacing.xxs,
   },
   headerCenter: {
     flex: 1,
@@ -847,43 +850,43 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333333',
+    color: colors.text.primary,
     textAlign: 'center',
   },
   headerSubtitle: {
     fontSize: 14,
-    color: '#666666',
+    color: colors.text.secondary,
     textAlign: 'center',
     marginTop: 2,
   },
   helpButton: {
-    padding: 5,
+    padding: spacing.xxs,
   },
   shareButton: {
-    padding: 5,
+    padding: spacing.xxs,
   },
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: spacing.sm,
   },
   scrollContent: {
     flexGrow: 1,
     alignItems: 'center',
-    paddingVertical: 20,
+    paddingVertical: spacing.lg,
   },
   qrContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 30,
+    marginBottom: spacing.xl,
   },
   qrWrapper: {
     position: 'relative',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FFFFFF',
-    padding: 20,
-    borderRadius: 15,
+    backgroundColor: '#FFFFFF', // Keep white for QR scanability
+    padding: spacing.lg,
+    borderRadius: spacing.borderRadius.lg,
     // High contrast shadow for emergency visibility
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 4 },
@@ -895,14 +898,14 @@ const styles = StyleSheet.create({
     position: 'absolute',
     borderWidth: 3,
     borderColor: '#000000',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 15,
+    backgroundColor: '#FFFFFF', // Keep white for QR
+    borderRadius: spacing.borderRadius.lg,
   },
   cornerMarker: {
     position: 'absolute',
     width: 20,
     height: 20,
-    backgroundColor: '#FF3B30',
+    backgroundColor: colors.medical.emergency,
     borderRadius: 10,
   },
   topLeft: { top: -10, left: -10 },
@@ -911,39 +914,39 @@ const styles = StyleSheet.create({
   bottomRight: { bottom: -10, right: -10 },
   qrPlaceholder: {
     borderWidth: 3,
-    borderColor: '#E0E0E0',
+    borderColor: colors.border.default,
     borderStyle: 'dashed',
-    borderRadius: 15,
+    borderRadius: spacing.borderRadius.lg,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#F8F8F8',
+    backgroundColor: colors.background.secondary,
   },
   loadingText: {
-    marginTop: 15,
+    marginTop: spacing.md,
     fontSize: 16,
-    color: '#666666',
+    color: colors.text.secondary,
     textAlign: 'center',
   },
   errorText: {
-    marginTop: 15,
+    marginTop: spacing.md,
     fontSize: 16,
-    color: '#FF3B30',
+    color: colors.status.error.main,
     textAlign: 'center',
   },
   emergencyInfoContainer: {
-    backgroundColor: '#F0F8FF',
-    padding: 20,
-    borderRadius: 15,
+    backgroundColor: colors.background.secondary,
+    padding: spacing.lg,
+    borderRadius: spacing.borderRadius.lg,
     width: '90%',
-    marginBottom: 20,
+    marginBottom: spacing.lg,
     borderLeftWidth: 5,
-    borderLeftColor: '#007AFF',
+    borderLeftColor: colors.primary.main,
   },
   emergencyTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333333',
-    marginBottom: 15,
+    color: colors.text.primary,
+    marginBottom: spacing.md,
     textAlign: 'center',
   },
   infoGrid: {
@@ -953,123 +956,123 @@ const styles = StyleSheet.create({
   },
   infoItem: {
     width: '48%',
-    marginBottom: 15,
+    marginBottom: spacing.md,
   },
   infoLabel: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#666666',
+    color: colors.text.tertiary,
     textTransform: 'uppercase',
-    marginBottom: 5,
+    marginBottom: spacing.xxs,
   },
   infoValue: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333333',
+    color: colors.text.primary,
   },
   criticalInfo: {
-    color: '#FF3B30',
+    color: colors.medical.emergency,
     fontSize: 18,
   },
   infoSubValue: {
     fontSize: 14,
-    color: '#666666',
+    color: colors.text.secondary,
     marginTop: 2,
   },
   noteContainer: {
-    marginTop: 15,
-    padding: 15,
-    backgroundColor: '#FFF8E1',
-    borderRadius: 10,
+    marginTop: spacing.md,
+    padding: spacing.md,
+    backgroundColor: colors.background.elevated,
+    borderRadius: spacing.borderRadius.md,
     borderLeftWidth: 3,
-    borderLeftColor: '#FF9500',
+    borderLeftColor: colors.status.warning.main,
   },
   noteLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#E65100',
-    marginBottom: 8,
+    color: colors.status.warning.main,
+    marginBottom: spacing.xs,
   },
   noteText: {
     fontSize: 15,
-    color: '#333333',
+    color: colors.text.primary,
     lineHeight: 22,
   },
   instructionsContainer: {
-    backgroundColor: '#F8F9FA',
-    padding: 20,
-    borderRadius: 15,
+    backgroundColor: colors.background.secondary,
+    padding: spacing.lg,
+    borderRadius: spacing.borderRadius.lg,
     width: '90%',
-    marginBottom: 20,
+    marginBottom: spacing.lg,
   },
   instructionsTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333333',
-    marginBottom: 10,
+    color: colors.text.primary,
+    marginBottom: spacing.sm,
   },
   instructionsText: {
     fontSize: 14,
-    color: '#666666',
+    color: colors.text.secondary,
     lineHeight: 20,
   },
   bottomControls: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-    backgroundColor: '#F8F9FA',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.lg,
+    backgroundColor: colors.background.secondary,
     borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
+    borderTopColor: colors.border.default,
   },
   controlButton: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.background.elevated,
     borderRadius: 25,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.lg,
     borderWidth: 2,
-    borderColor: '#007AFF',
+    borderColor: colors.primary.main,
     minWidth: 80,
   },
   controlButtonText: {
-    color: '#007AFF',
+    color: colors.primary.main,
     fontSize: 12,
     fontWeight: '600',
-    marginTop: 4,
+    marginTop: spacing.xxs,
   },
   toggleButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#F0F8FF',
+    backgroundColor: colors.background.elevated,
     borderRadius: 25,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    marginBottom: 20,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.lg,
+    marginBottom: spacing.lg,
     borderWidth: 2,
-    borderColor: '#007AFF',
+    borderColor: colors.primary.main,
   },
   toggleButtonText: {
-    color: '#007AFF',
+    color: colors.primary.main,
     fontSize: 16,
     fontWeight: '600',
-    marginLeft: 8,
+    marginLeft: spacing.xs,
   },
   backupTextContainer: {
     width: '100%',
     flex: 1,
   },
   fallbackButton: {
-    marginTop: 15,
-    backgroundColor: '#007AFF',
+    marginTop: spacing.md,
+    backgroundColor: colors.primary.main,
     borderRadius: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.lg,
   },
   fallbackButtonText: {
-    color: '#FFFFFF',
+    color: colors.text.inverse,
     fontSize: 14,
     fontWeight: '600',
     textAlign: 'center',
@@ -1077,43 +1080,44 @@ const styles = StyleSheet.create({
   // Modal Styles
   modalContainer: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.background.primary,
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 20,
+    padding: spacing.lg,
     borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
+    borderBottomColor: colors.border.default,
+    backgroundColor: colors.background.secondary,
   },
   modalTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333333',
+    color: colors.text.primary,
   },
   modalContent: {
     flex: 1,
-    padding: 20,
+    padding: spacing.lg,
   },
   modalSubtitle: {
     fontSize: 16,
-    color: '#666666',
+    color: colors.text.secondary,
     textAlign: 'center',
-    marginBottom: 30,
+    marginBottom: spacing.xl,
     lineHeight: 22,
   },
   optionsContainer: {
-    gap: 16,
+    gap: spacing.md,
   },
   optionButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F8F9FA',
-    borderRadius: 12,
-    padding: 16,
+    backgroundColor: colors.background.secondary,
+    borderRadius: spacing.borderRadius.lg,
+    padding: spacing.md,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: colors.border.default,
   },
   optionButtonDisabled: {
     opacity: 0.6,
@@ -1122,10 +1126,10 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.background.elevated,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 16,
+    marginRight: spacing.md,
   },
   optionText: {
     flex: 1,
@@ -1133,12 +1137,12 @@ const styles = StyleSheet.create({
   optionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333333',
-    marginBottom: 4,
+    color: colors.text.primary,
+    marginBottom: spacing.xxs,
   },
   optionDescription: {
     fontSize: 14,
-    color: '#666666',
+    color: colors.text.secondary,
     lineHeight: 20,
   },
 });

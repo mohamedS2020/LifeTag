@@ -11,7 +11,10 @@ import {
   TouchableOpacity, 
   Alert 
 } from 'react-native';
+import Animated, { FadeInDown, FadeOutUp } from 'react-native-reanimated';
+import { Ionicons } from '@expo/vector-icons';
 import { AuthError } from '../../utils/errorHandling';
+import { colors, spacing, borderRadius, typography } from '../../theme';
 
 interface ErrorDisplayProps {
   error: AuthError | null;
@@ -50,6 +53,28 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
     }
   };
 
+  const getIconName = (): keyof typeof Ionicons.glyphMap => {
+    switch (error.severity) {
+      case 'warning':
+        return 'warning-outline';
+      case 'info':
+        return 'information-circle-outline';
+      default:
+        return 'alert-circle-outline';
+    }
+  };
+
+  const getIconColor = () => {
+    switch (error.severity) {
+      case 'warning':
+        return colors.status.warning.main;
+      case 'info':
+        return colors.status.info.main;
+      default:
+        return colors.status.error.main;
+    }
+  };
+
   const handleShowDetails = () => {
     Alert.alert(
       'Error Details',
@@ -59,10 +84,17 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
   };
 
   return (
-    <View style={[getErrorStyle(), style]}>
-      <Text style={getTextStyle()}>
-        {error.userMessage}
-      </Text>
+    <Animated.View 
+      entering={FadeInDown.duration(250)}
+      exiting={FadeOutUp.duration(200)}
+      style={[getErrorStyle(), style]}
+    >
+      <View style={styles.contentRow}>
+        <Ionicons name={getIconName()} size={20} color={getIconColor()} style={styles.icon} />
+        <Text style={getTextStyle()}>
+          {error.userMessage}
+        </Text>
+      </View>
       
       <View style={styles.buttonContainer}>
         {showDetails && (
@@ -73,11 +105,11 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
         
         {onDismiss && (
           <TouchableOpacity onPress={onDismiss} style={styles.dismissButton}>
-            <Text style={styles.dismissButtonText}>✕</Text>
+            <Ionicons name="close" size={18} color={colors.text.tertiary} />
           </TouchableOpacity>
         )}
       </View>
-    </View>
+    </Animated.View>
   );
 };
 
@@ -91,9 +123,13 @@ export const FieldError: React.FC<FieldErrorProps> = ({ error, visible = true })
   if (!error || !visible) return null;
 
   return (
-    <View style={styles.fieldErrorContainer}>
-      <Text style={styles.fieldErrorText}>⚠ {error}</Text>
-    </View>
+    <Animated.View 
+      entering={FadeInDown.duration(200)}
+      style={styles.fieldErrorContainer}
+    >
+      <Ionicons name="warning-outline" size={12} color={colors.status.error.main} />
+      <Text style={styles.fieldErrorText}>{error}</Text>
+    </Animated.View>
   );
 };
 
@@ -121,83 +157,96 @@ export const SuccessDisplay: React.FC<SuccessDisplayProps> = ({
   if (!message) return null;
 
   return (
-    <View style={styles.successContainer}>
-      <Text style={styles.successText}>
-        ✓ {message}
-      </Text>
+    <Animated.View 
+      entering={FadeInDown.duration(250)}
+      exiting={FadeOutUp.duration(200)}
+      style={styles.successContainer}
+    >
+      <View style={styles.contentRow}>
+        <Ionicons name="checkmark-circle-outline" size={20} color={colors.status.success.main} style={styles.icon} />
+        <Text style={styles.successText}>{message}</Text>
+      </View>
       
       {onDismiss && (
         <TouchableOpacity onPress={onDismiss} style={styles.dismissButton}>
-          <Text style={styles.dismissButtonText}>✕</Text>
+          <Ionicons name="close" size={18} color={colors.text.tertiary} />
         </TouchableOpacity>
       )}
-    </View>
+    </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
   errorContainer: {
-    backgroundColor: '#fee',
-    borderColor: '#e74c3c',
+    backgroundColor: colors.status.error.background,
+    borderColor: colors.status.error.border,
     borderWidth: 1,
-    borderRadius: 8,
-    padding: 12,
-    marginVertical: 8,
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+    marginVertical: spacing.sm,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
   warningContainer: {
-    backgroundColor: '#fff8e1',
-    borderColor: '#f39c12',
+    backgroundColor: colors.status.warning.background,
+    borderColor: colors.status.warning.border,
     borderWidth: 1,
-    borderRadius: 8,
-    padding: 12,
-    marginVertical: 8,
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+    marginVertical: spacing.sm,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
   infoContainer: {
-    backgroundColor: '#e3f2fd',
-    borderColor: '#3498db',
+    backgroundColor: colors.status.info.background,
+    borderColor: colors.status.info.border,
     borderWidth: 1,
-    borderRadius: 8,
-    padding: 12,
-    marginVertical: 8,
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+    marginVertical: spacing.sm,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
   successContainer: {
-    backgroundColor: '#f0f8f0',
-    borderColor: '#27ae60',
+    backgroundColor: colors.status.success.background,
+    borderColor: colors.status.success.border,
     borderWidth: 1,
-    borderRadius: 8,
-    padding: 12,
-    marginVertical: 8,
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+    marginVertical: spacing.sm,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
+  contentRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  icon: {
+    marginRight: spacing.sm,
+  },
   errorText: {
-    color: '#c0392b',
-    fontSize: 14,
+    ...typography.bodySmall,
+    color: colors.status.error.main,
     flex: 1,
   },
   warningText: {
-    color: '#d68910',
-    fontSize: 14,
+    ...typography.bodySmall,
+    color: colors.status.warning.main,
     flex: 1,
   },
   infoText: {
-    color: '#2980b9',
-    fontSize: 14,
+    ...typography.bodySmall,
+    color: colors.status.info.main,
     flex: 1,
   },
   successText: {
-    color: '#1e8449',
-    fontSize: 14,
+    ...typography.bodySmall,
+    color: colors.status.success.main,
     flex: 1,
   },
   buttonContainer: {
@@ -205,29 +254,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   detailsButton: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    marginRight: 8,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    marginRight: spacing.sm,
   },
   detailsButtonText: {
-    color: '#7f8c8d',
-    fontSize: 12,
+    ...typography.caption,
+    color: colors.text.tertiary,
     textDecorationLine: 'underline',
   },
   dismissButton: {
-    padding: 4,
-  },
-  dismissButtonText: {
-    color: '#7f8c8d',
-    fontSize: 16,
-    fontWeight: 'bold',
+    padding: spacing.xs,
   },
   fieldErrorContainer: {
-    marginTop: 4,
-    marginBottom: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: spacing.xs,
+    marginBottom: spacing.sm,
+    gap: spacing.xs,
   },
   fieldErrorText: {
-    color: '#e74c3c',
-    fontSize: 12,
+    ...typography.caption,
+    color: colors.status.error.main,
   },
 });

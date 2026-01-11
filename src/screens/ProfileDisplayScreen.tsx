@@ -5,12 +5,12 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { Ionicons } from '@expo/vector-icons';
 import { ProfileDisplay } from '../components/Profile/ProfileDisplay';
 import { useAuth } from '../context/AuthContext';
 import profileService from '../services/profileService';
@@ -19,6 +19,8 @@ import { LoadingOverlay } from '../components/common/LoadingOverlay';
 import { ErrorDisplay } from '../components/common/ErrorDisplay';
 import VerifiedBadge from '../components/common/VerifiedBadge';
 import { UserProfile, MedicalProfessional } from '../types';
+import { colors, spacing } from '../theme';
+import { Button } from '../components/ui';
 
 type AuthenticatedStackParamList = {
   ProfileDisplay: {
@@ -177,7 +179,7 @@ export const ProfileDisplayScreen: React.FC = () => {
         Requesting access to patient profile for emergency medical purposes.
       </Text>
       {accessLoading && (
-        <ActivityIndicator size="large" color="#007AFF" style={styles.accessLoader} />
+        <ActivityIndicator size="large" color={colors.primary.main} style={styles.accessLoader} />
       )}
     </View>
   );
@@ -248,16 +250,17 @@ export const ProfileDisplayScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: colors.background.primary,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    backgroundColor: '#2196F3',
-    borderBottomWidth: 0,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    backgroundColor: colors.background.secondary,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border.default,
   },
   headerContent: {
     flexDirection: 'row',
@@ -267,20 +270,20 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#fff',
-    marginRight: 10,
+    color: colors.text.primary,
+    marginRight: spacing.sm,
   },
   verifiedBadge: {
-    marginLeft: 5,
+    marginLeft: spacing.xs,
   },
   editButton: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 20,
-    paddingVertical: 8,
-    borderRadius: 20,
+    backgroundColor: colors.primary.main,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: spacing.borderRadius.full,
   },
   editButtonText: {
-    color: '#fff',
+    color: colors.text.inverse,
     fontSize: 16,
     fontWeight: '600',
   },
@@ -292,31 +295,31 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingBottom: 20,
+    paddingBottom: spacing.lg,
   },
   errorContainer: {
-    margin: 20,
+    margin: spacing.lg,
   },
   noProfileContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 40,
+    padding: spacing.xxl,
   },
   noProfileText: {
     fontSize: 18,
-    color: '#666',
+    color: colors.text.secondary,
     textAlign: 'center',
-    marginBottom: 30,
+    marginBottom: spacing.xl,
   },
   createButton: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 30,
-    paddingVertical: 15,
-    borderRadius: 25,
+    backgroundColor: colors.primary.main,
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.md,
+    borderRadius: spacing.borderRadius.full,
   },
   createButtonText: {
-    color: '#fff',
+    color: colors.text.inverse,
     fontSize: 16,
     fontWeight: '600',
   },
@@ -324,39 +327,39 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 40,
+    padding: spacing.xxl,
   },
   accessTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 15,
+    color: colors.text.primary,
+    marginBottom: spacing.md,
     textAlign: 'center',
   },
   accessMessage: {
     fontSize: 16,
-    color: '#666',
+    color: colors.text.secondary,
     textAlign: 'center',
     lineHeight: 24,
-    marginBottom: 20,
+    marginBottom: spacing.lg,
   },
   accessLoader: {
-    marginTop: 20,
+    marginTop: spacing.lg,
   },
   errorText: {
     fontSize: 16,
-    color: '#e74c3c',
+    color: colors.status.error.main,
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: spacing.lg,
   },
   retryButton: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 8,
+    backgroundColor: colors.primary.main,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: spacing.borderRadius.md,
   },
   retryButtonText: {
-    color: '#fff',
+    color: colors.text.inverse,
     fontSize: 16,
     fontWeight: '600',
   },

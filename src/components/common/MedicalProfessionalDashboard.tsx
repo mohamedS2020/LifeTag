@@ -21,6 +21,7 @@ import PatientProfileList from './PatientProfileList';
 import { ProfileDisplay } from '../Profile';
 import { QRScanner } from '../QR';
 import { useMedicalProfessionalAccess } from '../../hooks';
+import { colors, spacing } from '../../theme';
 
 /**
  * Medical Professional Dashboard Props
@@ -273,7 +274,7 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
           </Text>
         </View>
       </View>
-      <Ionicons name="medical" size={24} color="#FF6B6B" />
+      <Ionicons name="medical" size={24} color={colors.status.error.main} />
     </View>
   );
 
@@ -289,7 +290,7 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
         <Ionicons 
           name="qr-code-outline" 
           size={20} 
-          color={activeTab === 'scanner' ? '#FF6B6B' : '#666666'} 
+          color={activeTab === 'scanner' ? colors.primary.main : colors.text.secondary} 
         />
         <Text style={[styles.tabText, activeTab === 'scanner' && styles.activeTabText]}>
           QR Scanner
@@ -303,7 +304,7 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
         <Ionicons 
           name="people-outline" 
           size={20} 
-          color={activeTab === 'profiles' ? '#FF6B6B' : '#666666'} 
+          color={activeTab === 'profiles' ? colors.primary.main : colors.text.secondary} 
         />
         <Text style={[styles.tabText, activeTab === 'profiles' && styles.activeTabText]}>
           Profiles
@@ -317,7 +318,7 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
         <Ionicons 
           name="time-outline" 
           size={20} 
-          color={activeTab === 'history' ? '#FF6B6B' : '#666666'} 
+          color={activeTab === 'history' ? colors.primary.main : colors.text.secondary} 
         />
         <Text style={[styles.tabText, activeTab === 'history' && styles.activeTabText]}>
           History
@@ -332,7 +333,7 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
   const renderScannerTab = () => (
     <View style={styles.tabContent}>
       <View style={styles.scannerCard}>
-        <Ionicons name="qr-code" size={64} color="#FF6B6B" />
+        <Ionicons name="qr-code" size={64} color={colors.primary.main} />
         <Text style={styles.scannerTitle}>Scan Patient QR Code</Text>
         <Text style={styles.scannerDescription}>
           Scan a LifeTag QR code to instantly access patient medical information with your verified professional status.
@@ -343,12 +344,12 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
           onPress={() => setShowQRScanner(true)}
           disabled={!isVerifiedProfessional}
         >
-          <Ionicons name="camera" size={20} color="#FFFFFF" />
+          <Ionicons name="camera" size={20} color={colors.text.inverse} />
           <Text style={styles.scanButtonText}>Start Scanning</Text>
         </TouchableOpacity>
 
         <View style={styles.privilegeNotice}>
-          <Ionicons name="shield-checkmark" size={16} color="#28A745" />
+          <Ionicons name="shield-checkmark" size={16} color={colors.status.success.main} />
           <Text style={styles.privilegeText}>
             Verified professionals bypass password requirements
           </Text>
@@ -380,7 +381,7 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
     if (historyLoading) {
       return (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#007AFF" />
+          <ActivityIndicator size="large" color={colors.primary.main} />
           <Text style={styles.loadingText}>Loading access history...</Text>
         </View>
       );
@@ -389,7 +390,7 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
     if (auditLogs.length === 0) {
       return (
         <View style={styles.emptyStateContainer}>
-          <Ionicons name="document-text-outline" size={64} color="#999999" />
+          <Ionicons name="document-text-outline" size={64} color={colors.text.tertiary} />
           <Text style={styles.emptyStateTitle}>No Access History</Text>
           <Text style={styles.emptyStateText}>
             Your profile access history will appear here after scanning QR codes or viewing patient profiles.
@@ -414,7 +415,7 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
             <RefreshControl
               refreshing={historyLoading}
               onRefresh={fetchMedicalProfessionalLogs}
-              tintColor="#007AFF"
+              tintColor={colors.primary.main}
             />
           }
           style={styles.historyList}
@@ -491,7 +492,7 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
             <Ionicons
               name={getAccessTypeIcon()}
               size={20}
-              color="#007AFF"
+              color={colors.primary.main}
             />
           </View>
           <View style={styles.auditLogInfo}>
@@ -563,7 +564,7 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
   if (!isVerifiedProfessional) {
     return (
       <View style={styles.accessDeniedContainer}>
-        <Ionicons name="shield-outline" size={64} color="#DC3545" />
+        <Ionicons name="shield-outline" size={64} color={colors.status.error.main} />
         <Text style={styles.accessDeniedTitle}>Access Denied</Text>
         <Text style={styles.accessDeniedText}>
           This dashboard is only available to verified medical professionals.
@@ -613,7 +614,7 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
         <SafeAreaView style={styles.profileModal}>
           <View style={styles.profileModalHeader}>
             <TouchableOpacity onPress={() => setShowProfileModal(false)}>
-              <Ionicons name="close" size={24} color="#333333" />
+              <Ionicons name="close" size={24} color={colors.text.primary} />
             </TouchableOpacity>
             <Text style={styles.profileModalTitle}>Patient Profile</Text>
             <View style={{ width: 24 }} />
@@ -651,21 +652,16 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: colors.background.primary,
   },
   verificationHeader: {
-    backgroundColor: '#FFFFFF',
-    padding: 20,
+    backgroundColor: colors.background.secondary,
+    padding: spacing.lg,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    borderBottomColor: colors.border.default,
   },
   verificationContent: {
     flexDirection: 'row',
@@ -673,45 +669,45 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   verificationText: {
-    marginLeft: 12,
+    marginLeft: spacing.sm,
     flex: 1,
   },
   verificationTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#333333',
-    marginBottom: 4,
+    color: colors.text.primary,
+    marginBottom: spacing.xxs,
   },
   verificationSubtitle: {
     fontSize: 14,
-    color: '#666666',
+    color: colors.text.secondary,
     lineHeight: 18,
   },
   tabContainer: {
     flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.background.secondary,
     borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
+    borderBottomColor: colors.border.default,
   },
   tab: {
     flex: 1,
-    paddingVertical: 16,
+    paddingVertical: spacing.md,
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
   },
   activeTab: {
     borderBottomWidth: 2,
-    borderBottomColor: '#FF6B6B',
+    borderBottomColor: colors.primary.main,
   },
   tabText: {
     fontSize: 14,
-    color: '#666666',
-    marginLeft: 6,
+    color: colors.text.secondary,
+    marginLeft: spacing.xxs,
     fontWeight: '500',
   },
   activeTabText: {
-    color: '#FF6B6B',
+    color: colors.primary.main,
     fontWeight: '600',
   },
   content: {
@@ -719,72 +715,69 @@ const styles = StyleSheet.create({
   },
   tabContent: {
     flex: 1,
-    padding: 20,
+    padding: spacing.lg,
   },
   scannerCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 32,
+    backgroundColor: colors.background.secondary,
+    borderRadius: spacing.borderRadius.xl,
+    padding: spacing.xl,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
+    borderWidth: 1,
+    borderColor: colors.border.light,
   },
   scannerTitle: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#333333',
-    marginTop: 16,
-    marginBottom: 8,
+    color: colors.text.primary,
+    marginTop: spacing.md,
+    marginBottom: spacing.xs,
   },
   scannerDescription: {
     fontSize: 16,
-    color: '#666666',
+    color: colors.text.secondary,
     textAlign: 'center',
     lineHeight: 22,
-    marginBottom: 24,
+    marginBottom: spacing.lg,
   },
   scanButton: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: colors.primary.main,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 14,
-    borderRadius: 12,
-    marginBottom: 16,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: spacing.borderRadius.lg,
+    marginBottom: spacing.md,
   },
   scanButtonText: {
-    color: '#FFFFFF',
+    color: colors.text.inverse,
     fontSize: 16,
     fontWeight: '600',
-    marginLeft: 8,
+    marginLeft: spacing.xs,
   },
   privilegeNotice: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#E8F5E8',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
+    backgroundColor: colors.background.elevated,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: spacing.borderRadius.md,
   },
   privilegeText: {
     fontSize: 12,
-    color: '#28A745',
-    marginLeft: 6,
+    color: colors.medical.verified,
+    marginLeft: spacing.xxs,
     fontWeight: '500',
   },
   comingSoonText: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333333',
+    color: colors.text.primary,
     textAlign: 'center',
-    marginBottom: 8,
+    marginBottom: spacing.xs,
   },
   comingSoonSubtext: {
     fontSize: 14,
-    color: '#666666',
+    color: colors.text.secondary,
     textAlign: 'center',
     lineHeight: 20,
   },
@@ -792,38 +785,39 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 40,
-    backgroundColor: '#F8F9FA',
+    padding: spacing.xxl,
+    backgroundColor: colors.background.primary,
   },
   accessDeniedTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#DC3545',
-    marginTop: 20,
-    marginBottom: 12,
+    color: colors.status.error.main,
+    marginTop: spacing.lg,
+    marginBottom: spacing.sm,
   },
   accessDeniedText: {
     fontSize: 16,
-    color: '#666666',
+    color: colors.text.secondary,
     textAlign: 'center',
     lineHeight: 22,
   },
   profileModal: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.background.primary,
   },
   profileModalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 20,
+    padding: spacing.lg,
     borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
+    borderBottomColor: colors.border.default,
+    backgroundColor: colors.background.secondary,
   },
   profileModalTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333333',
+    color: colors.text.primary,
   },
   profileModalContent: {
     flex: 1,
@@ -833,72 +827,69 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 40,
+    padding: spacing.xxl,
   },
   loadingText: {
     fontSize: 16,
-    color: '#666666',
-    marginTop: 16,
+    color: colors.text.secondary,
+    marginTop: spacing.md,
     fontWeight: '500',
   },
   emptyStateContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 40,
+    padding: spacing.xxl,
   },
   emptyStateTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#333333',
-    marginTop: 20,
-    marginBottom: 12,
+    color: colors.text.primary,
+    marginTop: spacing.lg,
+    marginBottom: spacing.sm,
   },
   emptyStateText: {
     fontSize: 16,
-    color: '#666666',
+    color: colors.text.secondary,
     textAlign: 'center',
     lineHeight: 22,
   },
   historyTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#333333',
-    marginBottom: 8,
+    color: colors.text.primary,
+    marginBottom: spacing.xs,
   },
   historySubtitle: {
     fontSize: 14,
-    color: '#666666',
-    marginBottom: 20,
+    color: colors.text.secondary,
+    marginBottom: spacing.lg,
     lineHeight: 20,
   },
   historyList: {
     flex: 1,
   },
   auditLogItem: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    backgroundColor: colors.background.secondary,
+    borderRadius: spacing.borderRadius.lg,
+    padding: spacing.md,
+    marginBottom: spacing.sm,
+    borderWidth: 1,
+    borderColor: colors.border.light,
   },
   auditLogHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: spacing.sm,
   },
   auditLogIcon: {
     width: 36,
     height: 36,
-    backgroundColor: '#E8F4FD',
+    backgroundColor: colors.background.elevated,
     borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: spacing.sm,
   },
   auditLogInfo: {
     flex: 1,
@@ -906,55 +897,55 @@ const styles = StyleSheet.create({
   auditLogAction: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333333',
-    marginBottom: 4,
+    color: colors.text.primary,
+    marginBottom: spacing.xxs,
   },
   auditLogTimestamp: {
     fontSize: 12,
-    color: '#666666',
+    color: colors.text.secondary,
     fontWeight: '500',
   },
   auditLogAccessType: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
+    backgroundColor: colors.primary.main,
+    paddingHorizontal: spacing.xs,
+    paddingVertical: spacing.xxs,
+    borderRadius: spacing.borderRadius.sm,
   },
   accessTypeText: {
     fontSize: 10,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: colors.text.inverse,
   },
   auditLogDetails: {
     paddingLeft: 48,
   },
   auditLogProfile: {
     fontSize: 12,
-    color: '#666666',
+    color: colors.text.secondary,
     fontFamily: 'monospace',
-    marginBottom: 4,
+    marginBottom: spacing.xxs,
   },
   auditLogNotes: {
     fontSize: 14,
-    color: '#333333',
+    color: colors.text.primary,
     fontStyle: 'italic',
   },
   auditLogPatient: {
     fontSize: 14,
-    color: '#007AFF',
+    color: colors.primary.main,
     fontWeight: '500',
     marginBottom: 2,
   },
   auditLogFields: {
     fontSize: 11,
-    color: '#999999',
+    color: colors.text.tertiary,
     fontStyle: 'italic',
   },
   auditLogPatientName: {
     fontSize: 14,
-    color: '#333333',
+    color: colors.text.primary,
     fontWeight: '600',
-    marginBottom: 4,
+    marginBottom: spacing.xxs,
   },
 });
 

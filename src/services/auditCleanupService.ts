@@ -51,10 +51,10 @@ export class AuditCleanupService {
       
       if (response.success && response.data) {
         stats.totalLogsDeleted = response.data.deletedCount;
-        stats.profilesProcessed = 1; // Global cleanup counts as 1 operation
+        stats.profilesProcessed = response.data.profilesProcessed ?? 1;
         this.lastCleanupRun = new Date();
         
-        console.log(`Global cleanup completed: ${stats.totalLogsDeleted} logs deleted`);
+        console.log(`Global cleanup completed: ${stats.totalLogsDeleted} logs deleted, ${stats.profilesProcessed} profiles processed`);
       } else {
         const errorMsg = response.error?.message || 'Unknown cleanup error';
         stats.errors.push(errorMsg);

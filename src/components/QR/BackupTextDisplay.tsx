@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { EmergencyQRData } from '../../services/qrService';
+import { colors, spacing } from '../../theme';
 
 /**
  * Backup Text Display Props
@@ -130,13 +131,13 @@ export const BackupTextDisplay: React.FC<BackupTextDisplayProps> = ({
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <Ionicons name="medical" size={24} color="#FF3B30" />
+          <Ionicons name="medical" size={24} color={colors.status.error.main} />
           <Text style={styles.headerTitle}>Emergency Medical Information</Text>
         </View>
         
         {showCopyButton && (
           <TouchableOpacity style={styles.copyButton} onPress={copyEmergencyInfo}>
-            <Ionicons name="copy" size={20} color="#007AFF" />
+            <Ionicons name="copy" size={20} color={colors.primary.main} />
           </TouchableOpacity>
         )}
       </View>
@@ -147,7 +148,7 @@ export const BackupTextDisplay: React.FC<BackupTextDisplayProps> = ({
         {/* Critical Information Card */}
         <View style={styles.criticalCard}>
           <View style={styles.cardHeader}>
-            <Ionicons name="warning" size={20} color="#FF3B30" />
+            <Ionicons name="warning" size={20} color={colors.status.error.main} />
             <Text style={styles.cardTitle}>Critical Information</Text>
           </View>
           
@@ -185,7 +186,7 @@ export const BackupTextDisplay: React.FC<BackupTextDisplayProps> = ({
         {emergencyData.emergencyContact && (
           <View style={styles.contactCard}>
             <View style={styles.cardHeader}>
-              <Ionicons name="call" size={20} color="#007AFF" />
+              <Ionicons name="call" size={20} color={colors.primary.main} />
               <Text style={styles.cardTitle}>Emergency Contact</Text>
             </View>
             
@@ -207,7 +208,7 @@ export const BackupTextDisplay: React.FC<BackupTextDisplayProps> = ({
         {emergencyData.emergencyNote && (
           <View style={styles.notesCard}>
             <View style={styles.cardHeader}>
-              <Ionicons name="document-text" size={20} color="#FF9500" />
+              <Ionicons name="document-text" size={20} color={colors.status.warning.main} />
               <Text style={styles.cardTitle}>Medical Notes</Text>
             </View>
             
@@ -221,7 +222,7 @@ export const BackupTextDisplay: React.FC<BackupTextDisplayProps> = ({
         {showQRData && qrData && (
           <View style={styles.qrDataCard}>
             <View style={styles.cardHeader}>
-              <Ionicons name="qr-code" size={20} color="#666666" />
+              <Ionicons name="qr-code" size={20} color={colors.text.tertiary} />
               <Text style={styles.cardTitle}>QR Code Data</Text>
             </View>
             
@@ -234,7 +235,7 @@ export const BackupTextDisplay: React.FC<BackupTextDisplayProps> = ({
         {/* Instructions Card */}
         <View style={styles.instructionsCard}>
           <View style={styles.cardHeader}>
-            <Ionicons name="information-circle" size={20} color="#34C759" />
+            <Ionicons name="information-circle" size={20} color={colors.status.success.main} />
             <Text style={styles.cardTitle}>For First Responders</Text>
           </View>
           
@@ -256,12 +257,12 @@ export const BackupTextDisplay: React.FC<BackupTextDisplayProps> = ({
       {/* Action Buttons */}
       <View style={styles.actionBar}>
         <TouchableOpacity style={styles.actionButton} onPress={showDetailedInfo}>
-          <Ionicons name="document-text" size={18} color="#007AFF" />
+          <Ionicons name="document-text" size={18} color={colors.primary.main} />
           <Text style={styles.actionButtonText}>View All</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.actionButton} onPress={copyEmergencyInfo}>
-          <Ionicons name="copy" size={18} color="#007AFF" />
+          <Ionicons name="copy" size={18} color={colors.primary.main} />
           <Text style={styles.actionButtonText}>Copy Text</Text>
         </TouchableOpacity>
       </View>
@@ -272,23 +273,23 @@ export const BackupTextDisplay: React.FC<BackupTextDisplayProps> = ({
 const styles = StyleSheet.create({
   fullContainer: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: colors.background.primary,
   },
   compactContainer: {
-    backgroundColor: '#F8F9FA',
-    borderRadius: 15,
-    padding: 15,
-    margin: 10,
+    backgroundColor: colors.background.secondary,
+    borderRadius: spacing.borderRadius.lg,
+    padding: spacing.md,
+    margin: spacing.sm,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    backgroundColor: '#FFFFFF',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    backgroundColor: colors.background.secondary,
     borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
+    borderBottomColor: colors.border.default,
   },
   headerLeft: {
     flexDirection: 'row',
@@ -298,96 +299,96 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333333',
-    marginLeft: 10,
+    color: colors.text.primary,
+    marginLeft: spacing.sm,
   },
   copyButton: {
-    padding: 8,
-    borderRadius: 20,
-    backgroundColor: '#F0F8FF',
+    padding: spacing.xs,
+    borderRadius: spacing.borderRadius.full,
+    backgroundColor: colors.background.tertiary,
   },
   scrollContainer: {
     flex: 1,
-    paddingHorizontal: 15,
-    paddingVertical: 10,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
   },
   
-  // Critical Information Card
+  // Critical Information Card - keep visible with slight color tints
   criticalCard: {
-    backgroundColor: '#FFEBEE',
-    borderRadius: 15,
-    padding: 20,
-    marginBottom: 15,
+    backgroundColor: 'rgba(255, 59, 48, 0.15)',
+    borderRadius: spacing.borderRadius.lg,
+    padding: spacing.lg,
+    marginBottom: spacing.md,
     borderLeftWidth: 5,
-    borderLeftColor: '#FF3B30',
+    borderLeftColor: colors.status.error.main,
   },
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 15,
+    marginBottom: spacing.md,
   },
   cardTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333333',
-    marginLeft: 8,
+    color: colors.text.primary,
+    marginLeft: spacing.xs,
   },
   criticalGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    marginBottom: 15,
+    marginBottom: spacing.md,
   },
   criticalItem: {
     width: '48%',
-    marginBottom: 10,
+    marginBottom: spacing.sm,
   },
   criticalLabel: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#666666',
+    color: colors.text.secondary,
     textTransform: 'uppercase',
-    marginBottom: 5,
+    marginBottom: spacing.xs,
   },
   criticalValue: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333333',
+    color: colors.text.primary,
   },
   bloodType: {
-    color: '#FF3B30',
+    color: colors.status.error.main,
     fontSize: 24,
   },
   allergiesSection: {
-    marginTop: 10,
+    marginTop: spacing.sm,
   },
   allergiesList: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginTop: 8,
+    marginTop: spacing.xs,
   },
   allergyTag: {
-    backgroundColor: '#FF3B30',
-    borderRadius: 15,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    marginRight: 8,
-    marginBottom: 8,
+    backgroundColor: colors.status.error.main,
+    borderRadius: spacing.borderRadius.full,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    marginRight: spacing.xs,
+    marginBottom: spacing.xs,
   },
   allergyText: {
-    color: '#FFFFFF',
+    color: colors.text.inverse,
     fontSize: 14,
     fontWeight: '600',
   },
 
   // Emergency Contact Card
   contactCard: {
-    backgroundColor: '#E3F2FD',
-    borderRadius: 15,
-    padding: 20,
-    marginBottom: 15,
+    backgroundColor: 'rgba(64, 124, 226, 0.15)',
+    borderRadius: spacing.borderRadius.lg,
+    padding: spacing.lg,
+    marginBottom: spacing.md,
     borderLeftWidth: 5,
-    borderLeftColor: '#007AFF',
+    borderLeftColor: colors.primary.main,
   },
   contactInfo: {
     alignItems: 'center',
@@ -395,75 +396,75 @@ const styles = StyleSheet.create({
   contactName: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333333',
-    marginBottom: 8,
+    color: colors.text.primary,
+    marginBottom: spacing.xs,
   },
   contactPhone: {
     fontSize: 18,
-    color: '#007AFF',
+    color: colors.primary.main,
     fontWeight: '600',
-    marginBottom: 5,
+    marginBottom: spacing.xs,
   },
   contactRelation: {
     fontSize: 14,
-    color: '#666666',
+    color: colors.text.secondary,
     textTransform: 'capitalize',
   },
 
   // Medical Notes Card
   notesCard: {
-    backgroundColor: '#FFF8E1',
-    borderRadius: 15,
-    padding: 20,
-    marginBottom: 15,
+    backgroundColor: 'rgba(255, 149, 0, 0.15)',
+    borderRadius: spacing.borderRadius.lg,
+    padding: spacing.lg,
+    marginBottom: spacing.md,
     borderLeftWidth: 5,
-    borderLeftColor: '#FF9500',
+    borderLeftColor: colors.status.warning.main,
   },
   notesText: {
     fontSize: 16,
-    color: '#333333',
+    color: colors.text.primary,
     lineHeight: 24,
   },
 
   // QR Data Card
   qrDataCard: {
-    backgroundColor: '#F5F5F5',
-    borderRadius: 15,
-    padding: 20,
-    marginBottom: 15,
+    backgroundColor: colors.background.tertiary,
+    borderRadius: spacing.borderRadius.lg,
+    padding: spacing.lg,
+    marginBottom: spacing.md,
     borderLeftWidth: 5,
-    borderLeftColor: '#666666',
+    borderLeftColor: colors.text.tertiary,
   },
   qrDataScroll: {
     maxHeight: 100,
   },
   qrDataText: {
     fontSize: 12,
-    color: '#666666',
+    color: colors.text.secondary,
     fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
   },
 
   // Instructions Card
   instructionsCard: {
-    backgroundColor: '#E8F5E8',
-    borderRadius: 15,
-    padding: 20,
-    marginBottom: 15,
+    backgroundColor: 'rgba(52, 199, 89, 0.15)',
+    borderRadius: spacing.borderRadius.lg,
+    padding: spacing.lg,
+    marginBottom: spacing.md,
     borderLeftWidth: 5,
-    borderLeftColor: '#34C759',
+    borderLeftColor: colors.status.success.main,
   },
   instructionsText: {
     fontSize: 14,
-    color: '#333333',
+    color: colors.text.primary,
     lineHeight: 20,
-    marginBottom: 15,
+    marginBottom: spacing.md,
   },
   timestampContainer: {
     alignItems: 'center',
   },
   timestampText: {
     fontSize: 12,
-    color: '#666666',
+    color: colors.text.tertiary,
     fontStyle: 'italic',
   },
 
@@ -471,27 +472,27 @@ const styles = StyleSheet.create({
   actionBar: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    backgroundColor: '#FFFFFF',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    backgroundColor: colors.background.secondary,
     borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
+    borderTopColor: colors.border.default,
   },
   actionButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F0F8FF',
-    borderRadius: 20,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
+    backgroundColor: colors.background.tertiary,
+    borderRadius: spacing.borderRadius.full,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
     borderWidth: 1,
-    borderColor: '#007AFF',
+    borderColor: colors.primary.main,
   },
   actionButtonText: {
-    color: '#007AFF',
+    color: colors.primary.main,
     fontSize: 14,
     fontWeight: '600',
-    marginLeft: 5,
+    marginLeft: spacing.xs,
   },
 });
 

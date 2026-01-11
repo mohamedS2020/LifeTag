@@ -12,6 +12,8 @@ import {
   Modal, 
   TouchableWithoutFeedback 
 } from 'react-native';
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import { colors, spacing, borderRadius, typography, shadows } from '../../theme';
 
 interface LoadingOverlayProps {
   visible: boolean;
@@ -42,13 +44,16 @@ export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
       <TouchableWithoutFeedback onPress={handleBackdropPress}>
         <View style={styles.overlay}>
           <TouchableWithoutFeedback>
-            <View style={styles.container}>
-              <ActivityIndicator size="large" color="#3498db" style={styles.spinner} />
+            <Animated.View 
+              entering={FadeIn.duration(200)}
+              style={styles.container}
+            >
+              <ActivityIndicator size="large" color={colors.primary.main} style={styles.spinner} />
               <Text style={styles.message}>{message}</Text>
               {cancelable && (
                 <Text style={styles.cancelHint}>Tap outside to cancel</Text>
               )}
-            </View>
+            </Animated.View>
           </TouchableWithoutFeedback>
         </View>
       </TouchableWithoutFeedback>
@@ -72,7 +77,7 @@ export const InlineLoading: React.FC<InlineLoadingProps> = ({
 
   return (
     <View style={styles.inlineContainer}>
-      <ActivityIndicator size={size} color="#3498db" style={styles.inlineSpinner} />
+      <ActivityIndicator size={size} color={colors.primary.main} style={styles.inlineSpinner} />
       <Text style={styles.inlineMessage}>{message}</Text>
     </View>
   );
@@ -81,51 +86,45 @@ export const InlineLoading: React.FC<InlineLoadingProps> = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: colors.overlay.heavy,
     justifyContent: 'center',
     alignItems: 'center',
   },
   container: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 24,
+    backgroundColor: colors.background.card,
+    borderRadius: borderRadius.lg,
+    padding: spacing['2xl'],
     alignItems: 'center',
     minWidth: 200,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    borderWidth: 1,
+    borderColor: colors.border.default,
+    ...shadows.lg,
   },
   spinner: {
-    marginBottom: 16,
+    marginBottom: spacing.lg,
   },
   message: {
-    fontSize: 16,
-    color: '#2c3e50',
+    ...typography.body,
+    color: colors.text.primary,
     textAlign: 'center',
-    fontWeight: '500',
   },
   cancelHint: {
-    fontSize: 12,
-    color: '#7f8c8d',
+    ...typography.caption,
+    color: colors.text.tertiary,
     textAlign: 'center',
-    marginTop: 8,
+    marginTop: spacing.sm,
   },
   inlineContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 12,
+    paddingVertical: spacing.md,
   },
   inlineSpinner: {
-    marginRight: 8,
+    marginRight: spacing.sm,
   },
   inlineMessage: {
-    fontSize: 14,
-    color: '#7f8c8d',
+    ...typography.bodySmall,
+    color: colors.text.secondary,
   },
 });

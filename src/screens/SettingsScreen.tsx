@@ -8,9 +8,12 @@ import {
   SafeAreaView,
   ScrollView,
 } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
+import { Card, Button, Badge, H2, H4, Body, BodySmall } from '../components/ui';
+import { colors, spacing, borderRadius, typography, shadows } from '../theme';
 
 /**
  * Settings Screen Component
@@ -52,60 +55,84 @@ export const SettingsScreen: React.FC = () => {
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer}>
         {/* Header */}
-        <View style={styles.header}>
-          <Ionicons name="settings-outline" size={48} color="#007AFF" />
-          <Text style={styles.headerTitle}>Settings</Text>
-          <Text style={styles.headerSubtitle}>Manage your account and preferences</Text>
-        </View>
+        <Animated.View entering={FadeInDown.delay(100).duration(400)} style={styles.header}>
+          <View style={styles.headerIconContainer}>
+            <Ionicons name="settings-outline" size={36} color={colors.primary.main} />
+          </View>
+          <H2 style={styles.headerTitle}>Settings</H2>
+          <Body color="secondary" align="center">Manage your account and preferences</Body>
+        </Animated.View>
 
         {/* Coming Soon Section */}
-        <View style={styles.comingSoonSection}>
-          <View style={styles.comingSoonBadge}>
-            <Ionicons name="time-outline" size={24} color="#FF9500" />
-            <Text style={styles.comingSoonText}>Coming Soon</Text>
-          </View>
-          <Text style={styles.comingSoonDescription}>
-            More settings and customization options will be available in upcoming updates.
-          </Text>
-        </View>
+        <Animated.View entering={FadeInDown.delay(200).duration(400)}>
+          <Card variant="default" style={styles.comingSoonSection}>
+            <Badge 
+              label="Coming Soon" 
+              variant="warning" 
+              icon="time-outline" 
+              size="lg"
+              style={styles.comingSoonBadge}
+            />
+            <BodySmall color="secondary" align="center" style={styles.comingSoonDescription}>
+              More settings and customization options will be available in upcoming updates.
+            </BodySmall>
+          </Card>
+        </Animated.View>
 
         {/* Settings Sections */}
-        <View style={styles.settingsSection}>
-          <Text style={styles.sectionTitle}>Account & Privacy</Text>
-          
-          <View style={styles.settingItem}>
-            <Ionicons name="person-outline" size={24} color="#666" />
-            <Text style={styles.settingText}>Profile Settings</Text>
-            <Text style={styles.comingSoonLabel}>Soon</Text>
-          </View>
-          <View style={styles.settingItem}>
-            <Ionicons name="shield-outline" size={24} color="#666" />
-            <Text style={styles.settingText}>Privacy Controls</Text>
-            <Text style={styles.comingSoonLabel}>Soon</Text>
-          </View>
-        </View>
+        <Animated.View entering={FadeInDown.delay(300).duration(400)}>
+          <Card variant="default" style={styles.settingsSection}>
+            <H4 style={styles.sectionTitle}>Account & Privacy</H4>
+            
+            <View style={styles.settingItem}>
+              <View style={styles.settingIconBg}>
+                <Ionicons name="person-outline" size={20} color={colors.text.secondary} />
+              </View>
+              <Text style={styles.settingText}>Profile Settings</Text>
+              <Badge label="Soon" variant="warning" size="sm" />
+            </View>
+            <View style={styles.settingItem}>
+              <View style={styles.settingIconBg}>
+                <Ionicons name="shield-outline" size={20} color={colors.text.secondary} />
+              </View>
+              <Text style={styles.settingText}>Privacy Controls</Text>
+              <Badge label="Soon" variant="warning" size="sm" />
+            </View>
+          </Card>
+        </Animated.View>
 
-        <View style={styles.settingsSection}>
-          <Text style={styles.sectionTitle}>Emergency Settings</Text>
-          <View style={styles.settingItem}>
-            <Ionicons name="medical-outline" size={24} color="#666" />
-            <Text style={styles.settingText}>Emergency Contacts</Text>
-            <Text style={styles.comingSoonLabel}>Soon</Text>
-          </View>
-          <View style={styles.settingItem}>
-            <Ionicons name="notifications-outline" size={24} color="#666" />
-            <Text style={styles.settingText}>Alert Preferences</Text>
-            <Text style={styles.comingSoonLabel}>Soon</Text>
-          </View>
-        </View>
+        <Animated.View entering={FadeInDown.delay(400).duration(400)}>
+          <Card variant="default" style={styles.settingsSection}>
+            <H4 style={styles.sectionTitle}>Emergency Settings</H4>
+            <View style={styles.settingItem}>
+              <View style={styles.settingIconBg}>
+                <Ionicons name="medical-outline" size={20} color={colors.text.secondary} />
+              </View>
+              <Text style={styles.settingText}>Emergency Contacts</Text>
+              <Badge label="Soon" variant="warning" size="sm" />
+            </View>
+            <View style={styles.settingItem}>
+              <View style={styles.settingIconBg}>
+                <Ionicons name="notifications-outline" size={20} color={colors.text.secondary} />
+              </View>
+              <Text style={styles.settingText}>Alert Preferences</Text>
+              <Badge label="Soon" variant="warning" size="sm" />
+            </View>
+          </Card>
+        </Animated.View>
 
         {/* Sign Out Button */}
-        <View style={styles.signOutSection}>
-          <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
-            <Ionicons name="log-out-outline" size={24} color="#FF3B30" />
-            <Text style={styles.signOutText}>Sign Out</Text>
-          </TouchableOpacity>
-        </View>
+        <Animated.View entering={FadeInDown.delay(500).duration(400)} style={styles.signOutSection}>
+          <Button
+            title="Sign Out"
+            onPress={handleSignOut}
+            variant="outline"
+            icon="log-out-outline"
+            iconColor={colors.status.error.main}
+            style={styles.signOutButton}
+            textStyle={styles.signOutText}
+          />
+        </Animated.View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -114,132 +141,76 @@ export const SettingsScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: colors.background.primary,
   },
   scrollView: {
     flex: 1,
   },
   contentContainer: {
-    padding: 20,
+    padding: spacing.xl,
   },
   header: {
     alignItems: 'center',
-    marginBottom: 30,
-    paddingVertical: 20,
+    marginBottom: spacing['3xl'],
+    paddingVertical: spacing.xl,
+  },
+  headerIconContainer: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: colors.background.elevated,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.lg,
+    borderWidth: 1,
+    borderColor: colors.border.default,
   },
   headerTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333',
-    marginTop: 12,
-  },
-  headerSubtitle: {
-    fontSize: 16,
-    color: '#666',
-    marginTop: 4,
-    textAlign: 'center',
+    marginBottom: spacing.xs,
   },
   comingSoonSection: {
-    backgroundColor: '#FFF',
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 20,
+    marginBottom: spacing.xl,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   comingSoonBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFF3CD',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    marginBottom: 12,
-  },
-  comingSoonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#FF9500',
-    marginLeft: 8,
+    marginBottom: spacing.md,
   },
   comingSoonDescription: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
-    lineHeight: 20,
+    lineHeight: 22,
   },
   settingsSection: {
-    backgroundColor: '#FFF',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    marginBottom: spacing.lg,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 16,
+    marginBottom: spacing.lg,
   },
   settingItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 4,
+    paddingVertical: spacing.md,
   },
-  settingText: {
-    fontSize: 16,
-    color: '#333',
-    marginLeft: 12,
-    flex: 1,
-  },
-  settingTextActive: {
-    fontSize: 16,
-    color: '#007AFF',
-    marginLeft: 12,
-    flex: 1,
-    fontWeight: '500',
-  },
-  comingSoonLabel: {
-    fontSize: 12,
-    color: '#FF9500',
-    backgroundColor: '#FFF3CD',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-    fontWeight: '500',
-  },
-  signOutSection: {
-    marginTop: 20,
-    marginBottom: 40,
-  },
-  signOutButton: {
-    flexDirection: 'row',
+  settingIconBg: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    backgroundColor: colors.background.elevated,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FFF',
-    borderRadius: 12,
-    padding: 16,
-    borderWidth: 2,
-    borderColor: '#FF3B30',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    marginRight: spacing.md,
+  },
+  settingText: {
+    ...typography.body,
+    color: colors.text.primary,
+    flex: 1,
+  },
+  signOutSection: {
+    marginTop: spacing.xl,
+    marginBottom: spacing['4xl'],
+  },
+  signOutButton: {
+    borderColor: colors.status.error.main,
   },
   signOutText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#FF3B30',
-    marginLeft: 8,
+    color: colors.status.error.main,
   },
 });

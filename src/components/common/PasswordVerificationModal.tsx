@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { passwordService } from '../../services';
+import { colors, spacing } from '../../theme';
 
 interface PasswordVerificationModalProps {
   visible: boolean;
@@ -188,6 +189,7 @@ export const PasswordVerificationModal: React.FC<PasswordVerificationModalProps>
                 <TextInput
                   style={[styles.input, attemptCount >= 3 && styles.inputDisabled]}
                   placeholder="Profile password"
+                  placeholderTextColor={colors.text.secondary}
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry={!showPassword}
@@ -258,7 +260,7 @@ export const PasswordVerificationModal: React.FC<PasswordVerificationModalProps>
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -267,128 +269,122 @@ const styles = StyleSheet.create({
     maxWidth: 400,
   },
   modal: {
-    backgroundColor: 'white',
-    borderRadius: 16,
-    padding: 24,
+    backgroundColor: colors.background.secondary,
+    borderRadius: spacing.borderRadius.xl,
+    padding: spacing.lg,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    borderWidth: 1,
+    borderColor: colors.border.light,
   },
   header: {
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: spacing.lg,
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
-    marginTop: 12,
+    color: colors.text.primary,
+    marginTop: spacing.sm,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 14,
-    color: '#666',
-    marginTop: 4,
+    color: colors.text.secondary,
+    marginTop: spacing.xxs,
     textAlign: 'center',
   },
   accessInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F0FDFC',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
-    marginBottom: 20,
+    backgroundColor: colors.background.elevated,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: spacing.borderRadius.md,
+    marginBottom: spacing.lg,
   },
   accessText: {
-    color: '#4ECDC4',
+    color: colors.primary.main,
     fontSize: 14,
     fontWeight: '500',
-    marginLeft: 6,
+    marginLeft: spacing.xxs,
   },
   inputContainer: {
     width: '100%',
-    marginBottom: 24,
+    marginBottom: spacing.lg,
   },
   label: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#333',
-    marginBottom: 8,
+    color: colors.text.primary,
+    marginBottom: spacing.xs,
   },
   passwordContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#DDD',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    backgroundColor: '#F9F9F9',
+    borderColor: colors.border.default,
+    borderRadius: spacing.borderRadius.md,
+    paddingHorizontal: spacing.sm,
+    backgroundColor: colors.background.elevated,
   },
   input: {
     flex: 1,
     height: 48,
     fontSize: 16,
-    color: '#333',
+    color: colors.text.primary,
   },
   inputDisabled: {
-    color: '#999',
-    backgroundColor: '#F5F5F5',
+    color: colors.text.tertiary,
+    backgroundColor: colors.background.secondary,
   },
   eyeButton: {
-    padding: 8,
+    padding: spacing.xs,
   },
   attemptWarning: {
-    color: '#FF6B6B',
+    color: colors.status.error.main,
     fontSize: 12,
-    marginTop: 6,
+    marginTop: spacing.xxs,
     fontWeight: '500',
   },
   buttonContainer: {
     flexDirection: 'row',
     width: '100%',
-    gap: 12,
+    gap: spacing.sm,
   },
   button: {
     flex: 1,
     height: 48,
-    borderRadius: 8,
+    borderRadius: spacing.borderRadius.md,
     justifyContent: 'center',
     alignItems: 'center',
   },
   cancelButton: {
-    backgroundColor: '#F5F5F5',
+    backgroundColor: colors.background.elevated,
     borderWidth: 1,
-    borderColor: '#DDD',
+    borderColor: colors.border.default,
   },
   cancelButtonText: {
-    color: '#666',
+    color: colors.text.secondary,
     fontSize: 16,
     fontWeight: '500',
   },
   verifyButton: {
-    backgroundColor: '#4ECDC4',
+    backgroundColor: colors.primary.main,
   },
   verifyButtonText: {
-    color: 'white',
+    color: colors.text.secondary,
     fontSize: 16,
     fontWeight: '600',
   },
   buttonDisabled: {
-    backgroundColor: '#DDD',
+    backgroundColor: colors.background.elevated,
     opacity: 0.6,
   },
   helpText: {
     fontSize: 12,
-    color: '#666',
+    color: colors.text.tertiary,
     textAlign: 'center',
-    marginTop: 16,
+    marginTop: spacing.md,
     lineHeight: 16,
   },
 });

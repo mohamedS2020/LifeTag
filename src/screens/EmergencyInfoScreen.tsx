@@ -17,6 +17,7 @@ import { EmergencyQRData } from '../services/qrService';
 import { profileService } from '../services';
 import { useAuth } from '../context/AuthContext';
 import { AuditLog } from '../types';
+import { colors, spacing } from '../theme';
 
 // Navigation type definitions
 type RootStackParamList = {
@@ -77,7 +78,12 @@ const EmergencyInfoScreen: React.FC = () => {
         const auditLog: Omit<AuditLog, 'id' | 'timestamp'> = {
           profileId: emergencyData.profileId || 'unknown_emergency_qr',
           accessedBy: user.id,
-          accessorType: user.userType === 'medical_professional' ? 'medical_professional' : 'individual',
+          accessorType:
+            user.userType === 'admin'
+              ? 'admin'
+              : user.userType === 'medical_professional'
+                ? 'medical_professional'
+                : 'individual',
           accessType: 'emergency_access', // Key distinction: emergency-only access
           accessMethod: 'qr_code',
           fieldsAccessed: ['name', 'bloodType', 'allergies', 'emergencyContact'], // Only emergency fields
@@ -168,12 +174,12 @@ const EmergencyInfoScreen: React.FC = () => {
   const getAllergyColor = (allergy: string): string => {
     const severity = allergy.toLowerCase();
     if (severity.includes('severe') || severity.includes('anaphylaxis')) {
-      return '#FF0000'; // Red for severe
+      return colors.status.error.main; // Red for severe
     }
     if (severity.includes('moderate')) {
-      return '#FF8C00'; // Orange for moderate
+      return colors.status.warning.main; // Orange for moderate
     }
-    return '#FFA500'; // Yellow for general allergies
+    return colors.status.warning.main; // Yellow for general allergies
   };
 
   return (
@@ -205,7 +211,7 @@ const EmergencyInfoScreen: React.FC = () => {
         <View style={styles.criticalInfoGrid}>
           {/* Blood Type */}
           <View style={[styles.criticalCard, styles.bloodTypeCard]}>
-            <Ionicons name="water" size={24} color="#FF6B6B" />
+            <Ionicons name="water" size={24} color={colors.primary.main} />
             <Text style={styles.criticalLabel}>BLOOD TYPE</Text>
             <Text style={styles.criticalValue}>
               {emergencyData.bloodType || 'UNKNOWN'}
@@ -218,7 +224,7 @@ const EmergencyInfoScreen: React.FC = () => {
               style={[styles.criticalCard, styles.emergencyContactCard]}
               onPress={handleCallEmergencyContact}
             >
-              <Ionicons name="call" size={24} color="#4CAF50" />
+              <Ionicons name="call" size={24} color={colors.status.warning.main} />
               <Text style={styles.criticalLabel}>EMERGENCY CONTACT</Text>
               <Text style={styles.criticalValue}>
                 {emergencyData.emergencyContact.name}
@@ -237,7 +243,7 @@ const EmergencyInfoScreen: React.FC = () => {
         {emergencyData.allergies && emergencyData.allergies.length > 0 && (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Ionicons name="warning" size={20} color="#FF8C00" />
+              <Ionicons name="warning" size={20} color={colors.status.warning.main} />
               <Text style={styles.sectionTitle}>ALLERGIES & REACTIONS</Text>
             </View>
             <View style={styles.allergiesList}>
@@ -260,7 +266,7 @@ const EmergencyInfoScreen: React.FC = () => {
         {emergencyData.emergencyNote && (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Ionicons name="document-text" size={20} color="#2196F3" />
+              <Ionicons name="document-text" size={20} color={colors.primary.main} />
               <Text style={styles.sectionTitle}>EMERGENCY NOTES</Text>
             </View>
             <View style={styles.notesContainer}>
@@ -272,7 +278,7 @@ const EmergencyInfoScreen: React.FC = () => {
         {/* Additional Information */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Ionicons name="information-circle" size={20} color="#9C27B0" />
+            <Ionicons name="information-circle" size={20} color={colors.status.info.main} />
             <Text style={styles.sectionTitle}>ADDITIONAL INFO</Text>
           </View>
           <View style={styles.additionalInfoContainer}>
@@ -282,7 +288,7 @@ const EmergencyInfoScreen: React.FC = () => {
             </View>
             {emergencyData.hasFullProfile && (
               <View style={styles.infoRow}>
-                <Ionicons name="phone-portrait" size={16} color="#4CAF50" />
+                <Ionicons name="phone-portrait" size={16} color={colors.status.warning.main} />
                 <Text style={styles.fullProfileText}>
                   Full medical profile available in LifeTag app
                 </Text>
@@ -324,12 +330,12 @@ const EmergencyInfoScreen: React.FC = () => {
           {/* Secondary Buttons */}
           <View style={styles.secondaryButtons}>
             <TouchableOpacity style={styles.secondaryButton} onPress={() => navigation.goBack()}>
-              <Ionicons name="qr-code" size={18} color="#666666" />
+              <Ionicons name="qr-code" size={18} color={colors.text.secondary} />
               <Text style={styles.secondaryButtonText}>Scan Another</Text>
             </TouchableOpacity>
             
             <TouchableOpacity style={styles.secondaryButton} onPress={() => navigation.goBack()}>
-              <Ionicons name="close" size={18} color="#666666" />
+              <Ionicons name="close" size={18} color={colors.text.secondary} />
               <Text style={styles.secondaryButtonText}>Close</Text>
             </TouchableOpacity>
           </View>
@@ -345,233 +351,236 @@ const EmergencyInfoScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.background.primary,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    backgroundColor: '#FF6B6B',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    backgroundColor: colors.medical.emergency,
     borderBottomWidth: 2,
-    borderBottomColor: '#E53E3E',
+    borderBottomColor: colors.status.error.main,
   },
   headerButton: {
-    padding: 5,
+    padding: spacing.xs,
+    borderRadius: spacing.borderRadius.full,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
   },
   headerTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: 'white',
+    color: colors.text.inverse,
   },
   scrollContainer: {
     flex: 1,
   },
   scrollContent: {
-    padding: 20,
+    padding: spacing.lg,
   },
   patientNameSection: {
-    backgroundColor: '#F8F9FA',
-    padding: 20,
-    borderRadius: 12,
-    marginBottom: 20,
+    backgroundColor: colors.background.elevated,
+    padding: spacing.lg,
+    borderRadius: spacing.borderRadius.lg,
+    marginBottom: spacing.lg,
     borderLeftWidth: 4,
-    borderLeftColor: '#FF6B6B',
+    borderLeftColor: colors.medical.emergency,
   },
   patientNameLabel: {
     fontSize: 12,
     fontWeight: 'bold',
-    color: '#666666',
+    color: colors.text.tertiary,
     letterSpacing: 1,
-    marginBottom: 5,
+    marginBottom: spacing.xs,
   },
   patientName: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#333333',
-    marginBottom: 5,
+    color: colors.text.primary,
+    marginBottom: spacing.xs,
   },
   lastUpdated: {
     fontSize: 12,
-    color: '#999999',
+    color: colors.text.tertiary,
   },
   criticalInfoGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginBottom: 20,
-    gap: 10,
+    marginBottom: spacing.lg,
+    gap: spacing.sm,
   },
   criticalCard: {
     flex: 1,
     minWidth: 150,
-    backgroundColor: 'white',
-    padding: 15,
-    borderRadius: 12,
+    backgroundColor: colors.background.elevated,
+    padding: spacing.md,
+    borderRadius: spacing.borderRadius.lg,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    borderWidth: 1,
+    borderColor: colors.border.light,
   },
   bloodTypeCard: {
     borderTopWidth: 3,
-    borderTopColor: '#FF6B6B',
+    borderTopColor: colors.medical.emergency,
   },
   emergencyContactCard: {
     borderTopWidth: 3,
-    borderTopColor: '#4CAF50',
+    borderTopColor: colors.medical.verified,
   },
   criticalLabel: {
     fontSize: 10,
     fontWeight: 'bold',
-    color: '#666666',
+    color: colors.text.tertiary,
     letterSpacing: 1,
-    marginTop: 8,
-    marginBottom: 4,
+    marginTop: spacing.sm,
+    marginBottom: spacing.xxs,
     textAlign: 'center',
   },
   criticalValue: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333333',
+    color: colors.text.primary,
     textAlign: 'center',
   },
   contactPhone: {
     fontSize: 14,
-    color: '#4CAF50',
+    color: colors.status.warning.main,
     fontWeight: '600',
-    marginTop: 4,
+    marginTop: spacing.xxs,
   },
   contactRelation: {
     fontSize: 12,
-    color: '#666666',
+    color: colors.text.tertiary,
     marginTop: 2,
   },
   section: {
-    marginBottom: 20,
+    marginBottom: spacing.lg,
   },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: spacing.sm,
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333333',
-    marginLeft: 8,
+    color: colors.text.primary,
+    marginLeft: spacing.sm,
     letterSpacing: 0.5,
   },
   allergiesList: {
-    gap: 8,
+    gap: spacing.sm,
   },
   allergyItem: {
-    backgroundColor: '#FFF8E1',
-    padding: 12,
-    borderRadius: 8,
+    backgroundColor: `${colors.status.warning.main}20`,
+    padding: spacing.sm,
+    borderRadius: spacing.borderRadius.md,
     borderLeftWidth: 4,
   },
   allergyText: {
     fontSize: 16,
-    color: '#333333',
+    color: colors.text.primary,
     fontWeight: '500',
   },
   notesContainer: {
-    backgroundColor: '#E3F2FD',
-    padding: 15,
-    borderRadius: 8,
+    backgroundColor: `${colors.primary.main}15`,
+    padding: spacing.md,
+    borderRadius: spacing.borderRadius.md,
     borderLeftWidth: 4,
-    borderLeftColor: '#2196F3',
+    borderLeftColor: colors.primary.main,
   },
   notesText: {
     fontSize: 16,
-    color: '#333333',
+    color: colors.text.primary,
     lineHeight: 22,
   },
   additionalInfoContainer: {
-    backgroundColor: '#F3E5F5',
-    padding: 15,
-    borderRadius: 8,
-    borderLeftWidth: 4,
-    borderLeftColor: '#9C27B0',
+    backgroundColor: colors.background.elevated,
+    padding: spacing.md,
+    borderRadius: spacing.borderRadius.md,
+    borderWidth: 1,
+    borderColor: colors.border.light,
   },
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: spacing.sm,
   },
   infoLabel: {
     fontSize: 14,
-    color: '#666666',
+    color: colors.text.tertiary,
     fontWeight: '500',
-    marginRight: 8,
+    marginRight: spacing.sm,
   },
   infoValue: {
     fontSize: 14,
-    color: '#333333',
+    color: colors.text.primary,
     fontWeight: '600',
   },
   fullProfileText: {
     fontSize: 14,
-    color: '#4CAF50',
+    color: colors.text.primary,
     fontWeight: '500',
-    marginLeft: 5,
+    marginLeft: spacing.xs,
   },
   actionButtons: {
-    backgroundColor: 'white',
-    padding: 20,
-    paddingBottom: 30,
+    backgroundColor: colors.background.secondary,
+    padding: spacing.lg,
+    paddingBottom: spacing.xl,
+    borderTopWidth: 1,
+    borderTopColor: colors.border.default,
   },
   fullProfileButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#2196F3',
-    paddingVertical: 15,
-    borderRadius: 8,
-    marginBottom: 10,
+    backgroundColor: colors.primary.main,
+    paddingVertical: spacing.md,
+    borderRadius: spacing.borderRadius.md,
+    marginBottom: spacing.sm,
   },
   fullProfileButtonText: {
-    color: 'white',
+    color: colors.text.inverse,
     fontSize: 16,
     fontWeight: 'bold',
-    marginLeft: 8,
+    marginLeft: spacing.sm,
   },
   emergencyCallButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#4CAF50',
-    paddingVertical: 15,
-    borderRadius: 8,
-    marginBottom: 10,
+    backgroundColor: colors.status.warning.main,
+    paddingVertical: spacing.md,
+    borderRadius: spacing.borderRadius.md,
+    marginBottom: spacing.sm,
   },
   emergencyCallText: {
-    color: 'white',
+    color: colors.text.primary,
     fontSize: 16,
     fontWeight: 'bold',
-    marginLeft: 8,
+    marginLeft: spacing.sm,
   },
   secondaryButtons: {
     flexDirection: 'row',
-    gap: 10,
+    gap: spacing.sm,
   },
   secondaryButton: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#F5F5F5',
-    paddingVertical: 12,
-    borderRadius: 8,
+    backgroundColor: colors.background.elevated,
+    paddingVertical: spacing.sm,
+    borderRadius: spacing.borderRadius.md,
+    borderWidth: 1,
+    borderColor: colors.border.default,
   },
   secondaryButtonText: {
-    color: '#666666',
+    color: colors.text.secondary,
     fontSize: 14,
     fontWeight: '500',
-    marginLeft: 5,
+    marginLeft: spacing.xs,
   },
 });
 

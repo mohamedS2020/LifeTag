@@ -16,6 +16,7 @@ import profileService from '../services/profileService';
 import authService from '../services/authService';
 import { MedicalProfessionalApprovalService } from '../services/medicalProfessionalApprovalService';
 import { RootStackParamList } from '../navigation/AppNavigator';
+import { colors, spacing } from '../theme';
 
 interface RouteParams {
   logId: string;
@@ -151,35 +152,35 @@ const AdminAuditLogDetailScreen: React.FC = () => {
           title: 'QR Code Scan',
           description: 'User scanned QR code to access emergency information',
           icon: 'qr-code',
-          color: '#007AFF'
+          color: colors.primary.main
         };
       case 'full_profile':
         return {
           title: 'Full Profile Access',
           description: 'Complete profile information was accessed',
           icon: 'person-outline',
-          color: '#28A745'
+          color: colors.status.success.main
         };
       case 'emergency_access':
         return {
           title: 'Emergency Access',
           description: 'Emergency medical information was accessed',
           icon: 'medical-outline',
-          color: '#DC3545'
+          color: colors.status.error.main
         };
       case 'profile_edit':
         return {
           title: 'Profile Modification',
           description: 'Profile data was modified or updated',
           icon: 'create-outline',
-          color: '#FF9500'
+          color: colors.status.warning.main
         };
       default:
         return {
           title: 'Profile Access',
           description: 'Profile was accessed',
           icon: 'eye-outline',
-          color: '#6C757D'
+          color: colors.text.tertiary
         };
     }
   };
@@ -190,7 +191,7 @@ const AdminAuditLogDetailScreen: React.FC = () => {
     <SafeAreaView style={styles.container} edges={[]}>
       <View style={[styles.header, { paddingTop: insets.top }]}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+          <Ionicons name="arrow-back" size={24} color={colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Audit Log Details</Text>
         <View style={styles.headerRight} />
@@ -212,7 +213,7 @@ const AdminAuditLogDetailScreen: React.FC = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Timestamp</Text>
           <View style={styles.infoCard}>
-            <Ionicons name="time-outline" size={20} color="#007AFF" />
+            <Ionicons name="time-outline" size={20} color={colors.primary.main} />
             <Text style={styles.infoText}>{formatFullTimestamp(logData.timestamp)}</Text>
           </View>
         </View>
@@ -221,7 +222,7 @@ const AdminAuditLogDetailScreen: React.FC = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Accessed By</Text>
           <View style={styles.infoCard}>
-            <Ionicons name="person-outline" size={20} color="#28A745" />
+            <Ionicons name="person-outline" size={20} color={colors.status.success.main} />
             <View style={styles.infoContent}>
               <Text style={styles.infoMainText}>
                 {accessorInfo?.name || 'Loading...'}
@@ -240,7 +241,7 @@ const AdminAuditLogDetailScreen: React.FC = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Profile Accessed</Text>
           <View style={styles.infoCard}>
-            <Ionicons name="document-text-outline" size={20} color="#FF9500" />
+            <Ionicons name="document-text-outline" size={20} color={colors.status.warning.main} />
             <View style={styles.infoContent}>
               <Text style={styles.infoMainText}>
                 {profileInfo?.name || 'Loading...'}
@@ -259,7 +260,7 @@ const AdminAuditLogDetailScreen: React.FC = () => {
             <Ionicons 
               name={logData.accessMethod === 'qr_code' ? 'qr-code-outline' : 'phone-portrait-outline'} 
               size={20} 
-              color="#6C757D" 
+              color={colors.text.tertiary} 
             />
             <Text style={styles.infoText}>
               {logData.accessMethod === 'qr_code' ? 'QR Code Scanner' : 'Mobile Application'}
@@ -272,7 +273,7 @@ const AdminAuditLogDetailScreen: React.FC = () => {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Fields Accessed</Text>
             <View style={styles.infoCard}>
-              <Ionicons name="list-outline" size={20} color="#17A2B8" />
+              <Ionicons name="list-outline" size={20} color={colors.status.info.main} />
               <View style={styles.infoContent}>
                 {logData.fieldsAccessed.map((field: string, index: number) => (
                   <Text key={index} style={styles.fieldItem}>
@@ -332,30 +333,30 @@ const AdminAuditLogDetailScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: colors.background.primary,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    backgroundColor: '#DC3545',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    backgroundColor: colors.background.secondary,
     borderBottomWidth: 1,
-    borderBottomColor: '#C82333',
+    borderBottomColor: colors.border.default,
   },
   backButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: colors.background.elevated,
     justifyContent: 'center',
     alignItems: 'center',
   },
   headerTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: colors.text.primary,
     flex: 1,
     textAlign: 'center',
   },
@@ -366,20 +367,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: 16,
+    padding: spacing.md,
   },
   accessTypeHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    padding: 20,
-    borderRadius: 12,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    backgroundColor: colors.background.secondary,
+    padding: spacing.lg,
+    borderRadius: spacing.borderRadius.lg,
+    marginBottom: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.border.light,
   },
   accessTypeIcon: {
     width: 60,
@@ -387,7 +385,7 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 16,
+    marginRight: spacing.md,
   },
   accessTypeInfo: {
     flex: 1,
@@ -395,110 +393,101 @@ const styles = StyleSheet.create({
   accessTypeTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#333333',
-    marginBottom: 4,
+    color: colors.text.primary,
+    marginBottom: spacing.xxs,
   },
   accessTypeDescription: {
     fontSize: 14,
-    color: '#666666',
+    color: colors.text.secondary,
     lineHeight: 20,
   },
   section: {
-    marginBottom: 16,
+    marginBottom: spacing.md,
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333333',
-    marginBottom: 8,
+    color: colors.text.primary,
+    marginBottom: spacing.sm,
   },
   infoCard: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    backgroundColor: '#FFFFFF',
-    padding: 16,
-    borderRadius: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    backgroundColor: colors.background.secondary,
+    padding: spacing.md,
+    borderRadius: spacing.borderRadius.md,
+    borderWidth: 1,
+    borderColor: colors.border.light,
   },
   infoContent: {
     flex: 1,
-    marginLeft: 12,
+    marginLeft: spacing.sm,
   },
   infoText: {
     fontSize: 14,
-    color: '#333333',
-    marginLeft: 12,
+    color: colors.text.primary,
+    marginLeft: spacing.sm,
     flex: 1,
   },
   infoMainText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333333',
-    marginBottom: 4,
+    color: colors.text.primary,
+    marginBottom: spacing.xxs,
   },
   infoSubText: {
     fontSize: 14,
-    color: '#007AFF',
+    color: colors.primary.main,
     marginBottom: 2,
   },
   infoDetailsText: {
     fontSize: 12,
-    color: '#666666',
+    color: colors.text.tertiary,
     fontFamily: 'monospace',
   },
   fieldItem: {
     fontSize: 14,
-    color: '#333333',
+    color: colors.text.primary,
     marginBottom: 2,
   },
   notesCard: {
-    backgroundColor: '#FFFFFF',
-    padding: 16,
-    borderRadius: 8,
+    backgroundColor: colors.background.secondary,
+    padding: spacing.md,
+    borderRadius: spacing.borderRadius.md,
     borderLeftWidth: 4,
-    borderLeftColor: '#17A2B8',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    borderLeftColor: colors.primary.main,
+    borderWidth: 1,
+    borderColor: colors.border.light,
   },
   notesText: {
     fontSize: 14,
-    color: '#333333',
+    color: colors.text.primary,
     lineHeight: 20,
     fontStyle: 'italic',
   },
   technicalCard: {
-    backgroundColor: '#FFFFFF',
-    padding: 16,
-    borderRadius: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    backgroundColor: colors.background.secondary,
+    padding: spacing.md,
+    borderRadius: spacing.borderRadius.md,
+    borderWidth: 1,
+    borderColor: colors.border.light,
   },
   technicalRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 4,
+    paddingVertical: spacing.xxs,
     borderBottomWidth: 1,
-    borderBottomColor: '#F8F9FA',
+    borderBottomColor: colors.border.light,
   },
   technicalLabel: {
     fontSize: 12,
-    color: '#666666',
+    color: colors.text.tertiary,
     fontWeight: '500',
   },
   technicalValue: {
     fontSize: 12,
-    color: '#333333',
+    color: colors.text.primary,
     fontFamily: 'monospace',
     flex: 1,
     textAlign: 'right',

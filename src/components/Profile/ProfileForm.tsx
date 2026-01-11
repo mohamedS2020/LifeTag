@@ -17,6 +17,7 @@ import {
   Alert,
   Platform,
 } from 'react-native';
+import Animated, { FadeInRight, FadeOutLeft } from 'react-native-reanimated';
 import { 
   UserProfile, 
   PersonalInfo, 
@@ -40,6 +41,7 @@ import {
 import { profileService, passwordService } from '../../services';
 import { LoadingOverlay } from '../common/LoadingOverlay';
 import { DatePicker } from '../common/DatePicker';
+import { colors, spacing } from '../../theme';
 
 // =============================================
 // INTERFACES
@@ -75,13 +77,13 @@ interface FormErrors {
 const getPasswordStrengthColor = (strength: 'weak' | 'medium' | 'strong'): string => {
   switch (strength) {
     case 'weak':
-      return '#FF6B6B';
+      return colors.status.error.main;
     case 'medium':
-      return '#FFE66D';
+      return colors.status.warning.main;
     case 'strong':
-      return '#4ECDC4';
+      return colors.status.success.main;
     default:
-      return '#999';
+      return colors.text.tertiary;
   }
 };
 
@@ -698,7 +700,11 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
   );
 
   const renderPersonalInfoStep = () => (
-    <View style={styles.stepContent}>
+    <Animated.View 
+      entering={FadeInRight.duration(300)} 
+      exiting={FadeOutLeft.duration(200)}
+      style={styles.stepContent}
+    >
       <Text style={styles.stepTitle}>Personal Information</Text>
       <Text style={styles.stepDescription}>
         Enter your basic personal information for emergency identification
@@ -711,6 +717,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
           value={formState.personalInfo.firstName || ''}
           onChangeText={(value) => updatePersonalInfo('firstName', value)}
           placeholder="Enter your first name"
+          placeholderTextColor={colors.text.tertiary}
           autoCapitalize="words"
         />
         {errors.firstName && <Text style={styles.errorText}>{errors.firstName}</Text>}
@@ -723,6 +730,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
           value={formState.personalInfo.lastName || ''}
           onChangeText={(value) => updatePersonalInfo('lastName', value)}
           placeholder="Enter your last name"
+          placeholderTextColor={colors.text.tertiary}
           autoCapitalize="words"
         />
         {errors.lastName && <Text style={styles.errorText}>{errors.lastName}</Text>}
@@ -746,6 +754,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
           value={formState.personalInfo.phoneNumber || ''}
           onChangeText={(value) => updatePersonalInfo('phoneNumber', value)}
           placeholder="Enter your phone number"
+          placeholderTextColor={colors.text.tertiary}
           keyboardType="phone-pad"
         />
       </View>
@@ -777,11 +786,15 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
           ))}
         </View>
       </View>
-    </View>
+    </Animated.View>
   );
 
   const renderMedicalInfoStep = () => (
-    <View style={styles.stepContent}>
+    <Animated.View 
+      entering={FadeInRight.duration(300)} 
+      exiting={FadeOutLeft.duration(200)}
+      style={styles.stepContent}
+    >
       <Text style={styles.stepTitle}>Medical Information</Text>
       <Text style={styles.stepDescription}>
         Provide critical medical information for emergency responders
@@ -818,6 +831,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
           value={formState.medicalInfo.height || ''}
           onChangeText={(value) => updateMedicalInfo('height', value)}
           placeholder="e.g., 5'10&quot; or 178 cm"
+          placeholderTextColor={colors.text.tertiary}
         />
       </View>
 
@@ -828,6 +842,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
           value={formState.medicalInfo.weight || ''}
           onChangeText={(value) => updateMedicalInfo('weight', value)}
           placeholder="e.g., 150 lbs or 68 kg"
+          placeholderTextColor={colors.text.tertiary}
         />
       </View>
 
@@ -839,7 +854,8 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
         {formState.medicalInfo.allergies?.map((allergy, index) => (
           <View key={index} style={styles.listItem}>
             <TextInput
-              style={[styles.input, styles.listItemInput]}
+              style={[styles.input, styles.listItemInput]
+              }
               value={allergy}
               onChangeText={(value) => {
                 const newAllergies = [...(formState.medicalInfo.allergies || [])];
@@ -847,6 +863,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
                 updateMedicalInfo('allergies', newAllergies);
               }}
               placeholder="e.g., Penicillin, Peanuts, Shellfish"
+              placeholderTextColor={colors.text.tertiary}
             />
             <TouchableOpacity
               style={styles.removeButton}
@@ -879,7 +896,8 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
         {formState.medicalInfo.medications?.map((medication, index) => (
           <View key={index} style={styles.listItem}>
             <TextInput
-              style={[styles.input, styles.listItemInput]}
+              style={[styles.input, styles.listItemInput]
+              }
               value={medication}
               onChangeText={(value) => {
                 const newMedications = [...(formState.medicalInfo.medications || [])];
@@ -887,6 +905,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
                 updateMedicalInfo('medications', newMedications);
               }}
               placeholder="e.g., Lisinopril 10mg daily, Aspirin 81mg"
+              placeholderTextColor={colors.text.tertiary}
             />
             <TouchableOpacity
               style={styles.removeButton}
@@ -919,7 +938,8 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
         {formState.medicalInfo.medicalConditions?.map((condition, index) => (
           <View key={index} style={styles.listItem}>
             <TextInput
-              style={[styles.input, styles.listItemInput]}
+              style={[styles.input, styles.listItemInput]
+              }
               value={condition}
               onChangeText={(value) => {
                 const newConditions = [...(formState.medicalInfo.medicalConditions || [])];
@@ -927,6 +947,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
                 updateMedicalInfo('medicalConditions', newConditions);
               }}
               placeholder="e.g., Diabetes Type 2, Hypertension, Asthma"
+              placeholderTextColor={colors.text.tertiary}
             />
             <TouchableOpacity
               style={styles.removeButton}
@@ -958,6 +979,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
           value={formState.medicalInfo.emergencyMedicalInfo || ''}
           onChangeText={(value) => updateMedicalInfo('emergencyMedicalInfo', value)}
           placeholder="Critical medical information for first responders (allergies, conditions, medications, etc.)"
+          placeholderTextColor={colors.text.tertiary}
           multiline
           numberOfLines={4}
         />
@@ -972,6 +994,8 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
           <Switch
             value={formState.medicalInfo.bloodDonorStatus || false}
             onValueChange={(value) => updateMedicalInfo('bloodDonorStatus', value)}
+            trackColor={{ false: colors.background.tertiary, true: colors.primary.main + '80' }}
+            thumbColor={formState.medicalInfo.bloodDonorStatus ? colors.primary.main : colors.text.tertiary}
           />
         </View>
         
@@ -980,14 +1004,20 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
           <Switch
             value={formState.medicalInfo.organDonorStatus || false}
             onValueChange={(value) => updateMedicalInfo('organDonorStatus', value)}
+            trackColor={{ false: colors.background.tertiary, true: colors.primary.main + '80' }}
+            thumbColor={formState.medicalInfo.organDonorStatus ? colors.primary.main : colors.text.tertiary}
           />
         </View>
       </View>
-    </View>
+    </Animated.View>
   );
 
   const renderEmergencyContactsStep = () => (
-    <View style={styles.stepContent}>
+    <Animated.View 
+      entering={FadeInRight.duration(300)} 
+      exiting={FadeOutLeft.duration(200)}
+      style={styles.stepContent}
+    >
       <Text style={styles.stepTitle}>Emergency Contacts</Text>
       <Text style={styles.stepDescription}>
         Add people to contact in case of emergency. At least one contact is required.
@@ -1024,6 +1054,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
               value={contact.name}
               onChangeText={(value) => updateEmergencyContact(index, 'name', value)}
               placeholder="Contact name"
+              placeholderTextColor={colors.text.tertiary}
               autoCapitalize="words"
             />
             {errors[`contact_${index}_name`] && (
@@ -1038,6 +1069,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
               value={contact.phoneNumber}
               onChangeText={(value) => updateEmergencyContact(index, 'phoneNumber', value)}
               placeholder="Phone number"
+              placeholderTextColor={colors.text.tertiary}
               keyboardType="phone-pad"
             />
             {errors[`contact_${index}_phone`] && (
@@ -1052,6 +1084,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
               value={contact.email || ''}
               onChangeText={(value) => updateEmergencyContact(index, 'email', value)}
               placeholder="Email address (optional)"
+              placeholderTextColor={colors.text.tertiary}
               keyboardType="email-address"
               autoCapitalize="none"
             />
@@ -1086,6 +1119,8 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
               <Switch
                 value={contact.isPrimary}
                 onValueChange={(value) => updateEmergencyContact(index, 'isPrimary', value)}
+                trackColor={{ false: colors.background.tertiary, true: colors.primary.main + '80' }}
+                thumbColor={contact.isPrimary ? colors.primary.main : colors.text.tertiary}
               />
             </View>
           )}
@@ -1104,11 +1139,15 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
       {errors.emergencyContacts && (
         <Text style={styles.errorText}>{errors.emergencyContacts}</Text>
       )}
-    </View>
+    </Animated.View>
   );
 
   const renderPrivacySettingsStep = () => (
-    <View style={styles.stepContent}>
+    <Animated.View 
+      entering={FadeInRight.duration(300)} 
+      exiting={FadeOutLeft.duration(200)}
+      style={styles.stepContent}
+    >
       <Text style={styles.stepTitle}>Privacy Settings</Text>
       <Text style={styles.stepDescription}>
         Configure how your profile information can be accessed in emergency situations.
@@ -1130,6 +1169,8 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
               allowEmergencyAccess: value
             }
           }))}
+          trackColor={{ false: colors.background.tertiary, true: colors.primary.main + '80' }}
+          thumbColor={formState.privacySettings.allowEmergencyAccess ? colors.primary.main : colors.text.tertiary}
         />
       </View>
 
@@ -1149,6 +1190,8 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
               allowMedicalProfessionalAccess: value
             }
           }))}
+          trackColor={{ false: colors.background.tertiary, true: colors.primary.main + '80' }}
+          thumbColor={formState.privacySettings.allowMedicalProfessionalAccess ? colors.primary.main : colors.text.tertiary}
         />
       </View>
 
@@ -1177,6 +1220,8 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
               setWantToChangePassword(false);
             }
           }}
+          trackColor={{ false: colors.background.tertiary, true: colors.primary.main + '80' }}
+          thumbColor={formState.privacySettings.requirePasswordForFullAccess ? colors.primary.main : colors.text.tertiary}
         />
       </View>
 
@@ -1221,6 +1266,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
                       <TextInput
                         style={[styles.passwordInput, passwordError ? styles.inputError : null]}
                         placeholder="Enter new profile password"
+                        placeholderTextColor={colors.text.tertiary}
                         value={profilePassword}
                         onChangeText={setProfilePassword}
                         secureTextEntry={!showPassword}
@@ -1243,6 +1289,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
                     <TextInput
                       style={[styles.passwordInput, passwordError ? styles.inputError : null]}
                       placeholder="Confirm new profile password"
+                      placeholderTextColor={colors.text.tertiary}
                       value={confirmPassword}
                       onChangeText={setConfirmPassword}
                       secureTextEntry={!showPassword}
@@ -1283,6 +1330,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
                   <TextInput
                     style={[styles.passwordInput, passwordError ? styles.inputError : null]}
                     placeholder="Enter profile password"
+                    placeholderTextColor={colors.text.tertiary}
                     value={profilePassword}
                     onChangeText={setProfilePassword}
                     secureTextEntry={!showPassword}
@@ -1305,6 +1353,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
                 <TextInput
                   style={[styles.passwordInput, passwordError ? styles.inputError : null]}
                   placeholder="Confirm profile password"
+                  placeholderTextColor={colors.text.tertiary}
                   value={confirmPassword}
                   onChangeText={setConfirmPassword}
                   secureTextEntry={!showPassword}
@@ -1349,6 +1398,8 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
               enableAuditLogging: value
             }
           }))}
+          trackColor={{ false: colors.background.tertiary, true: colors.primary.main + '80' }}
+          thumbColor={formState.privacySettings.enableAuditLogging ? colors.primary.main : colors.text.tertiary}
         />
       </View>
 
@@ -1358,7 +1409,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
           Your profile is ready to be saved. You can always edit this information later.
         </Text>
       </View>
-    </View>
+    </Animated.View>
   );
 
   // =============================================
@@ -1402,7 +1453,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
           disabled={isLoading}
         >
           {isLoading ? (
-            <ActivityIndicator color="#fff" />
+            <ActivityIndicator color={colors.text.inverse} />
           ) : (
             <Text style={styles.nextButtonText}>
               {currentStep === steps.length - 1 ? 'Save Profile' : 'Next'}
@@ -1421,16 +1472,16 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.background.primary,
   },
   stepIndicator: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    backgroundColor: '#f8f9fa',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    backgroundColor: colors.background.secondary,
     borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef',
+    borderBottomColor: colors.border.default,
   },
   stepItem: {
     alignItems: 'center',
@@ -1442,72 +1493,73 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 5,
+    marginBottom: spacing.xxs,
   },
   stepActiveCircle: {
-    backgroundColor: '#007bff',
+    backgroundColor: colors.primary.main,
   },
   stepInactiveCircle: {
-    backgroundColor: '#e9ecef',
+    backgroundColor: colors.background.elevated,
   },
   stepNumber: {
     fontSize: 14,
     fontWeight: 'bold',
   },
   stepActiveText: {
-    color: '#fff',
+    color: colors.text.inverse,
   },
   stepInactiveText: {
-    color: '#6c757d',
+    color: colors.text.tertiary,
   },
   stepLabel: {
     fontSize: 12,
     textAlign: 'center',
   },
   stepActiveLabel: {
-    color: '#007bff',
+    color: colors.primary.main,
     fontWeight: '600',
   },
   stepInactiveLabel: {
-    color: '#6c757d',
+    color: colors.text.tertiary,
   },
   scrollView: {
     flex: 1,
   },
   stepContent: {
-    padding: 20,
+    padding: spacing.lg,
   },
   stepTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 8,
-    color: '#333',
+    marginBottom: spacing.xs,
+    color: colors.text.primary,
   },
   stepDescription: {
     fontSize: 16,
-    color: '#666',
-    marginBottom: 20,
+    color: colors.text.secondary,
+    marginBottom: spacing.lg,
     lineHeight: 22,
   },
   inputGroup: {
-    marginBottom: 20,
+    marginBottom: spacing.lg,
   },
   label: {
     fontSize: 16,
     fontWeight: '600',
-    marginBottom: 8,
-    color: '#333',
+    marginBottom: spacing.xs,
+    color: colors.text.primary,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
+    borderColor: colors.border.default,
+    borderRadius: spacing.borderRadius.md,
+    padding: spacing.sm,
     fontSize: 16,
-    backgroundColor: '#fff',
+    backgroundColor: colors.background.secondary,
+    color: colors.text.primary,
   },
   inputError: {
-    borderColor: '#dc3545',
+    borderColor: colors.status.error.main,
   },
   textArea: {
     height: 100,
@@ -1515,73 +1567,73 @@ const styles = StyleSheet.create({
   },
   helperText: {
     fontSize: 14,
-    color: '#666',
-    marginTop: 5,
+    color: colors.text.secondary,
+    marginTop: spacing.xxs,
     fontStyle: 'italic',
   },
   errorText: {
-    color: '#dc3545',
+    color: colors.status.error.main,
     fontSize: 14,
-    marginTop: 5,
+    marginTop: spacing.xxs,
   },
   errorContainer: {
-    backgroundColor: '#f8d7da',
-    padding: 15,
-    margin: 20,
-    borderRadius: 8,
+    backgroundColor: colors.background.secondary,
+    padding: spacing.md,
+    margin: spacing.lg,
+    borderRadius: spacing.borderRadius.md,
     borderWidth: 1,
-    borderColor: '#f5c6cb',
+    borderColor: colors.status.error.main,
   },
   genderContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 10,
+    gap: spacing.sm,
   },
   genderButton: {
-    paddingHorizontal: 15,
-    paddingVertical: 8,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#ddd',
-    backgroundColor: '#fff',
+    borderColor: colors.border.default,
+    backgroundColor: colors.background.secondary,
   },
   genderButtonActive: {
-    backgroundColor: '#007bff',
-    borderColor: '#007bff',
+    backgroundColor: colors.primary.main,
+    borderColor: colors.primary.main,
   },
   genderText: {
     fontSize: 14,
-    color: '#333',
+    color: colors.text.primary,
   },
   genderTextActive: {
-    color: '#fff',
+    color: colors.text.inverse,
   },
   bloodTypeContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 10,
+    gap: spacing.sm,
   },
   bloodTypeButton: {
-    paddingHorizontal: 15,
-    paddingVertical: 10,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#ddd',
-    backgroundColor: '#fff',
+    borderColor: colors.border.default,
+    backgroundColor: colors.background.secondary,
     minWidth: 50,
     alignItems: 'center',
   },
   bloodTypeButtonActive: {
-    backgroundColor: '#dc3545',
-    borderColor: '#dc3545',
+    backgroundColor: colors.primary.main,
+    borderColor: colors.primary.main,
   },
   bloodTypeText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: colors.text.primary,
   },
   bloodTypeTextActive: {
-    color: '#fff',
+    color: colors.text.inverse,
   },
   switchGroup: {
     flexDirection: 'row',
@@ -1591,117 +1643,117 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-    marginHorizontal: 5,
+    marginHorizontal: spacing.xxs,
   },
   switchLabel: {
     fontSize: 14,
-    color: '#333',
-    marginRight: 10,
+    color: colors.text.primary,
+    marginRight: spacing.sm,
   },
   addButton: {
-    backgroundColor: '#28a745',
-    padding: 15,
-    borderRadius: 8,
+    backgroundColor: colors.status.error.main,
+    padding: spacing.md,
+    borderRadius: spacing.borderRadius.md,
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: spacing.lg,
   },
   addButtonText: {
-    color: '#fff',
+    color: colors.text.inverse,
     fontSize: 16,
     fontWeight: '600',
   },
   contactItem: {
-    backgroundColor: '#f8f9fa',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 15,
+    backgroundColor: colors.background.secondary,
+    padding: spacing.md,
+    borderRadius: spacing.borderRadius.md,
+    marginBottom: spacing.md,
     borderWidth: 1,
-    borderColor: '#e9ecef',
+    borderColor: colors.border.default,
   },
   contactHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 15,
+    marginBottom: spacing.md,
   },
   contactTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
+    color: colors.text.primary,
   },
   primaryBadge: {
-    backgroundColor: '#007bff',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
+    backgroundColor: colors.primary.main,
+    paddingHorizontal: spacing.xs,
+    paddingVertical: spacing.xxs,
+    borderRadius: spacing.borderRadius.sm,
   },
   primaryBadgeText: {
-    color: '#fff',
+    color: colors.text.inverse,
     fontSize: 12,
     fontWeight: '600',
   },
   removeButton: {
-    backgroundColor: '#dc3545',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
+    backgroundColor: colors.status.error.main,
+    paddingHorizontal: spacing.xs,
+    paddingVertical: spacing.xxs,
+    borderRadius: spacing.borderRadius.sm,
   },
   removeButtonText: {
-    color: '#fff',
+    color: colors.text.inverse,
     fontSize: 12,
     fontWeight: '600',
   },
   relationshipContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    gap: spacing.xs,
   },
   relationshipButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xxs,
     borderRadius: 15,
     borderWidth: 1,
-    borderColor: '#ddd',
-    backgroundColor: '#fff',
+    borderColor: colors.border.default,
+    backgroundColor: colors.background.secondary,
   },
   relationshipButtonActive: {
-    backgroundColor: '#007bff',
-    borderColor: '#007bff',
+    backgroundColor: colors.primary.main,
+    borderColor: colors.primary.main,
   },
   relationshipText: {
     fontSize: 12,
-    color: '#333',
+    color: colors.text.primary,
   },
   relationshipTextActive: {
-    color: '#fff',
+    color: colors.text.inverse,
   },
   switchContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 15,
-    paddingTop: 15,
+    marginTop: spacing.md,
+    paddingTop: spacing.md,
     borderTopWidth: 1,
-    borderTopColor: '#e9ecef',
+    borderTopColor: colors.border.default,
   },
   emptyState: {
     alignItems: 'center',
-    padding: 40,
-    backgroundColor: '#f8f9fa',
-    borderRadius: 8,
+    padding: spacing.xxl,
+    backgroundColor: colors.background.secondary,
+    borderRadius: spacing.borderRadius.md,
     borderStyle: 'dashed',
     borderWidth: 2,
-    borderColor: '#dee2e6',
+    borderColor: colors.border.default,
   },
   emptyStateText: {
     fontSize: 16,
-    color: '#666',
-    marginBottom: 5,
+    color: colors.text.secondary,
+    marginBottom: spacing.xxs,
     fontWeight: '500',
   },
   emptyStateSubtext: {
     fontSize: 14,
-    color: '#999',
+    color: colors.text.tertiary,
     textAlign: 'center',
     lineHeight: 20,
   },
@@ -1709,138 +1761,138 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 15,
+    paddingVertical: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef',
+    borderBottomColor: colors.border.default,
   },
   settingInfo: {
     flex: 1,
-    marginRight: 15,
+    marginRight: spacing.md,
   },
   settingTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: colors.text.primary,
     marginBottom: 2,
   },
   settingDescription: {
     fontSize: 14,
-    color: '#666',
+    color: colors.text.secondary,
     lineHeight: 20,
   },
   completionSection: {
-    backgroundColor: '#e7f3ff',
-    padding: 20,
-    borderRadius: 8,
-    marginTop: 20,
+    backgroundColor: colors.background.elevated,
+    padding: spacing.lg,
+    borderRadius: spacing.borderRadius.md,
+    marginTop: spacing.lg,
     borderWidth: 1,
-    borderColor: '#bee5eb',
+    borderColor: colors.primary.main,
   },
   completionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#0c5460',
-    marginBottom: 8,
+    color: colors.primary.main,
+    marginBottom: spacing.xs,
   },
   completionText: {
     fontSize: 14,
-    color: '#0c5460',
+    color: colors.text.secondary,
     lineHeight: 20,
   },
   buttonContainer: {
     flexDirection: 'row',
-    padding: 20,
-    backgroundColor: '#fff',
+    padding: spacing.lg,
+    backgroundColor: colors.background.secondary,
     borderTopWidth: 1,
-    borderTopColor: '#e9ecef',
+    borderTopColor: colors.border.default,
   },
   button: {
     flex: 1,
-    padding: 15,
-    borderRadius: 8,
+    padding: spacing.md,
+    borderRadius: spacing.borderRadius.md,
     alignItems: 'center',
-    marginHorizontal: 5,
+    marginHorizontal: spacing.xxs,
   },
   backButton: {
-    backgroundColor: '#6c757d',
+    backgroundColor: colors.background.elevated,
   },
   nextButton: {
-    backgroundColor: '#007bff',
+    backgroundColor: colors.primary.main,
   },
   backButtonText: {
-    color: '#fff',
+    color: colors.text.primary,
     fontSize: 16,
     fontWeight: '600',
   },
   nextButtonText: {
-    color: '#fff',
+    color: colors.text.inverse,
     fontSize: 16,
     fontWeight: '600',
   },
   
   // Password-related styles
   passwordSection: {
-    backgroundColor: '#f8f9fa',
-    borderRadius: 8,
-    padding: 16,
-    marginTop: 16,
+    backgroundColor: colors.background.secondary,
+    borderRadius: spacing.borderRadius.md,
+    padding: spacing.md,
+    marginTop: spacing.md,
     borderWidth: 1,
-    borderColor: '#e9ecef',
+    borderColor: colors.border.default,
   },
   passwordSectionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
-    marginBottom: 4,
+    color: colors.text.primary,
+    marginBottom: spacing.xxs,
   },
   passwordSectionDescription: {
     fontSize: 14,
-    color: '#666',
-    marginBottom: 16,
+    color: colors.text.secondary,
+    marginBottom: spacing.md,
     lineHeight: 20,
   },
   passwordInputContainer: {
-    marginBottom: 12,
+    marginBottom: spacing.sm,
   },
   passwordFieldContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    backgroundColor: '#fff',
+    borderColor: colors.border.default,
+    borderRadius: spacing.borderRadius.md,
+    backgroundColor: colors.background.secondary,
   },
   passwordInput: {
     flex: 1,
     height: 48,
-    paddingHorizontal: 12,
+    paddingHorizontal: spacing.sm,
     fontSize: 16,
-    color: '#333',
+    color: colors.text.primary,
   },
   passwordToggle: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
   },
   passwordToggleText: {
-    color: '#4ECDC4',
+    color: colors.primary.main,
     fontSize: 14,
     fontWeight: '500',
   },
   passwordError: {
-    color: '#FF6B6B',
+    color: colors.status.error.main,
     fontSize: 12,
-    marginTop: 6,
+    marginTop: spacing.xxs,
     fontWeight: '500',
   },
   passwordStrengthContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: spacing.xs,
   },
   passwordStrengthLabel: {
     fontSize: 12,
-    color: '#666',
-    marginRight: 6,
+    color: colors.text.secondary,
+    marginRight: spacing.xxs,
   },
   passwordStrengthText: {
     fontSize: 12,
@@ -1849,60 +1901,60 @@ const styles = StyleSheet.create({
   listItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: spacing.xs,
   },
   listItemInput: {
     flex: 1,
-    marginRight: 10,
+    marginRight: spacing.sm,
   },
   addItemButton: {
-    backgroundColor: '#f8f9fa',
-    padding: 12,
-    borderRadius: 8,
+    backgroundColor: colors.background.secondary,
+    padding: spacing.sm,
+    borderRadius: spacing.borderRadius.md,
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: spacing.xs,
     borderWidth: 1,
-    borderColor: '#007bff',
+    borderColor: colors.primary.main,
     borderStyle: 'dashed',
   },
   addItemButtonText: {
-    color: '#007bff',
+    color: colors.primary.main,
     fontSize: 14,
     fontWeight: '600',
   },
   existingPasswordInfo: {
-    backgroundColor: '#e7f3ff',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 12,
+    backgroundColor: colors.background.elevated,
+    padding: spacing.sm,
+    borderRadius: spacing.borderRadius.md,
+    marginBottom: spacing.sm,
     borderWidth: 1,
-    borderColor: '#bee5eb',
+    borderColor: colors.primary.main,
   },
   existingPasswordText: {
     fontSize: 14,
-    color: '#0c5460',
-    marginBottom: 8,
+    color: colors.text.secondary,
+    marginBottom: spacing.xs,
   },
   changePasswordButton: {
-    backgroundColor: '#007bff',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 4,
+    backgroundColor: colors.primary.main,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xxs,
+    borderRadius: spacing.borderRadius.sm,
     alignSelf: 'flex-start',
   },
   changePasswordButtonText: {
-    color: '#fff',
+    color: colors.text.inverse,
     fontSize: 12,
     fontWeight: '600',
   },
   changePasswordForm: {
-    marginTop: 12,
+    marginTop: spacing.sm,
   },
   changePasswordTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
-    marginBottom: 12,
+    color: colors.text.primary,
+    marginBottom: spacing.sm,
   },
 });
 

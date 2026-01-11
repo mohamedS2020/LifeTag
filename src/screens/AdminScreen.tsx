@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { AdminDashboard } from '../components/common';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { colors } from '../theme';
 
 type AdminScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
@@ -33,7 +34,6 @@ const AdminScreen: React.FC = () => {
    */
   const handleError = (error: string) => {
     console.error('Admin Screen Error:', error);
-    // Error handling can be enhanced with toast notifications or alerts
   };
 
   return (
@@ -51,7 +51,7 @@ const AdminScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: colors.background.primary,
   },
   content: {
     flex: 1,

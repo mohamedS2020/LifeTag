@@ -16,6 +16,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { AuditLog } from '../types';
 import profileService from '../services/profileService';
 import { RootStackParamList } from '../navigation/AppNavigator';
+import { colors, spacing } from '../theme';
 
 type AdminAuditLogsNavigationProp = StackNavigationProp<RootStackParamList>;
 
@@ -101,15 +102,15 @@ const AdminAuditLogsScreen: React.FC = () => {
     const getAccessTypeColor = () => {
       switch (item.accessorType) {
         case 'medical_professional':
-          return '#28A745';
+          return colors.status.success.main;
         case 'admin':
-          return '#DC3545';
+          return colors.status.error.main;
         case 'individual':
-          return '#007AFF';
+          return colors.primary.main;
         case 'anonymous':
-          return '#6C757D';
+          return colors.text.tertiary;
         default:
-          return '#6C757D';
+          return colors.text.tertiary;
       }
     };
 
@@ -185,7 +186,7 @@ const AdminAuditLogsScreen: React.FC = () => {
             </Text>
             <Text style={styles.logTimestamp}>{formatTimestamp(item.timestamp)}</Text>
           </View>
-          <Ionicons name="chevron-forward" size={16} color="#999999" />
+          <Ionicons name="chevron-forward" size={16} color={colors.text.tertiary} />
         </View>
       </TouchableOpacity>
     );
@@ -196,13 +197,13 @@ const AdminAuditLogsScreen: React.FC = () => {
       <SafeAreaView style={styles.container} edges={[]}>
         <View style={[styles.header, { paddingTop: insets.top }]}>
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+            <Ionicons name="arrow-back" size={24} color={colors.text.inverse} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>System Audit Logs</Text>
           <View style={styles.headerRight} />
         </View>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#007AFF" />
+          <ActivityIndicator size="large" color={colors.primary.main} />
           <Text style={styles.loadingText}>Loading audit logs...</Text>
         </View>
       </SafeAreaView>
@@ -213,12 +214,12 @@ const AdminAuditLogsScreen: React.FC = () => {
     <SafeAreaView style={styles.container} edges={[]}>
       <View style={[styles.header, { paddingTop: insets.top }]}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+          <Ionicons name="arrow-back" size={24} color={colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>System Audit Logs</Text>
         <View style={styles.headerRight}>
           <TouchableOpacity style={styles.refreshButton} onPress={handleRefresh}>
-            <Ionicons name="refresh" size={20} color="#FFFFFF" />
+            <Ionicons name="refresh" size={20} color={colors.text.primary} />
           </TouchableOpacity>
         </View>
       </View>
@@ -244,7 +245,7 @@ const AdminAuditLogsScreen: React.FC = () => {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={handleRefresh}
-              tintColor="#007AFF"
+              tintColor={colors.primary.main}
             />
           }
           contentContainerStyle={styles.listContent}
@@ -259,30 +260,30 @@ const AdminAuditLogsScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: colors.background.primary,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    backgroundColor: '#DC3545',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    backgroundColor: colors.background.secondary,
     borderBottomWidth: 1,
-    borderBottomColor: '#C82333',
+    borderBottomColor: colors.border.default,
   },
   backButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: colors.background.elevated,
     justifyContent: 'center',
     alignItems: 'center',
   },
   headerTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: colors.text.primary,
     flex: 1,
     textAlign: 'center',
   },
@@ -296,7 +297,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: colors.background.elevated,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -304,44 +305,41 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   statsHeader: {
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    backgroundColor: colors.background.secondary,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#E9ECEF',
+    borderBottomColor: colors.border.default,
   },
   statsText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333333',
-    marginBottom: 4,
+    color: colors.text.primary,
+    marginBottom: spacing.xxs,
   },
   statsSubtext: {
     fontSize: 14,
-    color: '#666666',
+    color: colors.text.secondary,
   },
   logsList: {
     flex: 1,
   },
   listContent: {
-    paddingVertical: 8,
-    paddingBottom: 20,
+    paddingVertical: spacing.sm,
+    paddingBottom: spacing.lg,
   },
   logItem: {
-    backgroundColor: '#FFFFFF',
-    marginHorizontal: 16,
-    marginVertical: 4,
-    borderRadius: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    backgroundColor: colors.background.secondary,
+    marginHorizontal: spacing.md,
+    marginVertical: spacing.xxs,
+    borderRadius: spacing.borderRadius.md,
+    borderWidth: 1,
+    borderColor: colors.border.light,
   },
   logHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
+    padding: spacing.sm,
   },
   logIcon: {
     width: 32,
@@ -349,7 +347,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: spacing.sm,
   },
   logInfo: {
     flex: 1,
@@ -357,44 +355,44 @@ const styles = StyleSheet.create({
   logTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: spacing.xxs,
   },
   logAction: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333333',
-    marginRight: 8,
+    color: colors.text.primary,
+    marginRight: spacing.sm,
   },
   userTypeBadge: {
-    paddingHorizontal: 6,
+    paddingHorizontal: spacing.xs,
     paddingVertical: 2,
-    borderRadius: 4,
+    borderRadius: spacing.borderRadius.sm,
   },
   userTypeText: {
     fontSize: 10,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: colors.text.inverse,
   },
   logProfileId: {
     fontSize: 12,
-    color: '#666666',
+    color: colors.text.tertiary,
     fontFamily: 'monospace',
     marginBottom: 2,
   },
   logTimestamp: {
     fontSize: 11,
-    color: '#999999',
+    color: colors.text.tertiary,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 40,
+    padding: spacing.xxl,
   },
   loadingText: {
     fontSize: 16,
-    color: '#666666',
-    marginTop: 16,
+    color: colors.text.secondary,
+    marginTop: spacing.md,
     fontWeight: '500',
   },
 });

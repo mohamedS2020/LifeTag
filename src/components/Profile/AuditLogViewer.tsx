@@ -11,6 +11,7 @@ import {
   Modal,
   ScrollView
 } from 'react-native';
+import { colors, spacing } from '../../theme';
 import { AuditLog } from '../../types';
 import { profileService } from '../../services';
 import { useAuth } from '../../context/AuthContext';
@@ -153,11 +154,11 @@ export const AuditLogViewer: React.FC<AuditLogViewerProps> = ({
 
   const getAccessorTypeColor = (accessorType: string) => {
     switch (accessorType) {
-      case 'medical_professional': return '#2196F3';
-      case 'emergency_responder': return '#FF5722';
-      case 'individual': return '#4CAF50';
-      case 'anonymous': return '#9E9E9E';
-      default: return '#757575';
+      case 'medical_professional': return colors.primary.main;
+      case 'emergency_responder': return colors.status.warning.main;
+      case 'individual': return colors.status.success.main;
+      case 'anonymous': return colors.text.tertiary;
+      default: return colors.text.tertiary;
     }
   };
 
@@ -366,7 +367,7 @@ export const AuditLogViewer: React.FC<AuditLogViewerProps> = ({
   if (loading) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#2196F3" />
+        <ActivityIndicator size="large" color={colors.primary.main} />
         <Text style={styles.loadingText}>Loading audit logs...</Text>
       </View>
     );
@@ -423,105 +424,105 @@ export const AuditLogViewer: React.FC<AuditLogViewerProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5'
+    backgroundColor: colors.background.tertiary
   },
   centerContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20
+    padding: spacing.lg
   },
   loadingText: {
-    marginTop: 10,
+    marginTop: spacing.sm,
     fontSize: 16,
-    color: '#666'
+    color: colors.text.secondary
   },
   errorText: {
     fontSize: 16,
-    color: '#d32f2f',
+    color: colors.status.error.main,
     textAlign: 'center',
-    marginBottom: 20
+    marginBottom: spacing.lg
   },
   retryButton: {
-    backgroundColor: '#2196F3',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
+    backgroundColor: colors.primary.main,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
     borderRadius: 8
   },
   retryButtonText: {
-    color: '#fff',
+    color: colors.text.inverse,
     fontSize: 16,
     fontWeight: 'bold'
   },
   filtersContainer: {
-    backgroundColor: '#fff',
-    padding: 15,
+    backgroundColor: colors.text.inverse,
+    padding: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0'
+    borderBottomColor: colors.border.default
   },
   searchInput: {
-    backgroundColor: '#f5f5f5',
+    backgroundColor: colors.background.tertiary,
     borderRadius: 8,
-    paddingHorizontal: 15,
-    paddingVertical: 10,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
     fontSize: 16,
-    marginBottom: 15
+    marginBottom: spacing.md
   },
   filterRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10
+    marginBottom: spacing.sm
   },
   filterLabel: {
     fontSize: 14,
     fontWeight: 'bold',
-    marginRight: 10,
+    marginRight: spacing.sm,
     minWidth: 80
   },
   filterButton: {
-    backgroundColor: '#e0e0e0',
+    backgroundColor: colors.border.default,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 15,
-    marginRight: 8
+    marginRight: spacing.xs
   },
   filterButtonActive: {
-    backgroundColor: '#2196F3'
+    backgroundColor: colors.primary.main
   },
   filterButtonText: {
     fontSize: 12,
-    color: '#333'
+    color: colors.text.primary
   },
   summaryContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    backgroundColor: '#fff',
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    backgroundColor: colors.text.inverse,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0'
+    borderBottomColor: colors.border.default
   },
   summaryText: {
     fontSize: 14,
-    color: '#666'
+    color: colors.text.secondary
   },
   refreshText: {
     fontSize: 14,
-    color: '#2196F3'
+    color: colors.primary.main
   },
   emptyText: {
     fontSize: 16,
-    color: '#666',
+    color: colors.text.secondary,
     textAlign: 'center'
   },
   listContainer: {
-    padding: 15
+    padding: spacing.md
   },
   logItem: {
-    backgroundColor: '#fff',
-    padding: 15,
-    marginBottom: 10,
+    backgroundColor: colors.text.inverse,
+    padding: spacing.md,
+    marginBottom: spacing.sm,
     borderRadius: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
@@ -533,7 +534,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8
+    marginBottom: spacing.xs
   },
   logInfo: {
     flexDirection: 'row',
@@ -542,7 +543,7 @@ const styles = StyleSheet.create({
   },
   accessTypeIcon: {
     fontSize: 24,
-    marginRight: 10
+    marginRight: spacing.sm
   },
   logDetails: {
     flex: 1
@@ -550,88 +551,88 @@ const styles = StyleSheet.create({
   accessType: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333'
+    color: colors.text.primary
   },
   timestamp: {
     fontSize: 12,
-    color: '#666',
+    color: colors.text.secondary,
     marginTop: 2
   },
   accessorTypeBadge: {
-    paddingHorizontal: 8,
+    paddingHorizontal: spacing.xs,
     paddingVertical: 4,
     borderRadius: 12
   },
   accessorTypeText: {
-    color: '#fff',
+    color: colors.text.inverse,
     fontSize: 10,
     fontWeight: 'bold'
   },
   logMeta: {
-    marginTop: 8
+    marginTop: spacing.xs
   },
   metaText: {
     fontSize: 12,
-    color: '#666',
+    color: colors.text.secondary,
     marginBottom: 2
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: '#fff'
+    backgroundColor: colors.text.inverse
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 20,
+    padding: spacing.lg,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0'
+    borderBottomColor: colors.border.default
   },
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333'
+    color: colors.text.primary
   },
   closeButton: {
     padding: 5
   },
   closeButtonText: {
     fontSize: 20,
-    color: '#666'
+    color: colors.text.secondary
   },
   modalContent: {
     flex: 1,
-    padding: 20
+    padding: spacing.lg
   },
   detailSection: {
-    marginBottom: 20
+    marginBottom: spacing.lg
   },
   detailLabel: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#666',
+    color: colors.text.secondary,
     marginBottom: 5
   },
   detailValue: {
     fontSize: 16,
-    color: '#333'
+    color: colors.text.primary
   },
   fieldItem: {
     fontSize: 14,
-    color: '#333',
+    color: colors.text.primary,
     marginVertical: 2,
-    marginLeft: 10
+    marginLeft: spacing.sm
   },
   warningSection: {
-    backgroundColor: '#fff3cd',
-    padding: 15,
+    backgroundColor: colors.status.warning.main + '30',
+    padding: spacing.md,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#ffeaa7'
+    borderColor: colors.status.warning.main + '50'
   },
   warningText: {
     fontSize: 14,
-    color: '#856404',
+    color: colors.status.warning.main,
     fontWeight: 'bold'
   }
 });

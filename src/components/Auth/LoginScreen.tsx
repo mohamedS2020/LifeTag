@@ -1,18 +1,18 @@
-
-
 import React, { useState } from 'react';
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   StyleSheet,
   Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  ActivityIndicator
+  ActivityIndicator,
+  StatusBar
 } from 'react-native';
+import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../context';
 import { 
   validateEmailAddress, 
@@ -27,6 +27,8 @@ import {
 // Import directly to avoid require cycle via common/index barrel
 import { LoadingOverlay } from '../../components/common/LoadingOverlay';
 import { ErrorDisplay, FieldError, SuccessDisplay } from '../../components/common/ErrorDisplay';
+import { Button, TextInput, Card, H1, H3, Body, BodySmall, Caption } from '../../components/ui';
+import { colors, spacing, borderRadius, typography, shadows } from '../../theme';
 
 interface LoginScreenProps {
   navigation?: any; // Will be properly typed when navigation is set up
@@ -210,21 +212,29 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
       <ScrollView 
-        contentContainerStyle={styles.scrollContainer}
+        contentContainerStyle={[
+          styles.scrollContainer,
+          { 
+            paddingTop: Platform.OS === 'android' ? (StatusBar.currentHeight || 32) : 48
+          }
+        ]}
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.content}>
           {/* Header */}
-          <View style={styles.header}>
-            <Text style={styles.title}>LifeTag</Text>
-            <Text style={styles.subtitle}>Emergency Medical Information</Text>
-            <Text style={styles.description}>
+          <Animated.View entering={FadeInDown.delay(100).duration(400)} style={styles.header}>
+            <View style={styles.logoContainer}>
+              <Ionicons name="medical" size={48} color={colors.primary.main} />
+            </View>
+            <H1 style={styles.title}>LifeTag</H1>
+            <Body color="secondary" style={styles.subtitle}>Emergency Medical Information</Body>
+            <BodySmall color="tertiary" align="center" style={styles.description}>
               Sign in to access your medical profile and QR code
-            </Text>
-          </View>
+            </BodySmall>
+          </Animated.View>
 
           {/* Form */}
-          <View style={styles.form}>
+          <Animated.View entering={FadeInDown.delay(200).duration(400)} style={styles.form}>
             {/* Error Display */}
             <ErrorDisplay 
               error={authError} 
@@ -240,65 +250,57 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
             />
 
             {/* Email Input */}
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Email Address</Text>
-              <TextInput
-                style={[styles.input, emailError ? styles.inputError : null]}
-                placeholder="Enter your email"
-                placeholderTextColor="#999"
-                value={email}
-                onChangeText={(text) => {
-                  setEmail(text);
-                  if (emailError) setEmailError('');
-                  if (authError) setAuthError(null);
-                }}
-                onBlur={() => validateEmail(email)}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-                editable={!loading && !isSubmitting}
-              />
-              <FieldError error={emailError} />
-            </View>
+            <TextInput
+              label="Email Address"
+              placeholder="Enter your email"
+              value={email}
+              onChangeText={(text) => {
+                setEmail(text);
+                if (emailError) setEmailError('');
+                if (authError) setAuthError(null);
+              }}
+              onBlur={() => validateEmail(email)}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+              editable={!loading && !isSubmitting}
+              error={emailError}
+              leftIcon="mail-outline"
+            />
 
             {/* Password Input */}
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Password</Text>
-              <TextInput
-                style={[styles.input, passwordError ? styles.inputError : null]}
-                placeholder="Enter your password"
-                placeholderTextColor="#999"
-                value={password}
-                onChangeText={(text) => {
-                  setPassword(text);
-                  if (passwordError) setPasswordError('');
-                  if (authError) setAuthError(null);
-                }}
-                onBlur={() => validatePassword(password)}
-                secureTextEntry
-                autoCapitalize="none"
-                autoCorrect={false}
-                editable={!loading && !isSubmitting}
-              />
-              <FieldError error={passwordError} />
-            </View>
+            <TextInput
+              label="Password"
+              placeholder="Enter your password"
+              value={password}
+              onChangeText={(text) => {
+                setPassword(text);
+                if (passwordError) setPasswordError('');
+                if (authError) setAuthError(null);
+              }}
+              onBlur={() => validatePassword(password)}
+              secureTextEntry
+              autoCapitalize="none"
+              autoCorrect={false}
+              editable={!loading && !isSubmitting}
+              error={passwordError}
+              leftIcon="lock-closed-outline"
+            />
 
             {/* Login Button */}
-            <TouchableOpacity
-              style={[styles.loginButton, (loading || isSubmitting) ? styles.buttonDisabled : null]}
+            <Button
+              title="Sign In"
               onPress={handleLogin}
+              loading={loading || isSubmitting}
               disabled={loading || isSubmitting}
-            >
-              {loading || isSubmitting ? (
-                <ActivityIndicator color="#FFFFFF" size="small" />
-              ) : (
-                <Text style={styles.loginButtonText}>Sign In</Text>
-              )}
-            </TouchableOpacity>
+              icon="log-in-outline"
+              size="lg"
+              style={styles.loginButton}
+            />
 
             {/* Register Link */}
             <View style={styles.registerContainer}>
-              <Text style={styles.registerText}>Don't have an account? </Text>
+              <BodySmall color="secondary">Don't have an account? </BodySmall>
               <TouchableOpacity 
                 onPress={handleNavigateToRegister}
                 disabled={loading || isSubmitting}
@@ -308,16 +310,21 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
                 </Text>
               </TouchableOpacity>
             </View>
-          </View>
+          </Animated.View>
 
           {/* Emergency Access Info */}
-          <View style={styles.emergencyInfo}>
-            <Text style={styles.emergencyTitle}>Emergency Access</Text>
-            <Text style={styles.emergencyText}>
-              In case of emergency, medical professionals can scan your QR code 
-              for immediate access to critical information.
-            </Text>
-          </View>
+          <Animated.View entering={FadeInUp.delay(300).duration(400)}>
+            <Card variant="outlined" style={styles.emergencyInfo}>
+              <View style={styles.emergencyHeader}>
+                <Ionicons name="warning-outline" size={20} color={colors.medical.emergency} />
+                <Text style={styles.emergencyTitle}>Emergency Access</Text>
+              </View>
+              <BodySmall color="secondary" style={styles.emergencyText}>
+                In case of emergency, medical professionals can scan your QR code 
+                for immediate access to critical information.
+              </BodySmall>
+            </Card>
+          </Animated.View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -328,13 +335,13 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.background.primary,
   },
   scrollContainer: {
     flexGrow: 1,
     justifyContent: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 32,
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing['3xl'],
   },
   content: {
     maxWidth: 400,
@@ -343,106 +350,65 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: spacing['4xl'],
+  },
+  logoContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: colors.background.elevated,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.lg,
+    borderWidth: 1,
+    borderColor: colors.border.default,
   },
   title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#D32F2F',
-    marginBottom: 8,
+    color: colors.primary.main,
+    marginBottom: spacing.sm,
   },
   subtitle: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 12,
+    marginBottom: spacing.md,
   },
   description: {
-    fontSize: 14,
-    color: '#888',
-    textAlign: 'center',
-    lineHeight: 20,
+    lineHeight: 22,
+    paddingHorizontal: spacing.lg,
   },
   form: {
-    marginBottom: 32,
-  },
-  inputContainer: {
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
-  },
-  input: {
-    height: 50,
-    borderWidth: 1,
-    borderColor: '#DDD',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    fontSize: 16,
-    backgroundColor: '#FAFAFA',
-  },
-  inputError: {
-    borderColor: '#D32F2F',
-    backgroundColor: '#FFEBEE',
-  },
-  errorText: {
-    fontSize: 14,
-    color: '#D32F2F',
-    marginTop: 4,
+    marginBottom: spacing['3xl'],
   },
   loginButton: {
-    height: 50,
-    backgroundColor: '#D32F2F',
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  buttonDisabled: {
-    backgroundColor: '#CCC',
-  },
-  loginButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
+    marginTop: spacing.sm,
   },
   registerContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 24,
-  },
-  registerText: {
-    fontSize: 14,
-    color: '#666',
+    marginTop: spacing['2xl'],
   },
   registerLink: {
-    fontSize: 14,
-    color: '#D32F2F',
-    fontWeight: '600',
+    ...typography.labelLarge,
+    color: colors.primary.main,
   },
   linkDisabled: {
-    color: '#CCC',
+    color: colors.text.disabled,
   },
   emergencyInfo: {
-    backgroundColor: '#F5F5F5',
-    padding: 16,
-    borderRadius: 8,
-    borderLeftWidth: 4,
-    borderLeftColor: '#D32F2F',
+    borderLeftWidth: 3,
+    borderLeftColor: colors.medical.emergency,
+  },
+  emergencyHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: spacing.sm,
+    gap: spacing.sm,
   },
   emergencyTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
+    ...typography.labelLarge,
+    color: colors.medical.emergency,
   },
   emergencyText: {
-    fontSize: 14,
-    color: '#666',
-    lineHeight: 20,
+    lineHeight: 22,
   },
 });
 

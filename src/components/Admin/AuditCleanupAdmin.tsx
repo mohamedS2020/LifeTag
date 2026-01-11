@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { auditRetentionManager, CleanupResult } from '../../utils/auditRetention';
 import { auditCleanupService } from '../../services/auditCleanupService';
+import { colors, spacing } from '../../theme';
 
 interface AuditCleanupAdminProps {
   onClose?: () => void;
@@ -125,7 +126,7 @@ export const AuditCleanupAdmin: React.FC<AuditCleanupAdminProps> = ({ onClose })
   if (loading) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#2196F3" />
+        <ActivityIndicator size="large" color={colors.primary.main} />
         <Text style={styles.loadingText}>Loading retention status...</Text>
       </View>
     );
@@ -182,7 +183,7 @@ export const AuditCleanupAdmin: React.FC<AuditCleanupAdminProps> = ({ onClose })
               )}
               <View style={[
                 styles.statusBadge,
-                { backgroundColor: retentionStatus.current.cleanupNeeded ? '#ff9800' : '#4caf50' }
+                { backgroundColor: retentionStatus.current.cleanupNeeded ? colors.status.warning.main : colors.status.success.main }
               ]}>
                 <Text style={styles.statusBadgeText}>
                   {retentionStatus.current.cleanupNeeded ? 'Cleanup Needed' : 'No Cleanup Needed'}
@@ -225,7 +226,7 @@ export const AuditCleanupAdmin: React.FC<AuditCleanupAdminProps> = ({ onClose })
               <View style={styles.resultInfo}>
                 <Text style={[
                   styles.resultText,
-                  { color: lastCleanupResult.success ? '#4caf50' : '#f44336' }
+                  { color: lastCleanupResult.success ? colors.status.success.main : colors.status.error.main }
                 ]}>
                   {lastCleanupResult.success ? '✅ Success' : '❌ Failed'}
                 </Text>
@@ -267,7 +268,7 @@ export const AuditCleanupAdmin: React.FC<AuditCleanupAdminProps> = ({ onClose })
                 disabled={cleanupLoading || retentionStatus.status.isCleanupRunning}
               >
                 {cleanupLoading ? (
-                  <ActivityIndicator size="small" color="#fff" />
+                  <ActivityIndicator size="small" color={colors.text.inverse} />
                 ) : (
                   <Text style={styles.actionButtonText}>🗑️ Run Manual Cleanup</Text>
                 )}
@@ -302,63 +303,63 @@ export const AuditCleanupAdmin: React.FC<AuditCleanupAdminProps> = ({ onClose })
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5'
+    backgroundColor: colors.background.primary
   },
   centerContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20
+    padding: spacing.lg
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#fff',
+    padding: spacing.lg,
+    backgroundColor: colors.background.secondary,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0'
+    borderBottomColor: colors.border.default
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333'
+    color: colors.text.primary
   },
   closeButton: {
-    padding: 5
+    padding: spacing.xs
   },
   closeButtonText: {
     fontSize: 20,
-    color: '#666'
+    color: colors.text.secondary
   },
   loadingText: {
-    marginTop: 10,
+    marginTop: spacing.sm,
     fontSize: 16,
-    color: '#666'
+    color: colors.text.secondary
   },
   errorText: {
     fontSize: 16,
-    color: '#d32f2f',
+    color: colors.status.error.main,
     textAlign: 'center',
-    marginBottom: 20
+    marginBottom: spacing.lg
   },
   retryButton: {
-    backgroundColor: '#2196F3',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 8
+    backgroundColor: colors.primary.main,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: spacing.borderRadius.md
   },
   retryButtonText: {
-    color: '#fff',
+    color: colors.text.inverse,
     fontSize: 16,
     fontWeight: 'bold'
   },
   section: {
-    backgroundColor: '#fff',
-    marginHorizontal: 15,
-    marginVertical: 8,
-    padding: 15,
-    borderRadius: 8,
+    backgroundColor: colors.background.secondary,
+    marginHorizontal: spacing.md,
+    marginVertical: spacing.xs,
+    padding: spacing.md,
+    borderRadius: spacing.borderRadius.md,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
@@ -368,101 +369,101 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 10
+    color: colors.text.primary,
+    marginBottom: spacing.sm
   },
   policyInfo: {
-    backgroundColor: '#e3f2fd',
-    padding: 12,
-    borderRadius: 6
+    backgroundColor: colors.primary.main + '20',
+    padding: spacing.sm,
+    borderRadius: spacing.borderRadius.sm
   },
   policyText: {
     fontSize: 14,
-    color: '#1976d2',
-    marginBottom: 4
+    color: colors.primary.main,
+    marginBottom: spacing.xxs
   },
   statusInfo: {
-    gap: 8
+    gap: spacing.xs
   },
   statusText: {
     fontSize: 14,
-    color: '#333'
+    color: colors.text.primary
   },
   statusBadge: {
     alignSelf: 'flex-start',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 15,
-    marginTop: 5
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: spacing.borderRadius.full,
+    marginTop: spacing.xs
   },
   statusBadgeText: {
-    color: '#fff',
+    color: colors.text.inverse,
     fontSize: 12,
     fontWeight: 'bold'
   },
   reasonText: {
     fontSize: 12,
-    color: '#666',
+    color: colors.text.secondary,
     fontStyle: 'italic',
-    marginTop: 5
+    marginTop: spacing.xs
   },
   historyInfo: {
-    gap: 6
+    gap: spacing.xs
   },
   historyText: {
     fontSize: 14,
-    color: '#333'
+    color: colors.text.primary
   },
   resultInfo: {
-    gap: 6
+    gap: spacing.xs
   },
   resultText: {
     fontSize: 14,
-    color: '#333'
+    color: colors.text.primary
   },
   errorContainer: {
-    backgroundColor: '#ffebee',
-    padding: 10,
-    borderRadius: 6,
-    marginTop: 8
+    backgroundColor: colors.status.error.main + '20',
+    padding: spacing.sm,
+    borderRadius: spacing.borderRadius.sm,
+    marginTop: spacing.xs
   },
   errorLabel: {
     fontSize: 12,
     fontWeight: 'bold',
-    color: '#d32f2f',
-    marginBottom: 4
+    color: colors.status.error.main,
+    marginBottom: spacing.xxs
   },
   errorItem: {
     fontSize: 11,
-    color: '#d32f2f',
-    marginLeft: 8
+    color: colors.status.error.main,
+    marginLeft: spacing.xs
   },
   actionButtons: {
-    gap: 10
+    gap: spacing.sm
   },
   actionButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: spacing.borderRadius.md,
     alignItems: 'center'
   },
   cleanupButton: {
-    backgroundColor: '#ff5722'
+    backgroundColor: colors.status.warning.main
   },
   refreshButton: {
-    backgroundColor: '#2196F3'
+    backgroundColor: colors.primary.main
   },
   disabledButton: {
-    backgroundColor: '#ccc'
+    backgroundColor: colors.text.tertiary
   },
   actionButtonText: {
-    color: '#fff',
+    color: colors.text.inverse,
     fontSize: 16,
     fontWeight: 'bold'
   },
   infoText: {
     fontSize: 12,
-    color: '#666',
+    color: colors.text.secondary,
     lineHeight: 18
   }
 });

@@ -13,6 +13,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { colors, spacing } from '../../theme';
 
 interface DatePickerProps {
   value?: Date | null;
@@ -247,7 +248,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
       <TouchableOpacity
         style={[
           styles.dateInput,
-          error && styles.inputError,
+          !!error && styles.inputError,
           !validDate && styles.placeholderContainer,
         ]}
         onPress={openPicker}
@@ -267,13 +268,13 @@ export const DatePicker: React.FC<DatePickerProps> = ({
               style={styles.clearButton}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
-              <Ionicons name="close-circle" size={20} color="#999" />
+              <Ionicons name="close-circle" size={20} color={colors.text.tertiary} />
             </TouchableOpacity>
           )}
           <Ionicons 
             name="calendar-outline" 
             size={24} 
-            color={error ? '#e74c3c' : '#007AFF'} 
+            color={error ? colors.status.error.main : colors.primary.main} 
           />
         </View>
       </TouchableOpacity>
@@ -312,16 +313,16 @@ export const DatePicker: React.FC<DatePickerProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 8,
+    marginVertical: spacing.sm,
   },
   label: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
+    color: colors.text.primary,
+    marginBottom: spacing.sm,
   },
   required: {
-    color: '#e74c3c',
+    color: colors.status.error.main,
   },
   inputContainer: {
     position: 'relative',
@@ -331,15 +332,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    paddingHorizontal: 15,
-    paddingVertical: 12,
-    backgroundColor: '#fff',
+    borderColor: colors.border.default,
+    borderRadius: spacing.sm,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    backgroundColor: colors.background.card,
     minHeight: 50,
   },
   inputError: {
-    borderColor: '#e74c3c',
+    borderColor: colors.status.error.main,
     borderWidth: 1.5,
   },
   placeholderContainer: {
@@ -347,11 +348,11 @@ const styles = StyleSheet.create({
   },
   dateText: {
     fontSize: 16,
-    color: '#333',
+    color: colors.text.primary,
     flex: 1,
   },
   placeholderText: {
-    color: '#999',
+    color: colors.text.tertiary,
     fontStyle: 'italic',
   },
   iconContainer: {
@@ -359,25 +360,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   clearButton: {
-    marginRight: 8,
+    marginRight: spacing.sm,
   },
   errorText: {
-    color: '#e74c3c',
+    color: colors.status.error.main,
     fontSize: 14,
-    marginTop: 5,
-    marginLeft: 5,
+    marginTop: spacing.xs,
+    marginLeft: spacing.xs,
   },
   
   // Modal Styles
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: colors.overlay.medium,
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    backgroundColor: colors.background.card,
+    borderTopLeftRadius: spacing.lg,
+    borderTopRightRadius: spacing.lg,
     paddingBottom: 34, // Safe area padding
     maxHeight: '80%',
   },
@@ -385,66 +386,66 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: colors.border.default,
   },
   pickerTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333',
+    color: colors.text.primary,
   },
   cancelButton: {
     fontSize: 16,
-    color: '#666',
+    color: colors.text.secondary,
   },
   confirmButton: {
     fontSize: 16,
-    color: '#007AFF',
+    color: colors.primary.main,
     fontWeight: '600',
   },
   
   // Picker Sections
   pickersContainer: {
     flexDirection: 'row',
-    paddingHorizontal: 10,
-    paddingVertical: 20,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.lg,
   },
   pickerSection: {
     flex: 1,
-    marginHorizontal: 5,
+    marginHorizontal: spacing.xs,
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: colors.text.primary,
     textAlign: 'center',
-    marginBottom: 10,
+    marginBottom: spacing.sm,
   },
   scrollPicker: {
     maxHeight: 200,
     borderWidth: 1,
-    borderColor: '#eee',
-    borderRadius: 8,
-    backgroundColor: '#f9f9f9',
+    borderColor: colors.border.default,
+    borderRadius: spacing.sm,
+    backgroundColor: colors.background.tertiary,
   },
   pickerItem: {
-    paddingVertical: 12,
-    paddingHorizontal: 10,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.sm,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: colors.border.default,
   },
   selectedItem: {
-    backgroundColor: '#007AFF',
+    backgroundColor: colors.primary.main,
   },
   itemText: {
     fontSize: 16,
-    color: '#333',
+    color: colors.text.primary,
     textAlign: 'center',
   },
   selectedItemText: {
-    color: '#fff',
+    color: colors.text.inverse,
     fontWeight: '600',
   },
   picker: {

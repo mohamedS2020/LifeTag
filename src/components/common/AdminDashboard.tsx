@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { AdminManagementService } from '../../services/adminManagementService';
 import {
   View,
   Text,
@@ -14,8 +15,10 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { ProfessionalVerification, AuditCleanupAdmin } from '../Admin';
 import { useAuth } from '../../context/AuthContext';
-import { AdminManagementService } from '../../services/adminManagementService';
+import { db } from '../../config/firebase.config';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
+import { colors, spacing } from '../../theme';
 
 /**
  * Admin Dashboard Props
@@ -66,24 +69,46 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
    * Load system statistics on component mount
    */
   useEffect(() => {
-    loadSystemStats();
-  }, []);
+    setLoading(true);
+    // Queries for each stat
+    const usersQuery = query(collection(db, 'users'), where('userType', '==', 'individual'));
+    const medProsQuery = query(collection(db, 'users'), where('userType', '==', 'medical_professional'), where('isVerified', '==', true));
+    const pendingMedProsQuery = query(collection(db, 'users'), where('userType', '==', 'medical_professional'), where('isVerified', '==', false));
+    const adminsQuery = query(collection(db, 'users'), where('userType', '==', 'admin'));
 
-  /**
-   * Load system statistics
-   */
-  const loadSystemStats = async () => {
-    try {
-      setLoading(true);
-      const systemStats = await AdminManagementService.getSystemStats();
-      setStats(systemStats);
-    } catch (error) {
-      console.error('Error loading system stats:', error);
-      onError?.('Failed to load system statistics');
-    } finally {
+    // Store unsubscribe functions for cleanup
+    const unsubRefs: Array<() => void> = [];
+
+    unsubRefs.push(onSnapshot(usersQuery, (snapshot) => {
+      setStats(prev => ({ ...prev, totalUsers: snapshot.size }));
       setLoading(false);
-    }
-  };
+    }, (error) => {
+      console.error('Error listening to usersQuery:', error);
+      onError?.('Failed to listen for user stats updates');
+    }));
+    unsubRefs.push(onSnapshot(medProsQuery, (snapshot) => {
+      setStats(prev => ({ ...prev, totalMedicalProfessionals: snapshot.size }));
+    }, (error) => {
+      console.error('Error listening to medProsQuery:', error);
+      onError?.('Failed to listen for medical professional stats updates');
+    }));
+    unsubRefs.push(onSnapshot(pendingMedProsQuery, (snapshot) => {
+      setStats(prev => ({ ...prev, pendingVerifications: snapshot.size }));
+    }, (error) => {
+      console.error('Error listening to pendingMedProsQuery:', error);
+      onError?.('Failed to listen for pending verification stats updates');
+    }));
+    unsubRefs.push(onSnapshot(adminsQuery, (snapshot) => {
+      setStats(prev => ({ ...prev, totalAdmins: snapshot.size }));
+    }, (error) => {
+      console.error('Error listening to adminsQuery:', error);
+      onError?.('Failed to listen for admin stats updates');
+    }));
+
+    return () => {
+      unsubRefs.forEach(unsub => unsub());
+    };
+  }, []);
 
   /**
    * Handle admin creation
@@ -97,14 +122,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
     try {
       setLoading(true);
       await AdminManagementService.createAdmin(adminForm, user?.id || '');
-      
       Alert.alert(
         'Success',
         'Admin user created successfully',
         [{ text: 'OK', onPress: () => {
           setActiveModal(null);
           setAdminForm({ email: '', password: '', firstName: '', lastName: '', role: 'admin' });
-          loadSystemStats(); // Refresh stats
         }}]
       );
     } catch (error) {
@@ -122,18 +145,15 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
     Alert.alert(
       'Success',
       'Medical professional has been verified successfully.',
-      [{ text: 'OK', onPress: () => loadSystemStats() }] // Refresh stats
+      [{ text: 'OK' }]
     );
   };
 
-  /**
-   * Handle professional rejection
-   */
   const handleProfessionalRejected = (professionalId: string) => {
     Alert.alert(
       'Professional Rejected',
       'Medical professional application has been rejected.',
-      [{ text: 'OK', onPress: () => loadSystemStats() }] // Refresh stats
+      [{ text: 'OK' }]
     );
   };
 
@@ -181,7 +201,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
           <View style={styles.headerInfo}>
             <Text style={styles.headerTitle}>Admin Dashboard</Text>
             <View style={styles.adminBadge}>
-              <Ionicons name="shield-checkmark" size={16} color="#4CAF50" />
+              <Ionicons name="shield-checkmark" size={16} color={colors.status.success.main} />
               <Text style={styles.adminBadgeText}>Administrator</Text>
             </View>
           </View>
@@ -192,26 +212,26 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
         <View style={styles.statsContainer}>
           <Text style={styles.sectionTitle}>System Overview</Text>
           {loading ? (
-            <ActivityIndicator size="small" color="#2196F3" />
+            <ActivityIndicator size="small" color={colors.primary.main} />
           ) : (
             <View style={styles.statsGrid}>
               <View style={styles.statCard}>
-                <Ionicons name="people" size={24} color="#2196F3" />
+                <Ionicons name="people" size={24} color={colors.primary.main} />
                 <Text style={styles.statLabel}>Total Users</Text>
                 <Text style={styles.statValue}>{stats.totalUsers}</Text>
               </View>
               <View style={styles.statCard}>
-                <Ionicons name="medical" size={24} color="#4CAF50" />
+                <Ionicons name="medical" size={24} color={colors.status.success.main} />
                 <Text style={styles.statLabel}>Medical Pros</Text>
                 <Text style={styles.statValue}>{stats.totalMedicalProfessionals}</Text>
               </View>
               <View style={styles.statCard}>
-                <Ionicons name="time" size={24} color="#FF9800" />
+                <Ionicons name="time" size={24} color={colors.status.warning.main} />
                 <Text style={styles.statLabel}>Pending Reviews</Text>
                 <Text style={styles.statValue}>{stats.pendingVerifications}</Text>
               </View>
               <View style={styles.statCard}>
-                <Ionicons name="shield-checkmark" size={24} color="#9C27B0" />
+                <Ionicons name="shield-checkmark" size={24} color={colors.status.info.main} />
                 <Text style={styles.statLabel}>Admins</Text>
                 <Text style={styles.statValue}>{stats.totalAdmins}</Text>
               </View>
@@ -229,7 +249,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
             onPress={() => navigation.navigate('QRScanner')}
           >
             <View style={styles.actionIcon}>
-              <Ionicons name="scan-outline" size={28} color="#2196F3" />
+              <Ionicons name="scan-outline" size={28} color={colors.primary.main} />
             </View>
             <View style={styles.actionContent}>
               <Text style={styles.actionTitle}>Scan QR Code</Text>
@@ -237,7 +257,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 Scan a patient's emergency QR code
               </Text>
             </View>
-            <Ionicons name="chevron-forward" size={24} color="#666" />
+            <Ionicons name="chevron-forward" size={24} color={colors.text.secondary} />
           </TouchableOpacity>
 
           {/* Medical Professional Verification */}
@@ -246,7 +266,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
             onPress={() => setActiveModal('verification')}
           >
             <View style={styles.actionIcon}>
-              <Ionicons name="shield-checkmark" size={28} color="#4CAF50" />
+              <Ionicons name="shield-checkmark" size={28} color={colors.status.success.main} />
             </View>
             <View style={styles.actionContent}>
               <Text style={styles.actionTitle}>Medical Professional Verification</Text>
@@ -254,7 +274,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 Review and approve medical professional registrations
               </Text>
             </View>
-            <Ionicons name="chevron-forward" size={24} color="#666" />
+            <Ionicons name="chevron-forward" size={24} color={colors.text.secondary} />
           </TouchableOpacity>
 
           {/* History - Admin Audit Logs */}
@@ -263,7 +283,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
             onPress={() => navigation.navigate('AdminAuditLogs')}
           >
             <View style={styles.actionIcon}>
-              <Ionicons name="time" size={28} color="#FF9800" />
+              <Ionicons name="time" size={28} color={colors.status.warning.main} />
             </View>
             <View style={styles.actionContent}>
               <Text style={styles.actionTitle}>History</Text>
@@ -271,7 +291,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 View all system audit logs and activity history
               </Text>
             </View>
-            <Ionicons name="chevron-forward" size={24} color="#666" />
+            <Ionicons name="chevron-forward" size={24} color={colors.text.secondary} />
           </TouchableOpacity>
 
           {/* Audit Log Management */}
@@ -280,7 +300,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
             onPress={() => setActiveModal('audit')}
           >
             <View style={styles.actionIcon}>
-              <Ionicons name="document-text" size={28} color="#2196F3" />
+              <Ionicons name="document-text" size={28} color={colors.primary.main} />
             </View>
             <View style={styles.actionContent}>
               <Text style={styles.actionTitle}>Audit Log Management</Text>
@@ -288,7 +308,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 Manage audit log retention and cleanup policies
               </Text>
             </View>
-            <Ionicons name="chevron-forward" size={24} color="#666" />
+            <Ionicons name="chevron-forward" size={24} color={colors.text.secondary} />
           </TouchableOpacity>
 
           {/* System Settings */}
@@ -297,7 +317,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
             onPress={() => setActiveModal('createAdmin')}
           >
             <View style={styles.actionIcon}>
-              <Ionicons name="person-add" size={28} color="#9C27B0" />
+              <Ionicons name="person-add" size={28} color={colors.status.info.main} />
             </View>
             <View style={styles.actionContent}>
               <Text style={styles.actionTitle}>Create Admin User</Text>
@@ -305,7 +325,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 Create new administrator accounts
               </Text>
             </View>
-            <Ionicons name="chevron-forward" size={24} color="#666" />
+            <Ionicons name="chevron-forward" size={24} color={colors.text.secondary} />
           </TouchableOpacity>
 
           {/* System Settings */}
@@ -314,7 +334,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
             disabled
           >
             <View style={styles.actionIcon}>
-              <Ionicons name="settings" size={28} color="#999" />
+              <Ionicons name="settings" size={28} color={colors.text.tertiary} />
             </View>
             <View style={styles.actionContent}>
               <Text style={[styles.actionTitle, styles.disabledText]}>System Settings</Text>
@@ -322,7 +342,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 Configure system-wide settings (Coming Soon)
               </Text>
             </View>
-            <Ionicons name="chevron-forward" size={24} color="#ccc" />
+            <Ionicons name="chevron-forward" size={24} color={colors.text.disabled} />
           </TouchableOpacity>
 
           {/* User Management */}
@@ -331,7 +351,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
             disabled
           >
             <View style={styles.actionIcon}>
-              <Ionicons name="people" size={28} color="#999" />
+              <Ionicons name="people" size={28} color={colors.text.tertiary} />
             </View>
             <View style={styles.actionContent}>
               <Text style={[styles.actionTitle, styles.disabledText]}>User Management</Text>
@@ -339,14 +359,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 Manage user accounts and permissions (Coming Soon)
               </Text>
             </View>
-            <Ionicons name="chevron-forward" size={24} color="#ccc" />
+            <Ionicons name="chevron-forward" size={24} color={colors.text.disabled} />
           </TouchableOpacity>
         </View>
 
         {/* Sign Out Button */}
         <View style={styles.signOutSection}>
           <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
-            <Ionicons name="log-out-outline" size={24} color="#FF3B30" />
+            <Ionicons name="log-out-outline" size={24} color={colors.status.error.main} />
             <Text style={styles.signOutText}>Sign Out</Text>
           </TouchableOpacity>
         </View>
@@ -385,7 +405,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
         <SafeAreaView style={styles.modalContainer}>
           <View style={styles.modalHeader}>
             <TouchableOpacity onPress={() => setActiveModal(null)}>
-              <Ionicons name="close" size={24} color="#666" />
+              <Ionicons name="close" size={24} color={colors.text.primary} />
             </TouchableOpacity>
             <Text style={styles.modalTitle}>Create Admin User</Text>
             <View style={{ width: 24 }} />
@@ -399,6 +419,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 value={adminForm.email}
                 onChangeText={(text) => setAdminForm(prev => ({ ...prev, email: text }))}
                 placeholder="admin@example.com"
+                placeholderTextColor={colors.text.tertiary}
                 keyboardType="email-address"
                 autoCapitalize="none"
               />
@@ -411,6 +432,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 value={adminForm.password}
                 onChangeText={(text) => setAdminForm(prev => ({ ...prev, password: text }))}
                 placeholder="Secure password"
+                placeholderTextColor={colors.text.tertiary}
                 secureTextEntry
               />
             </View>
@@ -422,6 +444,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 value={adminForm.firstName}
                 onChangeText={(text) => setAdminForm(prev => ({ ...prev, firstName: text }))}
                 placeholder="First name"
+                placeholderTextColor={colors.text.tertiary}
               />
             </View>
 
@@ -432,6 +455,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 value={adminForm.lastName}
                 onChangeText={(text) => setAdminForm(prev => ({ ...prev, lastName: text }))}
                 placeholder="Last name"
+                placeholderTextColor={colors.text.tertiary}
               />
             </View>
 
@@ -459,62 +483,59 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: colors.background.primary,
   },
   scrollContainer: {
     flex: 1,
   },
   scrollContent: {
-    padding: 16,
+    padding: spacing.md,
   },
   header: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 12,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    backgroundColor: colors.background.secondary,
+    padding: spacing.lg,
+    borderRadius: spacing.borderRadius.lg,
+    marginBottom: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.border.light,
   },
   headerInfo: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: spacing.xs,
   },
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
+    color: colors.text.primary,
   },
   adminBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#E8F5E8',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
+    backgroundColor: colors.status.success.main + '30',
+    paddingHorizontal: spacing.xs,
+    paddingVertical: spacing.xxs,
+    borderRadius: spacing.borderRadius.lg,
   },
   adminBadgeText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#4CAF50',
-    marginLeft: 4,
+    color: colors.status.success.main,
+    marginLeft: spacing.xxs,
   },
   welcomeText: {
     fontSize: 16,
-    color: '#666',
+    color: colors.text.secondary,
   },
   statsContainer: {
-    marginBottom: 24,
+    marginBottom: spacing.lg,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 12,
+    color: colors.text.primary,
+    marginBottom: spacing.sm,
   },
   statsGrid: {
     flexDirection: 'row',
@@ -522,44 +543,38 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: 'white',
-    padding: 16,
-    borderRadius: 12,
+    backgroundColor: colors.background.secondary,
+    padding: spacing.md,
+    borderRadius: spacing.borderRadius.lg,
     alignItems: 'center',
-    marginHorizontal: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    marginHorizontal: spacing.xxs,
+    borderWidth: 1,
+    borderColor: colors.border.light,
   },
   statLabel: {
     fontSize: 12,
-    color: '#666',
-    marginTop: 8,
+    color: colors.text.secondary,
+    marginTop: spacing.xs,
     textAlign: 'center',
   },
   statValue: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
-    marginTop: 4,
+    color: colors.text.primary,
+    marginTop: spacing.xxs,
   },
   actionsContainer: {
-    marginBottom: 24,
+    marginBottom: spacing.lg,
   },
   actionCard: {
-    backgroundColor: 'white',
-    padding: 16,
-    borderRadius: 12,
+    backgroundColor: colors.background.secondary,
+    padding: spacing.md,
+    borderRadius: spacing.borderRadius.lg,
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    marginBottom: spacing.sm,
+    borderWidth: 1,
+    borderColor: colors.border.light,
   },
   disabledCard: {
     opacity: 0.6,
@@ -568,10 +583,10 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: colors.background.elevated,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 16,
+    marginRight: spacing.md,
   },
   actionContent: {
     flex: 1,
@@ -579,102 +594,97 @@ const styles = StyleSheet.create({
   actionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
-    marginBottom: 4,
+    color: colors.text.primary,
+    marginBottom: spacing.xxs,
   },
   actionDescription: {
     fontSize: 14,
-    color: '#666',
+    color: colors.text.secondary,
     lineHeight: 20,
   },
   disabledText: {
-    color: '#999',
+    color: colors.text.tertiary,
   },
   
   // Modal styles
   modalContainer: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: colors.background.primary,
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
+    padding: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-    backgroundColor: 'white',
+    borderBottomColor: colors.border.default,
+    backgroundColor: colors.background.secondary,
   },
   modalTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: colors.text.primary,
   },
   modalContent: {
     flex: 1,
-    padding: 16,
+    padding: spacing.md,
   },
   formGroup: {
-    marginBottom: 16,
+    marginBottom: spacing.md,
   },
   formLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
+    color: colors.text.primary,
+    marginBottom: spacing.xs,
   },
   formInput: {
-    backgroundColor: 'white',
+    backgroundColor: colors.background.secondary,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
-    borderRadius: 8,
-    padding: 12,
+    borderColor: colors.border.default,
+    borderRadius: spacing.borderRadius.md,
+    padding: spacing.sm,
     fontSize: 16,
-    color: '#333',
+    color: colors.text.primary,
   },
   createButton: {
-    backgroundColor: '#9C27B0',
-    padding: 16,
-    borderRadius: 8,
+    backgroundColor: colors.primary.main,
+    padding: spacing.md,
+    borderRadius: spacing.borderRadius.md,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 24,
+    marginTop: spacing.lg,
   },
   disabledButton: {
     opacity: 0.6,
   },
   createButtonText: {
-    color: 'white',
+    color: colors.text.inverse,
     fontSize: 16,
     fontWeight: '600',
-    marginLeft: 8,
+    marginLeft: spacing.xs,
   },
   signOutSection: {
-    marginHorizontal: 16,
-    marginTop: 8,
-    marginBottom: 40,
+    marginHorizontal: spacing.md,
+    marginTop: spacing.xs,
+    marginBottom: spacing.xxl,
   },
   signOutButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FFF',
-    borderRadius: 12,
-    padding: 16,
+    backgroundColor: colors.background.secondary,
+    borderRadius: spacing.borderRadius.lg,
+    padding: spacing.md,
     borderWidth: 2,
-    borderColor: '#FF3B30',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    borderColor: colors.status.error.main,
   },
   signOutText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#FF3B30',
-    marginLeft: 8,
+    color: colors.status.error.main,
+    marginLeft: spacing.xs,
   },
 });
 

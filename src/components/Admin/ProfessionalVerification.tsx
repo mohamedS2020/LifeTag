@@ -15,6 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { MedicalProfessional } from '../../types';
 import { MedicalProfessionalApprovalService } from '../../services/medicalProfessionalApprovalService';
 import { VerifiedBadge } from '../common';
+import { colors, spacing } from '../../theme';
 
 /**
  * Props for ProfessionalVerification component
@@ -230,21 +231,21 @@ const ProfessionalVerification: React.FC<ProfessionalVerificationProps> = ({
         
         <View style={styles.cardDetails}>
         <View style={styles.detailRow}>
-          <Ionicons name="mail" size={14} color="#666666" />
+          <Ionicons name="mail" size={14} color={colors.text.tertiary} />
           <Text style={styles.detailText}>{professional.personalInfo.email}</Text>
         </View>
         <View style={styles.detailRow}>
-          <Ionicons name="document-text" size={14} color="#666666" />
+          <Ionicons name="document-text" size={14} color={colors.text.tertiary} />
           <Text style={styles.detailText}>License: {professional.professionalInfo.licenseNumber}</Text>
         </View>
         <View style={styles.detailRow}>
-          <Ionicons name="time" size={14} color="#666666" />
+          <Ionicons name="time" size={14} color={colors.text.tertiary} />
           <Text style={styles.detailText}>Applied: {formatDate(professional.createdAt)}</Text>
         </View>
       </View>
 
       <View style={styles.cardFooter}>
-        <Ionicons name="chevron-forward" size={16} color="#999999" />
+        <Ionicons name="chevron-forward" size={16} color={colors.text.tertiary} />
         <Text style={styles.reviewText}>Tap to review</Text>
       </View>
     </TouchableOpacity>
@@ -280,7 +281,7 @@ const ProfessionalVerification: React.FC<ProfessionalVerificationProps> = ({
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={onClose}>
-          <Ionicons name="close" size={24} color="#333333" />
+          <Ionicons name="close" size={24} color={colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Medical Professional Verification</Text>
         <View style={{ width: 24 }} />
@@ -292,14 +293,14 @@ const ProfessionalVerification: React.FC<ProfessionalVerificationProps> = ({
       {/* Content */}
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FF6B6B" />
+          <ActivityIndicator size="large" color={colors.primary.main} />
           <Text style={styles.loadingText}>Loading professionals...</Text>
         </View>
       ) : (
         <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.scrollContent}>
           {professionals.length === 0 ? (
             <View style={styles.emptyContainer}>
-              <Ionicons name="document-text-outline" size={64} color="#CCCCCC" />
+              <Ionicons name="document-text-outline" size={64} color={colors.text.tertiary} />
               <Text style={styles.emptyTitle}>No Applications Found</Text>
               <Text style={styles.emptyText}>
                 {filter === 'pending' 
@@ -327,7 +328,7 @@ const ProfessionalVerification: React.FC<ProfessionalVerificationProps> = ({
               {/* Modal Header */}
               <View style={styles.modalHeader}>
                 <TouchableOpacity onPress={() => setShowDetailModal(false)}>
-                  <Ionicons name="close" size={24} color="#333333" />
+                  <Ionicons name="close" size={24} color={colors.text.primary} />
                 </TouchableOpacity>
                 <Text style={styles.modalTitle}>Verification Review</Text>
                 <View style={{ width: 24 }} />
@@ -400,7 +401,7 @@ const ProfessionalVerification: React.FC<ProfessionalVerificationProps> = ({
                     value={verificationNotes}
                     onChangeText={setVerificationNotes}
                     placeholder="Add verification notes or rejection reason..."
-                    placeholderTextColor="#999999"
+                    placeholderTextColor={colors.text.tertiary}
                     multiline
                     numberOfLines={4}
                     textAlignVertical="top"
@@ -454,50 +455,50 @@ const ProfessionalVerification: React.FC<ProfessionalVerificationProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.background.primary,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#EEEEEE',
+    borderBottomColor: colors.border.default,
   },
   headerTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333333',
+    color: colors.text.primary,
   },
   filterContainer: {
     flexDirection: 'row',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    backgroundColor: '#F8F9FA',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    backgroundColor: colors.background.secondary,
     borderBottomWidth: 1,
-    borderBottomColor: '#EEEEEE',
+    borderBottomColor: colors.border.default,
   },
   filterButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: '#FFFFFF',
-    marginRight: 10,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    borderRadius: spacing.borderRadius.full,
+    backgroundColor: colors.background.elevated,
+    marginRight: spacing.sm,
     borderWidth: 1,
-    borderColor: '#DDDDDD',
+    borderColor: colors.border.default,
   },
   activeFilterButton: {
-    backgroundColor: '#FF6B6B',
-    borderColor: '#FF6B6B',
+    backgroundColor: colors.primary.main,
+    borderColor: colors.primary.main,
   },
   filterButtonText: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#666666',
+    color: colors.text.secondary,
   },
   activeFilterButtonText: {
-    color: '#FFFFFF',
+    color: colors.text.inverse,
   },
   loadingContainer: {
     flex: 1,
@@ -506,33 +507,33 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 16,
-    color: '#666666',
-    marginTop: 10,
+    color: colors.text.secondary,
+    marginTop: spacing.sm,
   },
   scrollContainer: {
     flex: 1,
   },
   scrollContent: {
-    padding: 20,
+    padding: spacing.lg,
   },
   professionalCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
+    backgroundColor: colors.background.secondary,
+    borderRadius: spacing.borderRadius.lg,
+    padding: spacing.md,
+    marginBottom: spacing.sm,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
     borderWidth: 1,
-    borderColor: '#F0F0F0',
+    borderColor: colors.border.light,
   },
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 12,
+    marginBottom: spacing.sm,
   },
   professionalInfo: {
     flex: 1,
@@ -540,52 +541,52 @@ const styles = StyleSheet.create({
   nameAndBadgeRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: spacing.xxs,
   },
   professionalName: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333333',
-    marginRight: 8,
+    color: colors.text.primary,
+    marginRight: spacing.xs,
     flex: 1,
   },
   professionalSpecialty: {
     fontSize: 14,
-    color: '#666666',
+    color: colors.text.secondary,
     marginBottom: 2,
   },
   professionalHospital: {
     fontSize: 12,
-    color: '#999999',
+    color: colors.text.tertiary,
   },
   statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingHorizontal: spacing.xs,
+    paddingVertical: spacing.xxs,
+    borderRadius: spacing.borderRadius.md,
   },
   pendingBadge: {
-    backgroundColor: '#FFF3CD',
+    backgroundColor: colors.status.warning.main + '30',
   },
   verifiedBadge: {
-    backgroundColor: '#D4EDDA',
+    backgroundColor: colors.status.success.main + '30',
   },
   statusText: {
     fontSize: 12,
     fontWeight: '500',
-    color: '#333333',
+    color: colors.text.primary,
   },
   cardDetails: {
-    marginBottom: 12,
+    marginBottom: spacing.sm,
   },
   detailRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: spacing.xxs,
   },
   detailText: {
     fontSize: 12,
-    color: '#666666',
-    marginLeft: 6,
+    color: colors.text.secondary,
+    marginLeft: spacing.xs,
   },
   cardFooter: {
     flexDirection: 'row',
@@ -594,125 +595,125 @@ const styles = StyleSheet.create({
   },
   reviewText: {
     fontSize: 12,
-    color: '#999999',
-    marginLeft: 4,
+    color: colors.text.tertiary,
+    marginLeft: spacing.xxs,
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 60,
+    paddingVertical: spacing.xxl,
   },
   emptyTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#333333',
-    marginTop: 20,
-    marginBottom: 8,
+    color: colors.text.primary,
+    marginTop: spacing.lg,
+    marginBottom: spacing.xs,
   },
   emptyText: {
     fontSize: 14,
-    color: '#666666',
+    color: colors.text.secondary,
     textAlign: 'center',
     lineHeight: 20,
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.background.primary,
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#EEEEEE',
+    borderBottomColor: colors.border.default,
   },
   modalTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333333',
+    color: colors.text.primary,
   },
   modalContent: {
     flex: 1,
-    padding: 20,
+    padding: spacing.lg,
   },
   section: {
-    marginBottom: 24,
+    marginBottom: spacing.xl,
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333333',
-    marginBottom: 12,
+    color: colors.text.primary,
+    marginBottom: spacing.sm,
   },
   infoCard: {
-    backgroundColor: '#F8F9FA',
-    borderRadius: 8,
-    padding: 16,
+    backgroundColor: colors.background.secondary,
+    borderRadius: spacing.borderRadius.md,
+    padding: spacing.md,
   },
   infoRow: {
     flexDirection: 'row',
-    marginBottom: 8,
+    marginBottom: spacing.xs,
   },
   infoLabel: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#666666',
+    color: colors.text.secondary,
     width: 120,
   },
   infoValue: {
     fontSize: 14,
-    color: '#333333',
+    color: colors.text.primary,
     flex: 1,
   },
   notesInput: {
     borderWidth: 1,
-    borderColor: '#DDDDDD',
-    borderRadius: 8,
-    padding: 12,
+    borderColor: colors.border.default,
+    borderRadius: spacing.borderRadius.md,
+    padding: spacing.sm,
     fontSize: 14,
-    color: '#333333',
-    backgroundColor: '#FFFFFF',
+    color: colors.text.primary,
+    backgroundColor: colors.background.secondary,
     minHeight: 100,
   },
   actionButtons: {
     flexDirection: 'row',
-    padding: 20,
-    gap: 12,
+    padding: spacing.lg,
+    gap: spacing.sm,
     borderTopWidth: 1,
-    borderTopColor: '#EEEEEE',
+    borderTopColor: colors.border.default,
   },
   rejectButton: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#DC3545',
-    paddingVertical: 14,
-    borderRadius: 8,
+    backgroundColor: colors.status.error.main,
+    paddingVertical: spacing.sm,
+    borderRadius: spacing.borderRadius.md,
   },
   rejectButtonText: {
-    color: 'white',
+    color: colors.text.inverse,
     fontSize: 16,
     fontWeight: '600',
-    marginLeft: 8,
+    marginLeft: spacing.xs,
   },
   approveButton: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#28A745',
-    paddingVertical: 14,
-    borderRadius: 8,
+    backgroundColor: colors.status.success.main,
+    paddingVertical: spacing.sm,
+    borderRadius: spacing.borderRadius.md,
   },
   approveButtonText: {
-    color: 'white',
+    color: colors.text.inverse,
     fontSize: 16,
     fontWeight: '600',
-    marginLeft: 8,
+    marginLeft: spacing.xs,
   },
 });
 

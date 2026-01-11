@@ -11,8 +11,11 @@ import {
   TouchableOpacity,
   SafeAreaView,
 } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
+import { colors, spacing } from '../theme';
+import { Card, H1, Body, Caption, Badge } from '../components/ui';
 
 interface QRTabScreenProps {
   navigation: any;
@@ -34,51 +37,61 @@ const QRTabScreen: React.FC<QRTabScreenProps> = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <View style={styles.header}>
-          <Ionicons name="qr-code" size={48} color="#2196F3" />
-          <Text style={styles.title}>QR Code Features</Text>
-          <Text style={styles.subtitle}>Quick access to emergency QR codes</Text>
-        </View>
+        <Animated.View style={styles.header} entering={FadeInDown.duration(500)}>
+          <View style={styles.iconContainer}>
+            <Ionicons name="qr-code" size={48} color={colors.primary.main} />
+          </View>
+          <H1 style={styles.title}>QR Code Features</H1>
+          <Body style={styles.subtitle}>Quick access to emergency QR codes</Body>
+        </Animated.View>
 
         <View style={styles.actionsContainer}>
-          <TouchableOpacity style={styles.actionButton} onPress={handleShowMyQR}>
-            <View style={styles.actionIcon}>
-              <Ionicons name="qr-code" size={32} color="#4CAF50" />
-            </View>
-            <View style={styles.actionContent}>
-              <Text style={styles.actionTitle}>Show My QR Code</Text>
-              <Text style={styles.actionDescription}>
-                Display your emergency information QR code
-              </Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color="#ccc" />
-          </TouchableOpacity>
+          <Animated.View entering={FadeInDown.duration(500).delay(100)}>
+            <TouchableOpacity onPress={handleShowMyQR} activeOpacity={0.7}>
+              <Card variant="elevated" style={styles.actionButton}>
+                <View style={[styles.actionIconBg, { backgroundColor: `${colors.medical.verified}20` }]}>
+                  <Ionicons name="qr-code" size={28} color={colors.medical.verified} />
+                </View>
+                <View style={styles.actionContent}>
+                  <Text style={styles.actionTitle}>Show My QR Code</Text>
+                  <Caption>Display your emergency information QR code</Caption>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color={colors.text.tertiary} />
+              </Card>
+            </TouchableOpacity>
+          </Animated.View>
 
-          <TouchableOpacity style={styles.actionButton} onPress={handleScanQR}>
-            <View style={styles.actionIcon}>
-              <Ionicons name="scan" size={32} color="#2196F3" />
-            </View>
-            <View style={styles.actionContent}>
-              <Text style={styles.actionTitle}>Scan QR Code</Text>
-              <Text style={styles.actionDescription}>
-                Scan emergency information from others
-                {user?.userType === 'medical_professional' && user?.isVerified && ' (Professional Mode)'}
-              </Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color="#ccc" />
-          </TouchableOpacity>
+          <Animated.View entering={FadeInDown.duration(500).delay(200)}>
+            <TouchableOpacity onPress={handleScanQR} activeOpacity={0.7}>
+              <Card variant="elevated" style={styles.actionButton}>
+                <View style={[styles.actionIconBg, { backgroundColor: `${colors.primary.main}20` }]}>
+                  <Ionicons name="scan" size={28} color={colors.primary.main} />
+                </View>
+                <View style={styles.actionContent}>
+                  <Text style={styles.actionTitle}>Scan QR Code</Text>
+                  <Caption>
+                    Scan emergency information from others
+                    {user?.userType === 'medical_professional' && user?.isVerified && ' (Professional Mode)'}
+                  </Caption>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color={colors.text.tertiary} />
+              </Card>
+            </TouchableOpacity>
+          </Animated.View>
         </View>
 
         {user?.userType === 'medical_professional' && user?.isVerified && (
-          <View style={styles.professionalSection}>
-            <View style={styles.professionalBadge}>
-              <Ionicons name="medical" size={16} color="#4CAF50" />
-              <Text style={styles.professionalText}>Medical Professional Features</Text>
-            </View>
-            <Text style={styles.professionalDescription}>
-              As a verified medical professional, you have enhanced access to full emergency profiles when scanning QR codes.
-            </Text>
-          </View>
+          <Animated.View entering={FadeInDown.duration(500).delay(300)}>
+            <Card variant="filled" style={styles.professionalSection}>
+              <View style={styles.professionalBadge}>
+                <Ionicons name="medical" size={20} color={colors.medical.verified} />
+                <Text style={styles.professionalText}>Medical Professional Features</Text>
+              </View>
+              <Caption style={styles.professionalDescription}>
+                As a verified medical professional, you have enhanced access to full emergency profiles when scanning QR codes.
+              </Caption>
+            </Card>
+          </Animated.View>
         )}
       </View>
     </SafeAreaView>
@@ -88,84 +101,81 @@ const QRTabScreen: React.FC<QRTabScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: colors.background.primary,
   },
   content: {
     flex: 1,
-    padding: 20,
+    padding: spacing.lg,
   },
   header: {
     alignItems: 'center',
-    marginBottom: 32,
+    marginBottom: spacing.xl,
+  },
+  iconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: colors.background.elevated,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.border.light,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    marginTop: 16,
-    marginBottom: 8,
+    color: colors.text.primary,
+    marginBottom: spacing.xs,
   },
   subtitle: {
-    fontSize: 16,
-    color: '#666',
+    color: colors.text.secondary,
     textAlign: 'center',
   },
   
   actionsContainer: {
-    gap: 16,
+    gap: spacing.md,
   },
   actionButton: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 12,
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    padding: spacing.md,
   },
-  actionIcon: {
-    marginRight: 16,
+  actionIconBg: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: spacing.md,
   },
   actionContent: {
     flex: 1,
   },
   actionTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
-    color: '#333',
-    marginBottom: 4,
-  },
-  actionDescription: {
-    fontSize: 14,
-    color: '#666',
-    lineHeight: 20,
+    color: colors.text.primary,
+    marginBottom: spacing.xxs,
   },
   
   professionalSection: {
-    marginTop: 32,
-    padding: 20,
-    backgroundColor: '#E8F5E8',
-    borderRadius: 12,
-    borderLeftWidth: 4,
-    borderLeftColor: '#4CAF50',
+    marginTop: spacing.xl,
+    backgroundColor: `${colors.medical.verified}10`,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.medical.verified,
   },
   professionalBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: spacing.sm,
   },
   professionalText: {
-    marginLeft: 8,
+    marginLeft: spacing.sm,
     fontSize: 16,
     fontWeight: '600',
-    color: '#4CAF50',
+    color: colors.medical.verified,
   },
   professionalDescription: {
-    fontSize: 14,
-    color: '#666',
+    color: colors.text.secondary,
     lineHeight: 20,
   },
 });

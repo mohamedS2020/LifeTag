@@ -8,6 +8,7 @@ import {
   RefreshControl,
   Platform,
 } from 'react-native';
+import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { UserProfile, AuditLog } from '../../types';
 import { profileService, passwordService, MedicalProfessionalAccessService } from '../../services';
@@ -15,6 +16,7 @@ import { LoadingOverlay } from '../common/LoadingOverlay';
 import { PasswordVerificationModal } from '../common/PasswordVerificationModal';
 import { VerifiedProfessionalIndicator } from '../common/VerifiedBadge';
 import { useAuth } from '../../context/AuthContext';
+import { colors, spacing } from '../../theme';
 
 interface ProfileDisplayProps {
   userId: string;
@@ -303,9 +305,9 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
     const visibleFields = profile.privacySettings?.visibleFields?.personalInfo;
 
     return (
-      <View style={styles.section}>
+      <Animated.View entering={FadeInDown.delay(100).duration(400)} style={styles.section}>
         <View style={styles.sectionHeader}>
-          <Ionicons name="person" size={20} color="#4ECDC4" />
+          <Ionicons name="person" size={20} color={colors.status.info.main} />
           <Text style={styles.sectionTitle}>Personal Information</Text>
         </View>
 
@@ -349,7 +351,7 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
             </View>
           )}
         </View>
-      </View>
+      </Animated.View>
     );
   };
 
@@ -360,9 +362,9 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
     const visibleFields = profile.privacySettings?.visibleFields?.medicalInfo;
 
     return (
-      <View style={styles.section}>
+      <Animated.View entering={FadeInDown.delay(200).duration(400)} style={styles.section}>
         <View style={styles.sectionHeader}>
-          <Ionicons name="medical" size={20} color="#FF6B6B" />
+          <Ionicons name="medical" size={20} color={colors.medical.emergency} />
           <Text style={styles.sectionTitle}>Medical Information</Text>
         </View>
 
@@ -439,7 +441,7 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
             </View>
           )}
         </View>
-      </View>
+      </Animated.View>
     );
   };
 
@@ -450,9 +452,9 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
     if (!visibleContacts) return null;
 
     return (
-      <View style={styles.section}>
+      <Animated.View entering={FadeInDown.delay(300).duration(400)} style={styles.section}>
         <View style={styles.sectionHeader}>
-          <Ionicons name="call" size={20} color="#FFE66D" />
+          <Ionicons name="call" size={20} color={colors.status.warning.main} />
           <Text style={styles.sectionTitle}>Emergency Contacts</Text>
         </View>
 
@@ -470,20 +472,20 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
 
               <View style={styles.contactDetails}>
                 <View style={styles.contactRow}>
-                  <Ionicons name="call" size={16} color="#666" />
+                  <Ionicons name="call" size={16} color={colors.text.tertiary} />
                   <Text style={styles.contactInfo}>{contact.phoneNumber}</Text>
                 </View>
 
                 {contact.email && (
                   <View style={styles.contactRow}>
-                    <Ionicons name="mail" size={16} color="#666" />
+                    <Ionicons name="mail" size={16} color={colors.text.tertiary} />
                     <Text style={styles.contactInfo}>{contact.email}</Text>
                   </View>
                 )}
 
                 {contact.relationship && (
                   <View style={styles.contactRow}>
-                    <Ionicons name="people" size={16} color="#666" />
+                    <Ionicons name="people" size={16} color={colors.text.tertiary} />
                     <Text style={styles.contactInfo}>{contact.relationship}</Text>
                   </View>
                 )}
@@ -491,7 +493,7 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
             </View>
           ))}
         </View>
-      </View>
+      </Animated.View>
     );
   };
 
@@ -501,9 +503,9 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
     const { privacySettings } = profile;
 
     return (
-      <View style={styles.section}>
+      <Animated.View entering={FadeInDown.delay(400).duration(400)} style={styles.section}>
         <View style={styles.sectionHeader}>
-          <Ionicons name="shield-checkmark" size={20} color="#9C88FF" />
+          <Ionicons name="shield-checkmark" size={20} color={colors.primary.main} />
           <Text style={styles.sectionTitle}>Privacy & Security</Text>
         </View>
 
@@ -511,7 +513,7 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
           <View style={styles.privacyRow}>
             <Text style={styles.privacyLabel}>Emergency Access</Text>
             <View style={[styles.statusBadge, privacySettings.allowEmergencyAccess ? styles.enabledBadge : styles.disabledBadge]}>
-              <Text style={styles.statusText}>
+              <Text style={[styles.statusText, { color: privacySettings.allowEmergencyAccess ? colors.status.warning.main : colors.status.error.main }]}>
                 {privacySettings.allowEmergencyAccess ? 'Enabled' : 'Disabled'}
               </Text>
             </View>
@@ -520,7 +522,7 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
           <View style={styles.privacyRow}>
             <Text style={styles.privacyLabel}>Medical Professional Access</Text>
             <View style={[styles.statusBadge, privacySettings.allowMedicalProfessionalAccess ? styles.enabledBadge : styles.disabledBadge]}>
-              <Text style={styles.statusText}>
+              <Text style={[styles.statusText, { color: privacySettings.allowMedicalProfessionalAccess ? colors.status.warning.main : colors.status.error.main }]}>
                 {privacySettings.allowMedicalProfessionalAccess ? 'Enabled' : 'Disabled'}
               </Text>
             </View>
@@ -529,7 +531,7 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
           <View style={styles.privacyRow}>
             <Text style={styles.privacyLabel}>Password Protection</Text>
             <View style={[styles.statusBadge, privacySettings.requirePasswordForFullAccess ? styles.enabledBadge : styles.disabledBadge]}>
-              <Text style={styles.statusText}>
+              <Text style={[styles.statusText, { color: privacySettings.requirePasswordForFullAccess ? colors.status.warning.main : colors.status.error.main }]}>
                 {privacySettings.requirePasswordForFullAccess ? 'Enabled' : 'Disabled'}
               </Text>
             </View>
@@ -537,21 +539,21 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
 
           {accessTimeRemaining && (
             <View style={styles.accessTimeRow}>
-              <Ionicons name="time" size={16} color="#4ECDC4" />
+              <Ionicons name="time" size={16} color={colors.status.info.main} />
               <Text style={styles.accessTimeText}>
                 Full access expires in {accessTimeRemaining} minutes
               </Text>
             </View>
           )}
         </View>
-      </View>
+      </Animated.View>
     );
   };
 
   const renderPasswordProtectionScreen = () => (
     <View style={styles.passwordProtectionContainer}>
       <View style={styles.lockIconContainer}>
-        <Ionicons name="lock-closed" size={64} color="#FF6B6B" />
+        <Ionicons name="lock-closed" size={64} color={colors.medical.emergency} />
       </View>
       
       <Text style={styles.protectionTitle}>Profile Protected</Text>
@@ -595,7 +597,7 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
   if (!profile) {
     return (
       <View style={styles.errorContainer}>
-        <Ionicons name="alert-circle" size={48} color="#FF6B6B" />
+        <Ionicons name="alert-circle" size={48} color={colors.status.error.main} />
         <Text style={styles.errorTitle}>Profile Not Found</Text>
         <Text style={styles.errorMessage}>
           Unable to load profile information. Please try again.
@@ -623,58 +625,57 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
         userFirstName={profile.personalInfo?.firstName}
       />
 
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <Text style={styles.profileName}>
-            {profile.personalInfo?.firstName && profile.personalInfo?.lastName
-              ? `${profile.personalInfo.firstName} ${profile.personalInfo.lastName}`
-              : 'User Profile'}
-          </Text>
-          <Text style={styles.lastUpdated}>
-            Last updated: {profile.updatedAt?.toLocaleDateString() || 'Unknown'}
-          </Text>
-        </View>
-
-        {showEditButton && onEdit && (
-          <TouchableOpacity style={styles.editButton} onPress={onEdit}>
-            <Ionicons name="create" size={20} color="white" />
-            <Text style={styles.editButtonText}>Edit</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-
-      {/* Medical Professional Access Indicator */}
-      {hasMedicalProfessionalAccess && medicalProfessionalData && (
-        <View style={styles.medicalAccessBanner}>
-          <View style={styles.medicalAccessContent}>
-            <VerifiedProfessionalIndicator 
-              isVerified={true}
-              compact={true}
-            />
-            <View style={styles.medicalAccessText}>
-              <Text style={styles.medicalAccessTitle}>
-                Medical Professional Access
+      {/* Only show Profile Protected section if password is required */}
+      {needsPasswordAccess ? (
+        renderPasswordProtectionScreen()
+      ) : (
+        <>
+          {/* ...existing code for header, banners, and profile sections... */}
+          <View style={styles.header}>
+            <View style={styles.headerContent}>
+              <Text style={styles.profileName}>
+                {profile.personalInfo?.firstName && profile.personalInfo?.lastName
+                  ? `${profile.personalInfo.firstName} ${profile.personalInfo.lastName}`
+                  : 'User Profile'}
               </Text>
-              <Text style={styles.medicalAccessSubtitle}>
-                Accessed by: {MedicalProfessionalAccessService.formatProfessionalCredentials(medicalProfessionalData)}
+              <Text style={styles.lastUpdated}>
+                Last updated: {profile.updatedAt?.toLocaleDateString() || 'Unknown'}
               </Text>
             </View>
-          </View>
-          <Ionicons name="shield-checkmark" size={20} color="#28A745" />
-        </View>
-      )}
 
-      {/* Content */}
-      {!needsPasswordAccess ? (
-        <>
+            {showEditButton && onEdit && (
+              <TouchableOpacity style={styles.editButton} onPress={onEdit}>
+                <Ionicons name="create" size={20} color="white" />
+                <Text style={styles.editButtonText}>Edit</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
+          {hasMedicalProfessionalAccess && medicalProfessionalData && (
+            <View style={styles.medicalAccessBanner}>
+              <View style={styles.medicalAccessContent}>
+                <VerifiedProfessionalIndicator 
+                  isVerified={true}
+                  compact={true}
+                />
+                <View style={styles.medicalAccessText}>
+                  <Text style={styles.medicalAccessTitle}>
+                    Medical Professional Access
+                  </Text>
+                  <Text style={styles.medicalAccessSubtitle}>
+                    Accessed by: {MedicalProfessionalAccessService.formatProfessionalCredentials(medicalProfessionalData)}
+                  </Text>
+                </View>
+              </View>
+              <Ionicons name="shield-checkmark" size={20} color={colors.medical.verified} />
+            </View>
+          )}
+
           {renderPersonalInfo()}
           {renderMedicalInfo()}
           {renderEmergencyContacts()}
           {renderPrivacyStatus()}
         </>
-      ) : (
-        renderPasswordProtectionScreen()
       )}
     </View>
   );
@@ -682,42 +683,42 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#f9f9f9',
-    paddingBottom: 20,
+    backgroundColor: colors.background.primary,
+    paddingBottom: spacing.lg,
     minHeight: '100%',
   },
   accessBanner: {
-    padding: 15,
-    backgroundColor: '#e8f4fd',
-    borderRadius: 8,
-    marginBottom: 16,
+    padding: spacing.md,
+    backgroundColor: colors.background.elevated,
+    borderRadius: spacing.borderRadius.md,
+    marginBottom: spacing.md,
     flexDirection: 'row',
     alignItems: 'center',
     borderLeftWidth: 4,
-    borderLeftColor: '#4ECDC4',
+    borderLeftColor: colors.medical.verified,
   },
   bannerIcon: {
-    marginRight: 12,
+    marginRight: spacing.sm,
   },
   accessTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: colors.text.primary,
   },
   accessSubtitle: {
     fontSize: 14,
-    color: '#666',
-    marginTop: 4,
+    color: colors.text.secondary,
+    marginTop: spacing.xxs,
   },
   header: {
-    backgroundColor: 'white',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    backgroundColor: colors.background.secondary,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef',
+    borderBottomColor: colors.border.default,
   },
   headerContent: {
     flex: 1,
@@ -725,109 +726,106 @@ const styles = StyleSheet.create({
   profileName: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 4,
+    color: colors.text.primary,
+    marginBottom: spacing.xxs,
   },
   lastUpdated: {
     fontSize: 14,
-    color: '#666',
+    color: colors.text.secondary,
   },
   editButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#4ECDC4',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
+    backgroundColor: colors.primary.main,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    borderRadius: spacing.borderRadius.md,
   },
   editButtonText: {
-    color: 'white',
+    color: colors.text.inverse,
     fontSize: 14,
     fontWeight: '600',
-    marginLeft: 6,
+    marginLeft: spacing.xxs,
   },
   section: {
-    backgroundColor: 'white',
-    marginHorizontal: 16,
-    marginVertical: 8,
-    borderRadius: 12,
+    backgroundColor: colors.background.secondary,
+    marginHorizontal: spacing.md,
+    marginVertical: spacing.xs,
+    borderRadius: spacing.borderRadius.lg,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    borderWidth: 1,
+    borderColor: colors.border.light,
   },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f8f9fa',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    backgroundColor: colors.background.elevated,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
     borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef',
+    borderBottomColor: colors.border.default,
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
-    marginLeft: 8,
+    color: colors.text.primary,
+    marginLeft: spacing.xs,
   },
   sectionContent: {
-    padding: 16,
+    padding: spacing.md,
   },
   infoRow: {
-    marginBottom: 12,
+    marginBottom: spacing.sm,
   },
   label: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#666',
+    color: colors.text.tertiary,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
-    marginBottom: 4,
+    marginBottom: spacing.xxs,
   },
   value: {
     fontSize: 16,
-    color: '#333',
+    color: colors.text.primary,
     lineHeight: 22,
   },
   criticalValue: {
     fontWeight: '600',
-    color: '#FF6B6B',
+    color: colors.status.error.main,
   },
   contactCard: {
-    backgroundColor: '#f8f9fa',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 12,
+    backgroundColor: colors.background.elevated,
+    borderRadius: spacing.borderRadius.md,
+    padding: spacing.sm,
+    marginBottom: spacing.sm,
     borderLeftWidth: 4,
-    borderLeftColor: '#FFE66D',
+    borderLeftColor: colors.medical.emergency,
   },
   contactHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: spacing.xs,
   },
   contactName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: colors.text.primary,
   },
   primaryBadge: {
-    backgroundColor: '#FFE66D',
-    paddingHorizontal: 8,
+    backgroundColor: colors.medical.emergency,
+    paddingHorizontal: spacing.xs,
     paddingVertical: 2,
-    borderRadius: 4,
+    borderRadius: spacing.borderRadius.sm,
   },
   primaryBadgeText: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#B8860B',
+    color: colors.text.inverse,
   },
   contactDetails: {
-    gap: 6,
+    gap: spacing.xxs,
   },
   contactRow: {
     flexDirection: 'row',
@@ -835,30 +833,30 @@ const styles = StyleSheet.create({
   },
   contactInfo: {
     fontSize: 14,
-    color: '#666',
-    marginLeft: 8,
+    color: colors.text.secondary,
+    marginLeft: spacing.xs,
   },
   privacyRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: spacing.sm,
   },
   privacyLabel: {
     fontSize: 14,
-    color: '#333',
+    color: colors.text.primary,
     flex: 1,
   },
   statusBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xxs,
+    borderRadius: spacing.borderRadius.lg,
   },
   enabledBadge: {
-    backgroundColor: '#d4edda',
+    backgroundColor: 'transparent',
   },
   disabledBadge: {
-    backgroundColor: '#f8d7da',
+    backgroundColor: colors.status.error.main + '30',
   },
   statusText: {
     fontSize: 12,
@@ -867,118 +865,118 @@ const styles = StyleSheet.create({
   accessTimeRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#e8f8f7',
-    padding: 12,
-    borderRadius: 8,
-    marginTop: 8,
+    backgroundColor: colors.background.elevated,
+    padding: spacing.sm,
+    borderRadius: spacing.borderRadius.md,
+    marginTop: spacing.xs,
   },
   accessTimeText: {
     fontSize: 14,
-    color: '#4ECDC4',
-    marginLeft: 8,
+    color: colors.primary.main,
+    marginLeft: spacing.xs,
     fontWeight: '500',
   },
   passwordProtectionContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 32,
+    padding: spacing.xl,
   },
   lockIconContainer: {
-    marginBottom: 24,
+    marginBottom: spacing.lg,
   },
   protectionTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 12,
+    color: colors.text.primary,
+    marginBottom: spacing.sm,
     textAlign: 'center',
   },
   protectionMessage: {
     fontSize: 16,
-    color: '#666',
+    color: colors.text.secondary,
     textAlign: 'center',
     lineHeight: 22,
-    marginBottom: 32,
+    marginBottom: spacing.xl,
   },
   unlockButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#4ECDC4',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
-    marginBottom: 32,
+    backgroundColor: colors.primary.main,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: spacing.borderRadius.md,
+    marginBottom: spacing.xl,
   },
   unlockButtonText: {
-    color: 'white',
+    color: colors.text.inverse,
     fontSize: 16,
     fontWeight: '600',
-    marginLeft: 8,
+    marginLeft: spacing.xs,
   },
   emergencyInfoCard: {
-    backgroundColor: '#fff5f5',
+    backgroundColor: colors.background.secondary,
     borderWidth: 1,
-    borderColor: '#fed7d7',
-    borderRadius: 8,
-    padding: 16,
+    borderColor: colors.medical.emergency,
+    borderRadius: spacing.borderRadius.md,
+    padding: spacing.md,
     width: '100%',
   },
   emergencyInfoTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#FF6B6B',
-    marginBottom: 8,
+    color: colors.medical.emergency,
+    marginBottom: spacing.xs,
   },
   emergencyInfoText: {
     fontSize: 14,
-    color: '#333',
-    marginBottom: 4,
+    color: colors.text.primary,
+    marginBottom: spacing.xxs,
   },
   errorContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 32,
+    padding: spacing.xl,
   },
   errorTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
-    marginTop: 16,
-    marginBottom: 8,
+    color: colors.text.primary,
+    marginTop: spacing.md,
+    marginBottom: spacing.xs,
   },
   errorMessage: {
     fontSize: 16,
-    color: '#666',
+    color: colors.text.secondary,
     textAlign: 'center',
     lineHeight: 22,
-    marginBottom: 24,
+    marginBottom: spacing.lg,
   },
   retryButton: {
-    backgroundColor: '#4ECDC4',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
+    backgroundColor: colors.primary.main,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: spacing.borderRadius.md,
   },
   retryButtonText: {
-    color: 'white',
+    color: colors.text.inverse,
     fontSize: 16,
     fontWeight: '600',
   },
   // Medical Professional Access Banner Styles
   medicalAccessBanner: {
-    backgroundColor: '#E8F5E8',
+    backgroundColor: colors.background.elevated,
     borderLeftWidth: 4,
-    borderLeftColor: '#28A745',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    borderLeftColor: colors.medical.verified,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginHorizontal: 16,
-    marginVertical: 8,
-    borderRadius: 8,
+    marginHorizontal: spacing.md,
+    marginVertical: spacing.xs,
+    borderRadius: spacing.borderRadius.md,
   },
   medicalAccessContent: {
     flexDirection: 'row',
@@ -986,18 +984,18 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   medicalAccessText: {
-    marginLeft: 12,
+    marginLeft: spacing.sm,
     flex: 1,
   },
   medicalAccessTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#28A745',
+    color: colors.medical.verified,
     marginBottom: 2,
   },
   medicalAccessSubtitle: {
     fontSize: 12,
-    color: '#666666',
+    color: colors.text.secondary,
     lineHeight: 16,
   },
 });

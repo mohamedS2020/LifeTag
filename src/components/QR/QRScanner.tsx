@@ -19,6 +19,7 @@ import { QRService, EmergencyQRData } from '../../services/qrService';
 import { profileService } from '../../services';
 import { useAuth } from '../../context/AuthContext';
 import { AuditLog } from '../../types';
+import { colors, spacing } from '../../theme';
 
 /**
  * QR Scanner Component Props
@@ -283,7 +284,7 @@ const QRScanner: React.FC<QRScannerProps> = ({
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centerContent}>
-          <ActivityIndicator size="large" color="#FF6B6B" />
+          <ActivityIndicator size="large" color={colors.primary.main} />
           <Text style={styles.statusText}>Requesting camera permission...</Text>
         </View>
       </SafeAreaView>
@@ -297,7 +298,7 @@ const QRScanner: React.FC<QRScannerProps> = ({
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centerContent}>
-          <Ionicons name="camera-outline" size={80} color="#999999" />
+          <Ionicons name="camera-outline" size={80} color={colors.text.tertiary} />
           <Text style={styles.errorTitle}>Camera Access Required</Text>
           <Text style={styles.errorText}>
             LifeTag needs camera access to scan QR codes containing emergency medical information.
@@ -333,7 +334,7 @@ const QRScanner: React.FC<QRScannerProps> = ({
         <ScrollView contentContainerStyle={styles.manualEntryContainer}>
           <View style={styles.header}>
             <TouchableOpacity onPress={() => setShowManualEntry(false)}>
-              <Ionicons name="arrow-back" size={24} color="#333333" />
+              <Ionicons name="arrow-back" size={24} color={colors.text.primary} />
             </TouchableOpacity>
             <Text style={styles.headerTitle}>Manual QR Entry</Text>
             <View style={{ width: 24 }} />
@@ -351,7 +352,7 @@ const QRScanner: React.FC<QRScannerProps> = ({
               value={manualQRCode}
               onChangeText={setManualQRCode}
               placeholder="Paste or type QR code data here..."
-              placeholderTextColor="#999999"
+              placeholderTextColor={colors.text.tertiary}
               multiline
               numberOfLines={6}
               textAlignVertical="top"
@@ -426,7 +427,7 @@ const QRScanner: React.FC<QRScannerProps> = ({
               {/* Loading indicator */}
               {isLoading && (
                 <View style={styles.loadingOverlay}>
-                  <ActivityIndicator size="large" color="#FF6B6B" />
+                  <ActivityIndicator size="large" color={colors.primary.main} />
                   <Text style={styles.loadingText}>Processing QR Code...</Text>
                 </View>
               )}
@@ -473,26 +474,26 @@ const QRScanner: React.FC<QRScannerProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: colors.background.primary,
   },
   centerContent: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: spacing.lg,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
     backgroundColor: 'rgba(0, 0, 0, 0.8)',
   },
   headerTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: 'white',
+    color: colors.text.primary,
   },
   scannerContainer: {
     flex: 1,
@@ -523,7 +524,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: 30,
     height: 30,
-    borderColor: '#FF6B6B',
+    borderColor: colors.primary.main,
     borderWidth: 3,
   },
   topLeft: {
@@ -561,117 +562,117 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
   },
   loadingText: {
-    color: 'white',
-    marginTop: 10,
+    color: colors.text.primary,
+    marginTop: spacing.sm,
     fontSize: 16,
     fontWeight: '500',
   },
   instructionsContainer: {
-    padding: 20,
+    padding: spacing.lg,
     backgroundColor: 'rgba(0, 0, 0, 0.8)',
   },
   instructionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: 'white',
+    color: colors.text.primary,
     textAlign: 'center',
-    marginBottom: 8,
+    marginBottom: spacing.xs,
   },
   instructionText: {
     fontSize: 14,
-    color: '#CCCCCC',
+    color: colors.text.secondary,
     textAlign: 'center',
     lineHeight: 20,
   },
   scanCountText: {
     fontSize: 12,
-    color: '#999999',
+    color: colors.text.tertiary,
     textAlign: 'center',
-    marginTop: 8,
+    marginTop: spacing.xs,
   },
   buttonContainer: {
-    marginTop: 15,
+    marginTop: spacing.md,
     alignItems: 'center',
   },
   primaryButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FF6B6B',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 8,
-    marginVertical: 5,
+    backgroundColor: colors.primary.main,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: spacing.borderRadius.md,
+    marginVertical: spacing.xs,
   },
   primaryButtonText: {
-    color: 'white',
+    color: colors.text.inverse,
     fontSize: 16,
     fontWeight: '600',
-    marginLeft: 8,
+    marginLeft: spacing.xs,
   },
   secondaryButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 8,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: spacing.borderRadius.md,
     borderWidth: 1,
-    borderColor: '#CCCCCC',
-    marginVertical: 5,
+    borderColor: colors.border.default,
+    marginVertical: spacing.xs,
   },
   secondaryButtonText: {
-    color: '#CCCCCC',
+    color: colors.text.secondary,
     fontSize: 16,
     fontWeight: '500',
     textAlign: 'center',
   },
   disabledButton: {
-    backgroundColor: '#999999',
+    backgroundColor: colors.text.tertiary,
     opacity: 0.6,
   },
   statusText: {
     fontSize: 16,
-    color: '#CCCCCC',
+    color: colors.text.secondary,
     textAlign: 'center',
-    marginTop: 15,
+    marginTop: spacing.md,
   },
   errorTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#FF6B6B',
+    color: colors.status.error.main,
     textAlign: 'center',
-    marginTop: 15,
-    marginBottom: 10,
+    marginTop: spacing.md,
+    marginBottom: spacing.sm,
   },
   errorText: {
     fontSize: 16,
-    color: '#CCCCCC',
+    color: colors.text.secondary,
     textAlign: 'center',
     lineHeight: 22,
-    marginBottom: 8,
+    marginBottom: spacing.xs,
   },
   errorSubtext: {
     fontSize: 14,
-    color: '#999999',
+    color: colors.text.tertiary,
     textAlign: 'center',
     lineHeight: 20,
-    marginBottom: 20,
+    marginBottom: spacing.lg,
   },
   manualEntryContainer: {
     flexGrow: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.background.primary,
   },
   manualEntryContent: {
     flex: 1,
-    padding: 20,
+    padding: spacing.lg,
   },
   textInput: {
     borderWidth: 1,
-    borderColor: '#DDDDDD',
-    borderRadius: 8,
-    padding: 15,
+    borderColor: colors.border.default,
+    borderRadius: spacing.borderRadius.md,
+    padding: spacing.md,
     fontSize: 14,
-    color: '#333333',
-    backgroundColor: '#FFFFFF',
+    color: colors.text.primary,
+    backgroundColor: colors.background.secondary,
     minHeight: 120,
-    marginVertical: 15,
+    marginVertical: spacing.md,
   },
 });
 

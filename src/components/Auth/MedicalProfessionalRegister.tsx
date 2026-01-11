@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
 import {
   View,
-  Text,
-  TextInput,
-  TouchableOpacity,
   StyleSheet,
   Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  ActivityIndicator
+  SafeAreaView,
+  StatusBar
 } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../context';
+import { Button, TextInput, Card, H1, Body, Caption } from '../../components/ui';
+import { LoadingOverlay } from '../../components/common';
+import { colors, spacing } from '../../theme';
 
 interface MedicalProfessionalRegisterProps {
   navigation?: any; // Will be properly typed when navigation is set up
@@ -253,213 +256,196 @@ const MedicalProfessionalRegister: React.FC<MedicalProfessionalRegisterProps> = 
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <ScrollView 
-        contentContainerStyle={styles.scrollContainer}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
+    <>
+      <LoadingOverlay visible={loading} message="Submitting registration..." />
+      
+      <SafeAreaView style={styles.container}>
+      <KeyboardAvoidingView 
+        style={{flex: 1}} 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <View style={styles.content}>
-          {/* Header */}
-          <View style={styles.header}>
-            <Text style={styles.title}>Medical Professional</Text>
-            <Text style={styles.subtitle}>Register for verified access to patient profiles</Text>
-          </View>
+        <ScrollView 
+          contentContainerStyle={[
+            styles.scrollContainer,
+            { 
+              paddingTop: Platform.OS === 'android' ? (StatusBar.currentHeight || 32) : 48,
+              paddingBottom: spacing.xl + 48 
+            }
+          ]}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <Animated.View style={styles.content} entering={FadeInDown.duration(600)}>
+            {/* Header */}
+            <View style={styles.header}>
+              <View style={styles.logoContainer}>
+                <Ionicons name="medical" size={48} color={colors.primary.main} />
+              </View>
+              <H1 style={styles.title}>Medical Professional</H1>
+              <Body style={styles.subtitle}>Register for verified access to patient profiles</Body>
+            </View>
 
-          {/* Verification Notice */}
-          <View style={styles.verificationNotice}>
-            <Text style={styles.noticeTitle}>⚕️ Verification Required</Text>
-            <Text style={styles.noticeText}>
-              Medical professional accounts require manual verification. 
-              You'll be notified via email once approved by our admin team.
-            </Text>
-          </View>
+            {/* Verification Notice */}
+            <Animated.View entering={FadeInDown.duration(600).delay(100)}>
+              <Card variant="filled" style={styles.verificationNotice}>
+                <View style={styles.noticeHeader}>
+                  <Ionicons name="shield-checkmark" size={24} color={colors.primary.main} />
+                  <Body style={styles.noticeTitle}>Verification Required</Body>
+                </View>
+                <Caption style={styles.noticeText}>
+                  Medical professional accounts require manual verification. 
+                  You'll be notified via email once approved by our admin team.
+                </Caption>
+              </Card>
+            </Animated.View>
 
-          {/* Form */}
-          <View style={styles.form}>
-            {/* Full Name */}
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Full Name *</Text>
+            {/* Form */}
+            <Animated.View entering={FadeInDown.duration(600).delay(200)}>
               <TextInput
-                style={[styles.input, errors.fullName ? styles.inputError : null]}
+                label="Full Name"
                 placeholder="Dr. John Smith"
-                placeholderTextColor="#999"
                 value={formData.fullName}
                 onChangeText={(text) => updateFormData('fullName', text)}
                 onBlur={() => validateFullNameField(formData.fullName)}
                 autoCapitalize="words"
                 autoCorrect={false}
+                error={errors.fullName}
+                leftIcon="person-outline"
                 editable={!loading}
               />
-              {errors.fullName ? <Text style={styles.errorText}>{errors.fullName}</Text> : null}
-            </View>
 
-            {/* Medical License Number */}
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Medical License Number *</Text>
               <TextInput
-                style={[styles.input, errors.licenseNumber ? styles.inputError : null]}
+                label="Medical License Number"
                 placeholder="e.g., MD123456 or 12345-MD"
-                placeholderTextColor="#999"
                 value={formData.licenseNumber}
                 onChangeText={(text) => updateFormData('licenseNumber', text)}
                 onBlur={() => validateLicenseNumberField(formData.licenseNumber)}
                 autoCapitalize="characters"
                 autoCorrect={false}
+                error={errors.licenseNumber}
+                leftIcon="card-outline"
+                hint="Enter your state medical license number (will be verified)"
                 editable={!loading}
               />
-              {errors.licenseNumber ? <Text style={styles.errorText}>{errors.licenseNumber}</Text> : null}
-              <Text style={styles.fieldHint}>
-                Enter your state medical license number (will be verified)
-              </Text>
-            </View>
 
-            {/* Medical Specialty */}
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Medical Specialty *</Text>
               <TextInput
-                style={[styles.input, errors.specialty ? styles.inputError : null]}
+                label="Medical Specialty"
                 placeholder="e.g., Emergency Medicine, Cardiology"
-                placeholderTextColor="#999"
                 value={formData.specialty}
                 onChangeText={(text) => updateFormData('specialty', text)}
                 onBlur={() => validateSpecialtyField(formData.specialty)}
                 autoCapitalize="words"
                 autoCorrect={false}
+                error={errors.specialty}
+                leftIcon="fitness-outline"
                 editable={!loading}
               />
-              {errors.specialty ? <Text style={styles.errorText}>{errors.specialty}</Text> : null}
-            </View>
 
-            {/* Institution/Hospital */}
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Institution/Hospital *</Text>
               <TextInput
-                style={[styles.input, errors.institution ? styles.inputError : null]}
+                label="Institution/Hospital"
                 placeholder="e.g., City General Hospital"
-                placeholderTextColor="#999"
                 value={formData.institution}
                 onChangeText={(text) => updateFormData('institution', text)}
                 onBlur={() => validateInstitutionField(formData.institution)}
                 autoCapitalize="words"
                 autoCorrect={false}
+                error={errors.institution}
+                leftIcon="business-outline"
                 editable={!loading}
               />
-              {errors.institution ? <Text style={styles.errorText}>{errors.institution}</Text> : null}
-            </View>
 
-            {/* Email */}
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Professional Email Address *</Text>
               <TextInput
-                style={[styles.input, errors.email ? styles.inputError : null]}
+                label="Professional Email Address"
                 placeholder="doctor@hospital.com"
-                placeholderTextColor="#999"
                 value={formData.email}
                 onChangeText={(text) => updateFormData('email', text)}
                 onBlur={() => validateEmailField(formData.email)}
                 keyboardType="email-address"
                 autoCapitalize="none"
                 autoCorrect={false}
+                error={errors.email}
+                leftIcon="mail-outline"
+                hint="Use your professional/institutional email address"
                 editable={!loading}
               />
-              {errors.email ? <Text style={styles.errorText}>{errors.email}</Text> : null}
-              <Text style={styles.fieldHint}>
-                Use your professional/institutional email address
-              </Text>
-            </View>
 
-            {/* Password */}
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Password *</Text>
               <TextInput
-                style={[styles.input, errors.password ? styles.inputError : null]}
+                label="Password"
                 placeholder="Create a secure password"
-                placeholderTextColor="#999"
                 value={formData.password}
                 onChangeText={(text) => updateFormData('password', text)}
                 onBlur={() => validatePasswordField(formData.password)}
                 secureTextEntry
                 autoCapitalize="none"
                 autoCorrect={false}
+                error={errors.password}
+                leftIcon="lock-closed-outline"
+                hint="8+ characters with uppercase, lowercase, and number"
                 editable={!loading}
               />
-              {errors.password ? <Text style={styles.errorText}>{errors.password}</Text> : null}
-              <Text style={styles.fieldHint}>
-                8+ characters with uppercase, lowercase, and number
-              </Text>
-            </View>
 
-            {/* Confirm Password */}
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Confirm Password *</Text>
               <TextInput
-                style={[styles.input, errors.confirmPassword ? styles.inputError : null]}
+                label="Confirm Password"
                 placeholder="Confirm your password"
-                placeholderTextColor="#999"
                 value={formData.confirmPassword}
                 onChangeText={(text) => updateFormData('confirmPassword', text)}
                 onBlur={() => validateConfirmPasswordField(formData.confirmPassword, formData.password)}
                 secureTextEntry
                 autoCapitalize="none"
                 autoCorrect={false}
+                error={errors.confirmPassword}
+                leftIcon="lock-closed-outline"
                 editable={!loading}
               />
-              {errors.confirmPassword ? <Text style={styles.errorText}>{errors.confirmPassword}</Text> : null}
-            </View>
 
-            {/* Register Button */}
-            <TouchableOpacity
-              style={[styles.registerButton, loading ? styles.buttonDisabled : null]}
-              onPress={handleRegister}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator color="#FFFFFF" size="small" />
-              ) : (
-                <Text style={styles.registerButtonText}>Submit for Verification</Text>
-              )}
-            </TouchableOpacity>
+              <Button
+                title="Submit for Verification"
+                onPress={handleRegister}
+                loading={loading}
+                disabled={loading}
+                style={styles.registerButton}
+              />
+            </Animated.View>
 
             {/* Navigation Links */}
-            <View style={styles.navigationContainer}>
-              <TouchableOpacity 
+            <Animated.View style={styles.navigationContainer} entering={FadeInDown.duration(600).delay(300)}>
+              <Button
+                title="Register as Individual"
+                variant="ghost"
                 onPress={handleNavigateToRegularRegister}
                 disabled={loading}
-                style={styles.navigationButton}
-              >
-                <Text style={styles.navigationText}>Register as Individual</Text>
-              </TouchableOpacity>
+              />
               
               <View style={styles.loginContainer}>
-                <Text style={styles.loginText}>Already have an account? </Text>
-                <TouchableOpacity 
+                <Body style={styles.loginText}>Already have an account? </Body>
+                <Button
+                  title="Sign In"
+                  variant="ghost"
+                  size="sm"
                   onPress={handleNavigateToLogin}
                   disabled={loading}
-                >
-                  <Text style={styles.loginLink}>Sign In</Text>
-                </TouchableOpacity>
+                  fullWidth={false}
+                />
               </View>
-            </View>
-          </View>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+              <View style={{ height: spacing.xl }} />
+            </Animated.View>
+          </Animated.View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+      </SafeAreaView>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.background.primary,
   },
   scrollContainer: {
     flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingVertical: 32,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.xl,
   },
   content: {
     maxWidth: 400,
@@ -468,119 +454,61 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: spacing.xl,
   },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#D32F2F',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-  verificationNotice: {
-    backgroundColor: '#E3F2FD',
-    padding: 16,
-    borderRadius: 8,
-    borderLeftWidth: 4,
-    borderLeftColor: '#2196F3',
-    marginBottom: 24,
-  },
-  noticeTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1976D2',
-    marginBottom: 8,
-  },
-  noticeText: {
-    fontSize: 14,
-    color: '#1976D2',
-    lineHeight: 20,
-  },
-  form: {
-    marginBottom: 32,
-  },
-  inputContainer: {
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
-  },
-  input: {
-    height: 50,
-    borderWidth: 1,
-    borderColor: '#DDD',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    fontSize: 16,
-    backgroundColor: '#FAFAFA',
-  },
-  inputError: {
-    borderColor: '#D32F2F',
-    backgroundColor: '#FFEBEE',
-  },
-  errorText: {
-    fontSize: 14,
-    color: '#D32F2F',
-    marginTop: 4,
-  },
-  fieldHint: {
-    fontSize: 12,
-    color: '#888',
-    marginTop: 4,
-    lineHeight: 16,
-  },
-  registerButton: {
-    height: 50,
-    backgroundColor: '#D32F2F',
-    borderRadius: 8,
+  logoContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: colors.background.elevated,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 8,
+    marginBottom: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.border.light,
   },
-  buttonDisabled: {
-    backgroundColor: '#CCC',
+  title: {
+    color: colors.text.primary,
+    marginBottom: spacing.xs,
   },
-  registerButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
+  subtitle: {
+    color: colors.text.secondary,
+    textAlign: 'center',
+  },
+  verificationNotice: {
+    marginBottom: spacing.lg,
+    backgroundColor: colors.background.elevated,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.primary.main,
+  },
+  noticeHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: spacing.sm,
+  },
+  noticeTitle: {
+    color: colors.primary.main,
     fontWeight: '600',
+    marginLeft: spacing.sm,
+  },
+  noticeText: {
+    color: colors.text.secondary,
+    lineHeight: 20,
+  },
+  registerButton: {
+    marginTop: spacing.md,
   },
   navigationContainer: {
-    marginTop: 24,
+    marginTop: spacing.xl,
     alignItems: 'center',
-  },
-  navigationButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    marginBottom: 16,
-  },
-  navigationText: {
-    fontSize: 14,
-    color: '#2196F3',
-    fontWeight: '600',
-    textAlign: 'center',
   },
   loginContainer: {
     flexDirection: 'row',
-    justifyContent: 'center',
     alignItems: 'center',
+    marginTop: spacing.md,
   },
   loginText: {
-    fontSize: 14,
-    color: '#666',
-  },
-  loginLink: {
-    fontSize: 14,
-    color: '#D32F2F',
-    fontWeight: '600',
+    color: colors.text.secondary,
   },
 });
 

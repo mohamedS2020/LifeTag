@@ -14,6 +14,7 @@ import QRCode from 'react-native-qrcode-svg';
 import { Ionicons } from '@expo/vector-icons';
 import { UserProfile } from '../../types';
 import { QRService, QRCodeGenerator, EmergencyQRData } from '../../services/qrService';
+import { colors, spacing } from '../../theme';
 
 /**
  * QR Generator Component Props
@@ -192,7 +193,7 @@ export const QRGenerator: React.FC<QRGeneratorProps> = ({
       <View style={styles.qrContainer}>
         {isGenerating ? (
           <View style={[styles.qrPlaceholder, { width: size, height: size }]}>
-            <ActivityIndicator size="large" color="#007AFF" />
+            <ActivityIndicator size="large" color={colors.primary.main} />
             <Text style={styles.generatingText}>Generating QR Code...</Text>
           </View>
         ) : qrData ? (
@@ -212,7 +213,7 @@ export const QRGenerator: React.FC<QRGeneratorProps> = ({
           </View>
         ) : (
           <View style={[styles.qrPlaceholder, { width: size, height: size }]}>
-            <Ionicons name="qr-code-outline" size={60} color="#999" />
+            <Ionicons name="qr-code-outline" size={60} color={colors.text.tertiary} />
             <Text style={styles.placeholderText}>No QR Code Generated</Text>
           </View>
         )}

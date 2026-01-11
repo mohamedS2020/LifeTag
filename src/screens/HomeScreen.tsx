@@ -14,10 +14,13 @@ import {
   RefreshControl,
   StatusBar,
 } from 'react-native';
+import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 import { UserProfile } from '../types';
 import { LoadingOverlay } from '../components/common';
+import { Card, Button, Badge, H2, H3, H4, Body, BodySmall, Caption } from '../components/ui';
+import { colors, spacing, borderRadius, typography, shadows } from '../theme';
 
 // Service imports
 import { profileService } from '../services';
@@ -115,7 +118,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         title: 'View Full Profile',
         subtitle: 'See complete information',
         icon: 'document-text',
-        color: '#9C27B0',
+        color: colors.status.info.main,
         onPress: () => navigation.navigate('ProfileDisplay'),
       },
       {
@@ -123,7 +126,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         title: 'Edit Profile',
         subtitle: 'Update emergency information',
         icon: 'person-circle',
-        color: '#FF9800',
+        color: colors.status.warning.main,
         onPress: () => navigation.navigate('ProfileForm'),
       },
       {
@@ -131,7 +134,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         title: 'Profile Access History',
         subtitle: 'View who accessed your profile',
         icon: 'eye-outline',
-        color: '#007AFF',
+        color: colors.primary.main,
         onPress: () => navigation.navigate('ProfileAccessHistory'),
       },
     ];
@@ -143,7 +146,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         title: 'Professional Scanner',
         subtitle: 'Verified access scanning',
         icon: 'medical',
-        color: '#F44336',
+        color: colors.status.error.main,
         onPress: () => navigation.navigate('MedPro'),
       });
     }
@@ -152,78 +155,90 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   };
 
   const renderWelcomeCard = () => (
-    <View style={styles.welcomeCard}>
-      <View style={styles.welcomeHeader}>
-        <Ionicons name="heart-circle" size={40} color="#2196F3" />
-        <View style={styles.welcomeText}>
-          <Text style={styles.welcomeTitle}>
-            Welcome back{profile?.personalInfo?.firstName ? `, ${profile.personalInfo.firstName}` : ''}!
-          </Text>
-          <Text style={styles.welcomeSubtitle}>
-            {user?.userType === 'medical_professional' && user?.isVerified 
-              ? 'Verified Medical Professional' 
-              : user?.userType === 'medical_professional' && !user?.isVerified
-              ? 'Medical Professional - Awaiting Verification'
-              : 'Emergency Medical Information System'}
-          </Text>
+    <Animated.View entering={FadeInDown.delay(100).duration(400)}>
+      <Card variant="elevated" style={styles.welcomeCard}>
+        <View style={styles.welcomeHeader}>
+          <View style={styles.welcomeIconContainer}>
+            <Ionicons name="heart-circle" size={32} color={colors.primary.main} />
+          </View>
+          <View style={styles.welcomeText}>
+            <H3 style={styles.welcomeTitle}>
+              Welcome back{profile?.personalInfo?.firstName ? `, ${profile.personalInfo.firstName}` : ''}!
+            </H3>
+            <BodySmall color="secondary">
+              {user?.userType === 'medical_professional' && user?.isVerified 
+                ? 'Verified Medical Professional' 
+                : user?.userType === 'medical_professional' && !user?.isVerified
+                ? 'Medical Professional - Awaiting Verification'
+                : 'Emergency Medical Information System'}
+            </BodySmall>
+          </View>
         </View>
-      </View>
-      
-      {user?.userType === 'medical_professional' && user?.isVerified && (
-        <View style={styles.verifiedBadge}>
-          <Ionicons name="checkmark-circle" size={16} color="#4CAF50" />
-          <Text style={styles.verifiedText}>Verified Professional</Text>
-        </View>
-      )}
-      
-      {user?.userType === 'medical_professional' && !user?.isVerified && (
-        <View style={styles.unverifiedBadge}>
-          <Ionicons name="time-outline" size={16} color="#FF9800" />
-          <Text style={styles.unverifiedText}>Pending Verification</Text>
-        </View>
-      )}
-    </View>
+        
+        {user?.userType === 'medical_professional' && user?.isVerified && (
+          <Badge 
+            label="Verified Professional" 
+            variant="success" 
+            icon="checkmark-circle" 
+            style={styles.statusBadge}
+          />
+        )}
+        
+        {user?.userType === 'medical_professional' && !user?.isVerified && (
+          <Badge 
+            label="Pending Verification" 
+            variant="warning" 
+            icon="time-outline"
+            pulse
+            style={styles.statusBadge}
+          />
+        )}
+      </Card>
+    </Animated.View>
   );
 
   const renderProfileStatus = () => {
     if (profileCompletion === 100) return null;
     
     return (
-      <View style={styles.statusCard}>
-      <View style={styles.statusHeader}>
-        <Text style={styles.statusTitle}>Profile Status</Text>
-        <Text style={styles.completionPercentage}>{profileCompletion}%</Text>
-      </View>
-      
-      <View style={styles.progressBarContainer}>
-        <View style={styles.progressBarBackground}>
-          <View 
-            style={[
-              styles.progressBarFill, 
-              { width: `${profileCompletion}%` }
-            ]} 
-          />
-        </View>
-      </View>
-      
-      <Text style={styles.statusDescription}>
-        {profileCompletion < 50 
-          ? 'Complete your profile for better emergency response'
-          : profileCompletion < 100 
-          ? 'Almost done! Add remaining details'
-          : 'Profile complete and ready for emergencies'}
-      </Text>
-      
-      {profileCompletion < 100 && (
-        <TouchableOpacity 
-          style={styles.completeProfileButton}
-          onPress={() => navigation.navigate('ProfileForm')}
-        >
-          <Text style={styles.completeProfileText}>Complete Profile</Text>
-          <Ionicons name="arrow-forward" size={16} color="#fff" />
-        </TouchableOpacity>
-      )}
-    </View>
+      <Animated.View entering={FadeInDown.delay(200).duration(400)}>
+        <Card variant="default" style={styles.statusCard}>
+          <View style={styles.statusHeader}>
+            <H4>Profile Status</H4>
+            <Text style={styles.completionPercentage}>{profileCompletion}%</Text>
+          </View>
+          
+          <View style={styles.progressBarContainer}>
+            <View style={styles.progressBarBackground}>
+              <Animated.View 
+                style={[
+                  styles.progressBarFill, 
+                  { width: `${profileCompletion}%` }
+                ]} 
+              />
+            </View>
+          </View>
+          
+          <BodySmall color="secondary" style={styles.statusDescription}>
+            {profileCompletion < 50 
+              ? 'Complete your profile for better emergency response'
+              : profileCompletion < 100 
+              ? 'Almost done! Add remaining details'
+              : 'Profile complete and ready for emergencies'}
+          </BodySmall>
+          
+          {profileCompletion < 100 && (
+            <Button
+              title="Complete Profile"
+              onPress={() => navigation.navigate('ProfileForm')}
+              icon="arrow-forward"
+              iconPosition="right"
+              size="sm"
+              style={styles.completeProfileButton}
+            />
+          )}
+        </Card>
+      </Animated.View>
     );
   };
 
@@ -231,33 +246,39 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     const actions = getQuickActions();
     
     return (
-      <View style={styles.quickActionsContainer}>
-        <Text style={styles.sectionTitle}>Quick Actions</Text>
+      <Animated.View entering={FadeInDown.delay(300).duration(400)} style={styles.quickActionsContainer}>
+        <H4 style={styles.sectionTitle}>Quick Actions</H4>
         <View style={styles.actionsGrid}>
-          {actions.map((action) => (
-            <TouchableOpacity
+          {actions.map((action, index) => (
+            <Animated.View 
               key={action.id}
-              style={[styles.actionCard, { borderLeftColor: action.color }]}
-              onPress={action.onPress}
-              activeOpacity={0.7}
+              entering={FadeInDown.delay(350 + index * 50).duration(300)}
             >
-              <View style={styles.actionIconContainer}>
-                <Ionicons name={action.icon} size={24} color={action.color} />
-                {action.badge && (
-                  <View style={styles.actionBadge}>
-                    <Text style={styles.actionBadgeText}>{action.badge}</Text>
+              <Card
+                variant="default"
+                onPress={action.onPress}
+                style={{ ...styles.actionCard, borderLeftColor: action.color }}
+              >
+                <View style={styles.actionIconContainer}>
+                  <View style={[styles.actionIconBg, { backgroundColor: `${action.color}20` }]}>
+                    <Ionicons name={action.icon} size={22} color={action.color} />
                   </View>
-                )}
-              </View>
-              <View style={styles.actionContent}>
-                <Text style={styles.actionTitle}>{action.title}</Text>
-                <Text style={styles.actionSubtitle}>{action.subtitle}</Text>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color="#ccc" />
-            </TouchableOpacity>
+                  {action.badge && (
+                    <View style={styles.actionBadge}>
+                      <Text style={styles.actionBadgeText}>{action.badge}</Text>
+                    </View>
+                  )}
+                </View>
+                <View style={styles.actionContent}>
+                  <Text style={styles.actionTitle}>{action.title}</Text>
+                  <Text style={styles.actionSubtitle}>{action.subtitle}</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color={colors.text.tertiary} />
+              </Card>
+            </Animated.View>
           ))}
         </View>
-      </View>
+      </Animated.View>
     );
   };
 
@@ -265,46 +286,48 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     if (!profile?.personalInfo) return null;
 
     return (
-      <View style={styles.emergencyCard}>
-        <View style={styles.emergencyHeader}>
-          <Ionicons name="warning" size={24} color="#F44336" />
-          <Text style={styles.emergencyTitle}>Emergency Summary</Text>
-        </View>
-        
-        <View style={styles.emergencyContent}>
-          {profile.medicalInfo?.bloodType && (
-            <View style={styles.emergencyItem}>
-              <Text style={styles.emergencyLabel}>Blood Type:</Text>
-              <Text style={styles.emergencyValue}>{profile.medicalInfo.bloodType}</Text>
-            </View>
-          )}
+      <Animated.View entering={FadeInDown.delay(250).duration(400)}>
+        <Card variant="default" style={styles.emergencyCard}>
+          <View style={styles.emergencyHeader}>
+            <Ionicons name="warning" size={22} color={colors.medical.emergency} />
+            <Text style={styles.emergencyTitle}>Emergency Summary</Text>
+          </View>
           
-          {profile.medicalInfo?.allergies && profile.medicalInfo.allergies.length > 0 && (
-            <View style={styles.emergencyItem}>
-              <Text style={styles.emergencyLabel}>Allergies:</Text>
-              <Text style={styles.emergencyValue}>
-                {profile.medicalInfo.allergies.join(', ')}
-              </Text>
-            </View>
-          )}
+          <View style={styles.emergencyContent}>
+            {profile.medicalInfo?.bloodType && (
+              <View style={styles.emergencyItem}>
+                <Text style={styles.emergencyLabel}>Blood Type:</Text>
+                <Text style={styles.emergencyValue}>{profile.medicalInfo.bloodType}</Text>
+              </View>
+            )}
+            
+            {profile.medicalInfo?.allergies && profile.medicalInfo.allergies.length > 0 && (
+              <View style={styles.emergencyItem}>
+                <Text style={styles.emergencyLabel}>Allergies:</Text>
+                <Text style={styles.emergencyValue}>
+                  {profile.medicalInfo.allergies.join(', ')}
+                </Text>
+              </View>
+            )}
+            
+            {profile.emergencyContacts && profile.emergencyContacts.length > 0 && (
+              <View style={styles.emergencyItem}>
+                <Text style={styles.emergencyLabel}>Emergency Contact:</Text>
+                <Text style={styles.emergencyValue}>
+                  {profile.emergencyContacts[0].name} ({profile.emergencyContacts[0].phoneNumber})
+                </Text>
+              </View>
+            )}
+          </View>
           
-          {profile.emergencyContacts && profile.emergencyContacts.length > 0 && (
-            <View style={styles.emergencyItem}>
-              <Text style={styles.emergencyLabel}>Emergency Contact:</Text>
-              <Text style={styles.emergencyValue}>
-                {profile.emergencyContacts[0].name} ({profile.emergencyContacts[0].phoneNumber})
-              </Text>
-            </View>
-          )}
-        </View>
-        
-        <TouchableOpacity 
-          style={styles.viewFullButton}
-          onPress={() => navigation.navigate('QRDisplay')}
-        >
-          <Text style={styles.viewFullButtonText}>Show Emergency QR Code</Text>
-        </TouchableOpacity>
-      </View>
+          <Button
+            title="Show Emergency QR Code"
+            onPress={() => navigation.navigate('QRDisplay')}
+            variant="danger"
+            icon="qr-code-outline"
+          />
+        </Card>
+      </Animated.View>
     );
   };
 
@@ -314,22 +337,34 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#2196F3" />
+      <StatusBar barStyle="light-content" backgroundColor={colors.background.primary} />
       
       <ScrollView
         style={styles.scrollView}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          <RefreshControl 
+            refreshing={refreshing} 
+            onRefresh={onRefresh}
+            tintColor={colors.primary.main}
+            colors={[colors.primary.main]}
+          />
         }
         showsVerticalScrollIndicator={false}
       >
         {error && (
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>{error}</Text>
-            <TouchableOpacity style={styles.retryButton} onPress={loadDashboardData}>
-              <Text style={styles.retryButtonText}>Retry</Text>
-            </TouchableOpacity>
-          </View>
+          <Animated.View entering={FadeInDown.duration(300)} style={styles.errorContainer}>
+            <View style={styles.errorContent}>
+              <Ionicons name="alert-circle" size={20} color={colors.status.error.main} />
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
+            <Button
+              title="Retry"
+              onPress={loadDashboardData}
+              variant="danger"
+              size="sm"
+              fullWidth={false}
+            />
+          </Animated.View>
         )}
         
         {renderWelcomeCard()}
@@ -346,197 +381,133 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: colors.background.primary,
   },
   scrollView: {
     flex: 1,
   },
   errorContainer: {
-    margin: 16,
-    padding: 16,
-    backgroundColor: '#ffebee',
-    borderRadius: 8,
+    margin: spacing.lg,
+    padding: spacing.lg,
+    backgroundColor: colors.status.error.background,
+    borderRadius: borderRadius.md,
     borderLeftWidth: 4,
-    borderLeftColor: '#f44336',
+    borderLeftColor: colors.status.error.main,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  errorContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    marginRight: spacing.md,
+    gap: spacing.sm,
   },
   errorText: {
-    color: '#c62828',
-    fontSize: 14,
-    marginBottom: 12,
-  },
-  retryButton: {
-    backgroundColor: '#f44336',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 6,
-    alignSelf: 'flex-start',
-  },
-  retryButtonText: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 14,
+    ...typography.bodySmall,
+    color: colors.status.error.main,
+    flex: 1,
   },
   
   // Welcome Card
   welcomeCard: {
-    backgroundColor: '#fff',
-    margin: 16,
-    padding: 20,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    margin: spacing.lg,
   },
   welcomeHeader: {
     flexDirection: 'row',
     alignItems: 'center',
   },
+  welcomeIconContainer: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: colors.background.elevated,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: colors.border.default,
+  },
   welcomeText: {
-    marginLeft: 16,
+    marginLeft: spacing.lg,
     flex: 1,
   },
   welcomeTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
+    marginBottom: spacing.xxs,
   },
-  welcomeSubtitle: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 4,
-  },
-  verifiedBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 12,
-    padding: 8,
-    backgroundColor: '#E8F5E8',
-    borderRadius: 6,
-    alignSelf: 'flex-start',
-  },
-  verifiedText: {
-    marginLeft: 6,
-    fontSize: 12,
-    color: '#4CAF50',
-    fontWeight: '600',
-  },
-  unverifiedBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 12,
-    padding: 8,
-    backgroundColor: '#FFF3E0',
-    borderRadius: 6,
-    alignSelf: 'flex-start',
-  },
-  unverifiedText: {
-    marginLeft: 6,
-    fontSize: 12,
-    color: '#FF9800',
-    fontWeight: '600',
+  statusBadge: {
+    marginTop: spacing.md,
   },
   
   // Profile Status Card
   statusCard: {
-    backgroundColor: '#fff',
-    marginHorizontal: 16,
-    marginBottom: 16,
-    padding: 20,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    marginHorizontal: spacing.lg,
+    marginBottom: spacing.lg,
   },
   statusHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
-  },
-  statusTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
+    marginBottom: spacing.md,
   },
   completionPercentage: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#2196F3',
+    ...typography.h3,
+    color: colors.primary.main,
   },
   progressBarContainer: {
-    marginBottom: 12,
+    marginBottom: spacing.md,
   },
   progressBarBackground: {
     height: 8,
-    backgroundColor: '#E0E0E0',
-    borderRadius: 4,
+    backgroundColor: colors.background.elevated,
+    borderRadius: borderRadius.full,
     overflow: 'hidden',
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: '#4CAF50',
-    borderRadius: 4,
+    backgroundColor: colors.status.success.main,
+    borderRadius: borderRadius.full,
   },
   statusDescription: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 12,
+    marginBottom: spacing.md,
   },
   completeProfileButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#2196F3',
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 6,
-  },
-  completeProfileText: {
-    color: '#fff',
-    fontWeight: '600',
-    marginRight: 8,
+    alignSelf: 'flex-start',
   },
   
   // Quick Actions
   quickActionsContainer: {
-    marginHorizontal: 16,
-    marginBottom: 16,
+    marginHorizontal: spacing.lg,
+    marginBottom: spacing.lg,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 12,
+    marginBottom: spacing.md,
   },
   actionsGrid: {
-    gap: 12,
+    gap: spacing.md,
   },
   actionCard: {
-    backgroundColor: '#fff',
-    padding: 16,
-    borderRadius: 12,
     flexDirection: 'row',
     alignItems: 'center',
-    borderLeftWidth: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
+    borderLeftWidth: 3,
+    paddingVertical: spacing.md,
   },
   actionIconContainer: {
     position: 'relative',
-    marginRight: 16,
+    marginRight: spacing.lg,
+  },
+  actionIconBg: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   actionBadge: {
     position: 'absolute',
-    top: -6,
-    right: -6,
-    backgroundColor: '#F44336',
+    top: -4,
+    right: -4,
+    backgroundColor: colors.status.error.main,
     borderRadius: 10,
     minWidth: 20,
     height: 20,
@@ -544,82 +515,60 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   actionBadgeText: {
-    color: '#fff',
-    fontSize: 12,
+    ...typography.caption,
+    color: colors.white,
     fontWeight: 'bold',
   },
   actionContent: {
     flex: 1,
   },
   actionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
+    ...typography.labelLarge,
+    color: colors.text.primary,
   },
   actionSubtitle: {
-    fontSize: 13,
-    color: '#666',
-    marginTop: 2,
+    ...typography.caption,
+    color: colors.text.secondary,
+    marginTop: spacing.xxs,
   },
   
   // Emergency Info Card
   emergencyCard: {
-    backgroundColor: '#fff',
-    marginHorizontal: 16,
-    marginBottom: 16,
-    padding: 20,
-    borderRadius: 12,
-    borderLeftWidth: 4,
-    borderLeftColor: '#F44336',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    marginHorizontal: spacing.lg,
+    marginBottom: spacing.lg,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.medical.emergency,
   },
   emergencyHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: spacing.lg,
+    gap: spacing.sm,
   },
   emergencyTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#F44336',
-    marginLeft: 8,
+    ...typography.h4,
+    color: colors.medical.emergency,
   },
   emergencyContent: {
-    marginBottom: 16,
+    marginBottom: spacing.lg,
   },
   emergencyItem: {
     flexDirection: 'row',
-    marginBottom: 8,
+    marginBottom: spacing.sm,
   },
   emergencyLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
+    ...typography.label,
+    color: colors.text.secondary,
     width: 120,
   },
   emergencyValue: {
-    fontSize: 14,
-    color: '#666',
+    ...typography.body,
+    color: colors.text.primary,
     flex: 1,
-  },
-  viewFullButton: {
-    backgroundColor: '#F44336',
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 6,
-    alignItems: 'center',
-  },
-  viewFullButtonText: {
-    color: '#fff',
-    fontWeight: '600',
   },
   
   bottomSpacing: {
-    height: 20,
+    height: spacing.xl,
   },
 });
 

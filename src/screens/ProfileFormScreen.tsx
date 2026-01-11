@@ -11,7 +11,6 @@ import {
   StyleSheet,
   Alert,
   TouchableOpacity,
-  ScrollView,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -20,6 +19,8 @@ import { UserProfile } from '../types';
 import { ProfileForm } from '../components/Profile';
 import { LoadingOverlay } from '../components/common';
 import { profileService } from '../services';
+import { colors, spacing } from '../theme';
+import { Button } from '../components/ui';
 
 interface ProfileFormScreenProps {
   navigation: any;
@@ -172,30 +173,36 @@ const ProfileFormScreen: React.FC<ProfileFormScreenProps> = ({ navigation, route
         
         <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
           <TouchableOpacity style={styles.closeButton} onPress={() => navigation.goBack()}>
-            <Ionicons name="close" size={24} color="#fff" />
+            <Ionicons name="close" size={24} color={colors.text.primary} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Profile Error</Text>
           <View style={styles.placeholder} />
         </View>
 
         <View style={styles.errorContainer}>
-          <Ionicons name="warning" size={48} color="#F44336" />
+          <View style={styles.errorIconContainer}>
+            <Ionicons name="warning" size={48} color={colors.status.error.main} />
+          </View>
           <Text style={styles.errorTitle}>Unable to Load Profile</Text>
           <Text style={styles.errorMessage}>{error}</Text>
           
           <View style={styles.errorActions}>
-            <TouchableOpacity style={styles.retryButton} onPress={loadProfile}>
-              <Ionicons name="refresh" size={20} color="#fff" />
-              <Text style={styles.retryButtonText}>Retry</Text>
-            </TouchableOpacity>
+            <Button
+              title="Retry"
+              onPress={loadProfile}
+              icon="refresh"
+              style={styles.retryButton}
+            />
             
-            <TouchableOpacity style={styles.createButton} onPress={() => {
-              setError(null);
-              setProfile(null);
-            }}>
-              <Ionicons name="add-circle" size={20} color="#2196F3" />
-              <Text style={styles.createButtonText}>Create New Profile</Text>
-            </TouchableOpacity>
+            <Button
+              title="Create New Profile"
+              variant="outline"
+              onPress={() => {
+                setError(null);
+                setProfile(null);
+              }}
+              icon="add-circle"
+            />
           </View>
         </View>
       </SafeAreaView>
@@ -206,14 +213,18 @@ const ProfileFormScreen: React.FC<ProfileFormScreenProps> = ({ navigation, route
     return (
       <SafeAreaView style={styles.container} edges={[]}>
         <View style={styles.errorContainer}>
-          <Ionicons name="person-remove" size={48} color="#F44336" />
+          <View style={styles.errorIconContainer}>
+            <Ionicons name="person-remove" size={48} color={colors.status.error.main} />
+          </View>
           <Text style={styles.errorTitle}>No User Available</Text>
           <Text style={styles.errorMessage}>
             Unable to create or edit profile without user information.
           </Text>
-          <TouchableOpacity style={styles.closeButton} onPress={() => navigation.goBack()}>
-            <Text style={styles.closeButtonText}>Close</Text>
-          </TouchableOpacity>
+          <Button
+            title="Close"
+            variant="outline"
+            onPress={() => navigation.goBack()}
+          />
         </View>
       </SafeAreaView>
     );
@@ -224,7 +235,7 @@ const ProfileFormScreen: React.FC<ProfileFormScreenProps> = ({ navigation, route
       
       <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
         <TouchableOpacity style={styles.closeButton} onPress={handleCancel}>
-          <Ionicons name="close" size={24} color="#fff" />
+          <Ionicons name="close" size={24} color={colors.text.primary} />
         </TouchableOpacity>
         <View style={styles.headerContent}>
           <Text style={styles.headerTitle}>{getScreenTitle()}</Text>
@@ -252,18 +263,22 @@ const ProfileFormScreen: React.FC<ProfileFormScreenProps> = ({ navigation, route
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.background.primary,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#2196F3',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    backgroundColor: colors.background.secondary,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border.default,
   },
   closeButton: {
-    padding: 8,
+    padding: spacing.xs,
+    borderRadius: spacing.borderRadius.full,
+    backgroundColor: colors.background.elevated,
   },
   headerContent: {
     flex: 1,
@@ -272,15 +287,15 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#fff',
+    color: colors.text.primary,
   },
   headerSubtitle: {
     fontSize: 12,
-    color: '#E3F2FD',
+    color: colors.text.tertiary,
     marginTop: 2,
   },
   placeholder: {
-    width: 40, // Same width as close button to center content
+    width: 40,
   },
   
   // Error State Styles
@@ -288,64 +303,37 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 32,
+    padding: spacing.xl,
+  },
+  errorIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: `${colors.status.error.main}20`,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: spacing.md,
   },
   errorTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
-    marginTop: 16,
-    marginBottom: 8,
+    color: colors.text.primary,
+    marginBottom: spacing.sm,
     textAlign: 'center',
   },
   errorMessage: {
     fontSize: 16,
-    color: '#666',
+    color: colors.text.secondary,
     textAlign: 'center',
-    marginBottom: 32,
+    marginBottom: spacing.xl,
     lineHeight: 24,
   },
   errorActions: {
-    flexDirection: 'column',
     width: '100%',
-    gap: 12,
+    gap: spacing.sm,
   },
   retryButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#F44336',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-  },
-  retryButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-    marginLeft: 8,
-  },
-  createButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'transparent',
-    borderWidth: 2,
-    borderColor: '#2196F3',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-  },
-  createButtonText: {
-    color: '#2196F3',
-    fontSize: 16,
-    fontWeight: '600',
-    marginLeft: 8,
-  },
-  closeButtonText: {
-    color: '#2196F3',
-    fontSize: 16,
-    fontWeight: '600',
+    marginBottom: spacing.sm,
   },
 });
 

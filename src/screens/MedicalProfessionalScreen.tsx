@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { MedicalProfessionalDashboard } from '../components/common';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { colors } from '../theme';
 
 type MedicalProfessionalScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
@@ -34,7 +35,6 @@ const MedicalProfessionalScreen: React.FC = () => {
    */
   const handleError = (error: string) => {
     console.error('Medical Professional Screen Error:', error);
-    // Error handling can be enhanced with toast notifications or alerts
   };
 
   return (
@@ -52,7 +52,7 @@ const MedicalProfessionalScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: colors.background.primary,
   },
   content: {
     flex: 1,
