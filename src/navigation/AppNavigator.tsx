@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity, Alert } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { LoginScreen, RegisterScreen, MedicalProfessionalRegister } from '../components/Auth';
+import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
 import { HomeScreen, ProfileFormScreen, ProfileDisplayScreen, QRTabScreen, QRDisplayScreen, QRScannerScreen, EmergencyInfoScreen, VerificationStatusScreen, MedicalProfessionalScreen, AdminScreen, SettingsScreen, ProfileAccessHistoryScreen } from '../screens';
 import AdminAuditLogsScreen from '../screens/AdminAuditLogsScreen';
 import AdminAuditLogDetailScreen from '../screens/AdminAuditLogDetailScreen';
@@ -40,6 +41,7 @@ const DarkNavigationTheme = {
 export type RootStackParamList = {
   MainTabs: undefined;
   Login: undefined;
+  ForgotPassword: undefined;
   Register: undefined;
   MedicalProfessionalRegister: undefined;
   QRDisplay: {
@@ -341,6 +343,11 @@ const AuthStack: React.FC = () => {
         name="Login" 
         component={LoginScreen}
         options={{ title: 'Sign In' }}
+      />
+      <Stack.Screen 
+        name="ForgotPassword" 
+        component={ForgotPasswordScreen}
+        options={{ title: 'Forgot Password' }}
       />
       <Stack.Screen 
         name="Register" 

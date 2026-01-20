@@ -27,7 +27,16 @@ export interface AuthService {
   createUserProfile: (firebaseUser: FirebaseUser, userType: 'individual' | 'medical_professional', additionalData?: any) => Promise<User>;
 }
 
+import { sendPasswordResetEmail as firebaseSendPasswordResetEmail } from 'firebase/auth';
+
 class AuthServiceImpl implements AuthService {
+    /**
+     * Send password reset email
+     */
+    async sendPasswordResetEmail(email: string): Promise<void> {
+      if (!email) throw new Error('Email is required');
+      await firebaseSendPasswordResetEmail(auth, email);
+    }
   
   /**
    * Login with email and password
@@ -328,3 +337,4 @@ class AuthServiceImpl implements AuthService {
 // Export singleton instance
 const authService = new AuthServiceImpl();
 export default authService;
+export const sendPasswordResetEmail = authService.sendPasswordResetEmail.bind(authService);

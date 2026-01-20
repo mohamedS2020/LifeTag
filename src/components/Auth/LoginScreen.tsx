@@ -223,9 +223,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
         <View style={styles.content}>
           {/* Header */}
           <Animated.View entering={FadeInDown.delay(100).duration(400)} style={styles.header}>
-            <View style={styles.logoContainer}>
-              <Ionicons name="medical" size={48} color={colors.primary.main} />
-            </View>
             <H1 style={styles.title}>LifeTag</H1>
             <Body color="secondary" style={styles.subtitle}>Emergency Medical Information</Body>
             <BodySmall color="tertiary" align="center" style={styles.description}>
@@ -286,6 +283,18 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
               error={passwordError}
               leftIcon="lock-closed-outline"
             />
+
+            {/* Forgot Password Link */}
+            <View style={{ alignItems: 'flex-end', marginBottom: spacing.sm }}>
+              <TouchableOpacity
+                onPress={() => navigation?.navigate('ForgotPassword')}
+                disabled={loading || isSubmitting}
+              >
+                <Text style={[styles.forgotPasswordLink, (loading || isSubmitting) ? styles.linkDisabled : null]}>
+                  Forgot Password?
+                </Text>
+              </TouchableOpacity>
+            </View>
 
             {/* Login Button */}
             <Button
@@ -392,6 +401,12 @@ const styles = StyleSheet.create({
   },
   linkDisabled: {
     color: colors.text.disabled,
+  },
+  forgotPasswordLink: {
+    ...typography.labelLarge,
+    color: colors.primary.main,
+    textDecorationLine: 'underline',
+    marginBottom: 2,
   },
   emergencyInfo: {
     borderLeftWidth: 3,
