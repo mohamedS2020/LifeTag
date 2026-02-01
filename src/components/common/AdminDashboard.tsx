@@ -18,6 +18,7 @@ import { useAuth } from '../../context/AuthContext';
 import { db } from '../../config/firebase.config';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import { colors, spacing } from '../../theme';
 
 /**
@@ -47,6 +48,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
 }) => {
   const { user, logout } = useAuth();
   const navigation = useNavigation<AdminNavigationProp>();
+  const { t } = useTranslation();
   const [activeModal, setActiveModal] = useState<'verification' | 'audit' | 'createAdmin' | null>(null);
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState({
@@ -115,7 +117,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
    */
   const handleCreateAdmin = async () => {
     if (!adminForm.email || !adminForm.password || !adminForm.firstName || !adminForm.lastName) {
-      Alert.alert('Error', 'Please fill in all required fields');
+      Alert.alert(t('common.error'), t('admin.fillAllFields'));
       return;
     }
 
@@ -123,16 +125,16 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
       setLoading(true);
       await AdminManagementService.createAdmin(adminForm, user?.id || '');
       Alert.alert(
-        'Success',
-        'Admin user created successfully',
-        [{ text: 'OK', onPress: () => {
+        t('common.success'),
+        t('admin.adminCreatedSuccess'),
+        [{ text: t('common.ok'), onPress: () => {
           setActiveModal(null);
           setAdminForm({ email: '', password: '', firstName: '', lastName: '', role: 'admin' });
         }}]
       );
     } catch (error) {
       console.error('Error creating admin:', error);
-      Alert.alert('Error', `Failed to create admin: ${error}`);
+      Alert.alert(t('common.error'), t('admin.failedCreateAdmin', { error }));
     } finally {
       setLoading(false);
     }
@@ -143,17 +145,17 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
    */
   const handleProfessionalVerified = (professionalId: string) => {
     Alert.alert(
-      'Success',
-      'Medical professional has been verified successfully.',
-      [{ text: 'OK' }]
+      t('common.success'),
+      t('admin.professionalVerifiedSuccess'),
+      [{ text: t('common.ok') }]
     );
   };
 
   const handleProfessionalRejected = (professionalId: string) => {
     Alert.alert(
-      'Professional Rejected',
-      'Medical professional application has been rejected.',
-      [{ text: 'OK' }]
+      t('admin.professionalRejected'),
+      t('admin.professionalRejectedMessage'),
+      [{ text: t('common.ok') }]
     );
   };
 
@@ -162,7 +164,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
    */
   const handleError = (error: string) => {
     onError?.(error);
-    Alert.alert('Error', error, [{ text: 'OK' }]);
+    Alert.alert(t('common.error'), error, [{ text: t('common.ok') }]);
   };
 
   /**
@@ -170,22 +172,22 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
    */
   const handleSignOut = async () => {
     Alert.alert(
-      'Sign Out',
-      'Are you sure you want to sign out?',
+      t('auth.logout'),
+      t('auth.logoutConfirm'),
       [
         {
-          text: 'Cancel',
+          text: t('common.cancel'),
           style: 'cancel',
         },
         {
-          text: 'Sign Out',
+          text: t('auth.logout'),
           style: 'destructive',
           onPress: async () => {
             try {
               await logout();
             } catch (error) {
               console.error('Error signing out:', error);
-              Alert.alert('Error', 'Failed to sign out. Please try again.');
+              Alert.alert(t('common.error'), t('auth.logoutError'));
             }
           },
         },
@@ -199,40 +201,40 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerInfo}>
-            <Text style={styles.headerTitle}>Admin Dashboard</Text>
+            <Text style={styles.headerTitle}>{t('admin.dashboard')}</Text>
             <View style={styles.adminBadge}>
               <Ionicons name="shield-checkmark" size={16} color={colors.status.success.main} />
-              <Text style={styles.adminBadgeText}>Administrator</Text>
+              <Text style={styles.adminBadgeText}>{t('admin.administrator')}</Text>
             </View>
           </View>
-          <Text style={styles.welcomeText}>Welcome, {user?.email}</Text>
+          <Text style={styles.welcomeText}>{t('admin.welcome')} {user?.email}</Text>
         </View>
 
         {/* Quick Stats */}
         <View style={styles.statsContainer}>
-          <Text style={styles.sectionTitle}>System Overview</Text>
+          <Text style={styles.sectionTitle}>{t('admin.systemOverview')}</Text>
           {loading ? (
             <ActivityIndicator size="small" color={colors.primary.main} />
           ) : (
             <View style={styles.statsGrid}>
               <View style={styles.statCard}>
                 <Ionicons name="people" size={24} color={colors.primary.main} />
-                <Text style={styles.statLabel}>Total Users</Text>
+                <Text style={styles.statLabel}>{t('admin.totalUsers')}</Text>
                 <Text style={styles.statValue}>{stats.totalUsers}</Text>
               </View>
               <View style={styles.statCard}>
                 <Ionicons name="medical" size={24} color={colors.status.success.main} />
-                <Text style={styles.statLabel}>Medical Pros</Text>
+                <Text style={styles.statLabel}>{t('admin.medicalPros')}</Text>
                 <Text style={styles.statValue}>{stats.totalMedicalProfessionals}</Text>
               </View>
               <View style={styles.statCard}>
                 <Ionicons name="time" size={24} color={colors.status.warning.main} />
-                <Text style={styles.statLabel}>Pending Reviews</Text>
+                <Text style={styles.statLabel}>{t('admin.pendingReviews')}</Text>
                 <Text style={styles.statValue}>{stats.pendingVerifications}</Text>
               </View>
               <View style={styles.statCard}>
                 <Ionicons name="shield-checkmark" size={24} color={colors.status.info.main} />
-                <Text style={styles.statLabel}>Admins</Text>
+                <Text style={styles.statLabel}>{t('admin.admins')}</Text>
                 <Text style={styles.statValue}>{stats.totalAdmins}</Text>
               </View>
             </View>
@@ -241,7 +243,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
         {/* Admin Actions */}
         <View style={styles.actionsContainer}>
-          <Text style={styles.sectionTitle}>Administration Tools</Text>
+          <Text style={styles.sectionTitle}>{t('admin.administrationTools')}</Text>
           
           {/* Scan QR Code */}
           <TouchableOpacity
@@ -252,9 +254,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <Ionicons name="scan-outline" size={28} color={colors.primary.main} />
             </View>
             <View style={styles.actionContent}>
-              <Text style={styles.actionTitle}>Scan QR Code</Text>
+              <Text style={styles.actionTitle}>{t('qr.scanQR')}</Text>
               <Text style={styles.actionDescription}>
-                Scan a patient's emergency QR code
+                {t('admin.scanPatientQR')}
               </Text>
             </View>
             <Ionicons name="chevron-forward" size={24} color={colors.text.secondary} />
@@ -269,9 +271,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <Ionicons name="shield-checkmark" size={28} color={colors.status.success.main} />
             </View>
             <View style={styles.actionContent}>
-              <Text style={styles.actionTitle}>Medical Professional Verification</Text>
+              <Text style={styles.actionTitle}>{t('admin.medicalProfVerification')}</Text>
               <Text style={styles.actionDescription}>
-                Review and approve medical professional registrations
+                {t('admin.reviewApprove')}
               </Text>
             </View>
             <Ionicons name="chevron-forward" size={24} color={colors.text.secondary} />
@@ -286,9 +288,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <Ionicons name="time" size={28} color={colors.status.warning.main} />
             </View>
             <View style={styles.actionContent}>
-              <Text style={styles.actionTitle}>History</Text>
+              <Text style={styles.actionTitle}>{t('admin.history')}</Text>
               <Text style={styles.actionDescription}>
-                View all system audit logs and activity history
+                {t('admin.viewAuditLogs')}
               </Text>
             </View>
             <Ionicons name="chevron-forward" size={24} color={colors.text.secondary} />
@@ -303,9 +305,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <Ionicons name="document-text" size={28} color={colors.primary.main} />
             </View>
             <View style={styles.actionContent}>
-              <Text style={styles.actionTitle}>Audit Log Management</Text>
+              <Text style={styles.actionTitle}>{t('admin.auditLogManagement')}</Text>
               <Text style={styles.actionDescription}>
-                Manage audit log retention and cleanup policies
+                {t('admin.manageAuditRetention')}
               </Text>
             </View>
             <Ionicons name="chevron-forward" size={24} color={colors.text.secondary} />
@@ -320,9 +322,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <Ionicons name="person-add" size={28} color={colors.status.info.main} />
             </View>
             <View style={styles.actionContent}>
-              <Text style={styles.actionTitle}>Create Admin User</Text>
+              <Text style={styles.actionTitle}>{t('admin.createAdminUser')}</Text>
               <Text style={styles.actionDescription}>
-                Create new administrator accounts
+                {t('admin.createAdminAccounts')}
               </Text>
             </View>
             <Ionicons name="chevron-forward" size={24} color={colors.text.secondary} />
@@ -337,9 +339,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <Ionicons name="settings" size={28} color={colors.text.tertiary} />
             </View>
             <View style={styles.actionContent}>
-              <Text style={[styles.actionTitle, styles.disabledText]}>System Settings</Text>
+              <Text style={[styles.actionTitle, styles.disabledText]}>{t('settings.title')}</Text>
               <Text style={[styles.actionDescription, styles.disabledText]}>
-                Configure system-wide settings (Coming Soon)
+                {t('admin.configureSettings')}
               </Text>
             </View>
             <Ionicons name="chevron-forward" size={24} color={colors.text.disabled} />
@@ -354,9 +356,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <Ionicons name="people" size={28} color={colors.text.tertiary} />
             </View>
             <View style={styles.actionContent}>
-              <Text style={[styles.actionTitle, styles.disabledText]}>User Management</Text>
+              <Text style={[styles.actionTitle, styles.disabledText]}>{t('admin.userManagement')}</Text>
               <Text style={[styles.actionDescription, styles.disabledText]}>
-                Manage user accounts and permissions (Coming Soon)
+                {t('admin.manageUsersPermissions')}
               </Text>
             </View>
             <Ionicons name="chevron-forward" size={24} color={colors.text.disabled} />
@@ -367,7 +369,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
         <View style={styles.signOutSection}>
           <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
             <Ionicons name="log-out-outline" size={24} color={colors.status.error.main} />
-            <Text style={styles.signOutText}>Sign Out</Text>
+            <Text style={styles.signOutText}>{t('auth.logout')}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -407,13 +409,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <TouchableOpacity onPress={() => setActiveModal(null)}>
               <Ionicons name="close" size={24} color={colors.text.primary} />
             </TouchableOpacity>
-            <Text style={styles.modalTitle}>Create Admin User</Text>
+            <Text style={styles.modalTitle}>{t('admin.createNewAdmin')}</Text>
             <View style={{ width: 24 }} />
           </View>
           
           <ScrollView style={styles.modalContent}>
             <View style={styles.formGroup}>
-              <Text style={styles.formLabel}>Email *</Text>
+              <Text style={styles.formLabel}>{t('auth.email')} *</Text>
               <TextInput
                 style={styles.formInput}
                 value={adminForm.email}
@@ -426,7 +428,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </View>
 
             <View style={styles.formGroup}>
-              <Text style={styles.formLabel}>Password *</Text>
+              <Text style={styles.formLabel}>{t('auth.password')} *</Text>
               <TextInput
                 style={styles.formInput}
                 value={adminForm.password}
@@ -438,7 +440,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </View>
 
             <View style={styles.formGroup}>
-              <Text style={styles.formLabel}>First Name *</Text>
+              <Text style={styles.formLabel}>{t('auth.firstName')} *</Text>
               <TextInput
                 style={styles.formInput}
                 value={adminForm.firstName}
@@ -449,7 +451,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </View>
 
             <View style={styles.formGroup}>
-              <Text style={styles.formLabel}>Last Name *</Text>
+              <Text style={styles.formLabel}>{t('auth.lastName')} *</Text>
               <TextInput
                 style={styles.formInput}
                 value={adminForm.lastName}
@@ -469,7 +471,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
               ) : (
                 <>
                   <Ionicons name="person-add" size={20} color="white" />
-                  <Text style={styles.createButtonText}>Create Admin</Text>
+                  <Text style={styles.createButtonText}>{t('admin.createAdmin')}</Text>
                 </>
               )}
             </TouchableOpacity>

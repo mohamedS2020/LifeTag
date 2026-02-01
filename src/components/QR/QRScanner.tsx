@@ -13,6 +13,7 @@ import {
   TextInput,
   ScrollView
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { CameraView, CameraType, useCameraPermissions, BarcodeScanningResult } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
 import { QRService, EmergencyQRData } from '../../services/qrService';
@@ -45,6 +46,9 @@ const QRScanner: React.FC<QRScannerProps> = ({
   onError,
   onClose,
 }) => {
+  // Translation hook
+  const { t } = useTranslation();
+
   // Camera permissions
   const [permission, requestPermission] = useCameraPermissions();
   
@@ -77,11 +81,11 @@ const QRScanner: React.FC<QRScannerProps> = ({
           const result = await requestPermission();
           if (!result.granted) {
             Alert.alert(
-              'Camera Permission Required',
-              'LifeTag needs camera access to scan QR codes containing emergency medical information. Please enable camera permissions in your device settings.',
+              t('qr.cameraPermissionRequired'),
+              t('qr.cameraPermissionMessage'),
               [
-                { text: 'Cancel', style: 'cancel' },
-                { text: 'Use Manual Entry', onPress: () => setShowManualEntry(true) }
+                { text: t('common.cancel'), style: 'cancel' },
+                { text: t('qr.useManualEntry'), onPress: () => setShowManualEntry(true) }
               ]
             );
           }
@@ -173,11 +177,17 @@ const QRScanner: React.FC<QRScannerProps> = ({
             await logQRScan(data, 'success', 'emergency_qr', parsedEmergencyData.profileId);
             
             Alert.alert(
-              '✅ Emergency Medical QR Code Detected',
-              `Successfully scanned medical information for: ${parsedEmergencyData.name}\n\nBlood Type: ${parsedEmergencyData.bloodType || 'Not specified'}\nAllergies: ${parsedEmergencyData.allergies && parsedEmergencyData.allergies.length > 0 ? parsedEmergencyData.allergies.join(', ') : 'None specified'}\nEmergency Contact: ${parsedEmergencyData.emergencyContact?.name || 'Not specified'}${parsedEmergencyData.emergencyContact?.phone ? ` (${parsedEmergencyData.emergencyContact.phone})` : ''}`,
+              t('qr.emergencyQRDetected'),
+              t('qr.scannedMedicalInfo', {
+                name: parsedEmergencyData.name,
+                bloodType: parsedEmergencyData.bloodType || t('common.notSpecified'),
+                allergies: parsedEmergencyData.allergies && parsedEmergencyData.allergies.length > 0 ? parsedEmergencyData.allergies.join(', ') : t('qr.noneSpecified'),
+                contactName: parsedEmergencyData.emergencyContact?.name || t('common.notSpecified'),
+                contactPhone: parsedEmergencyData.emergencyContact?.phone ? ` (${parsedEmergencyData.emergencyContact.phone})` : ''
+              }),
               [
-                { text: 'View Details', onPress: () => onQRScanned?.(data, parsedEmergencyData) },
-                { text: 'Scan Another', onPress: resetScanner }
+                { text: t('qr.viewDetails'), onPress: () => onQRScanned?.(data, parsedEmergencyData) },
+                { text: t('qr.scanAnother'), onPress: resetScanner }
               ]
             );
           }
@@ -188,11 +198,11 @@ const QRScanner: React.FC<QRScannerProps> = ({
           await logQRScan(data, 'error', 'emergency_qr');
           
           Alert.alert(
-            '⚠️ QR Code Format Issue',
-            'This appears to be a LifeTag QR code but there was an issue reading the medical information. The QR code may be damaged or from an older version.',
+            t('qr.formatIssue'),
+            t('qr.formatIssueMessage'),
             [
-              { text: 'Try Again', onPress: resetScanner },
-              { text: 'Use Raw Data', onPress: () => onQRScanned?.(data, null) }
+              { text: t('qr.tryAgain'), onPress: resetScanner },
+              { text: t('qr.useRawData'), onPress: () => onQRScanned?.(data, null) }
             ]
           );
         }
@@ -202,11 +212,11 @@ const QRScanner: React.FC<QRScannerProps> = ({
         
         // Not a LifeTag emergency QR - ask user what to do
         Alert.alert(
-          'Non-Emergency QR Code',
-          'This QR code does not contain LifeTag emergency medical information. It may be a website, contact, or other type of QR code.',
+          t('qr.nonEmergencyQR'),
+          t('qr.nonEmergencyQRMessage'),
           [
-            { text: 'Scan Another', onPress: resetScanner },
-            { text: 'Process Anyway', onPress: () => onQRScanned?.(data, null) }
+            { text: t('qr.scanAnother'), onPress: resetScanner },
+            { text: t('qr.processAnyway'), onPress: () => onQRScanned?.(data, null) }
           ]
         );
       }
@@ -237,7 +247,7 @@ const QRScanner: React.FC<QRScannerProps> = ({
    */
   const handleManualEntry = async () => {
     if (!manualQRCode.trim()) {
-      Alert.alert('Error', 'Please enter a QR code string');
+      Alert.alert(t('common.error'), t('qr.pleaseEnterQRCode'));
       return;
     }
 
@@ -285,7 +295,7 @@ const QRScanner: React.FC<QRScannerProps> = ({
       <SafeAreaView style={styles.container}>
         <View style={styles.centerContent}>
           <ActivityIndicator size="large" color={colors.primary.main} />
-          <Text style={styles.statusText}>Requesting camera permission...</Text>
+          <Text style={styles.statusText}>{t('qr.requestingCameraPermission')}</Text>
         </View>
       </SafeAreaView>
     );
@@ -299,12 +309,12 @@ const QRScanner: React.FC<QRScannerProps> = ({
       <SafeAreaView style={styles.container}>
         <View style={styles.centerContent}>
           <Ionicons name="camera-outline" size={80} color={colors.text.tertiary} />
-          <Text style={styles.errorTitle}>Camera Access Required</Text>
+          <Text style={styles.errorTitle}>{t('qr.cameraAccessRequired')}</Text>
           <Text style={styles.errorText}>
-            LifeTag needs camera access to scan QR codes containing emergency medical information.
+            {t('qr.cameraAccessMessage')}
           </Text>
           <Text style={styles.errorSubtext}>
-            Please enable camera permissions in your device settings, or use manual entry below.
+            {t('qr.enableCameraOrManualEntry')}
           </Text>
           
           <TouchableOpacity
@@ -312,12 +322,12 @@ const QRScanner: React.FC<QRScannerProps> = ({
             onPress={() => setShowManualEntry(true)}
           >
             <Ionicons name="create-outline" size={20} color="white" />
-            <Text style={styles.primaryButtonText}>Manual Entry</Text>
+            <Text style={styles.primaryButtonText}>{t('qr.manualEntry')}</Text>
           </TouchableOpacity>
           
           {onClose && (
             <TouchableOpacity style={styles.secondaryButton} onPress={onClose}>
-              <Text style={styles.secondaryButtonText}>Cancel</Text>
+              <Text style={styles.secondaryButtonText}>{t('common.cancel')}</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -336,22 +346,21 @@ const QRScanner: React.FC<QRScannerProps> = ({
             <TouchableOpacity onPress={() => setShowManualEntry(false)}>
               <Ionicons name="arrow-back" size={24} color={colors.text.primary} />
             </TouchableOpacity>
-            <Text style={styles.headerTitle}>Manual QR Entry</Text>
+            <Text style={styles.headerTitle}>{t('qr.manualQREntry')}</Text>
             <View style={{ width: 24 }} />
           </View>
 
           <View style={styles.manualEntryContent}>
-            <Text style={styles.instructionTitle}>Enter QR Code Data</Text>
+            <Text style={styles.instructionTitle}>{t('qr.enterQRCodeData')}</Text>
             <Text style={styles.instructionText}>
-              If you can't scan the QR code, you can manually enter the QR code data below. 
-              This is typically a long string of text found below or beside the QR code.
+              {t('qr.manualEntryInstructions')}
             </Text>
 
             <TextInput
               style={styles.textInput}
               value={manualQRCode}
               onChangeText={setManualQRCode}
-              placeholder="Paste or type QR code data here..."
+              placeholder={t('qr.pasteOrTypeQRData')}
               placeholderTextColor={colors.text.tertiary}
               multiline
               numberOfLines={6}
@@ -368,7 +377,7 @@ const QRScanner: React.FC<QRScannerProps> = ({
               ) : (
                 <>
                   <Ionicons name="checkmark-circle" size={20} color="white" />
-                  <Text style={styles.primaryButtonText}>Process QR Data</Text>
+                  <Text style={styles.primaryButtonText}>{t('qr.processQRData')}</Text>
                 </>
               )}
             </TouchableOpacity>
@@ -377,7 +386,7 @@ const QRScanner: React.FC<QRScannerProps> = ({
               style={styles.secondaryButton}
               onPress={() => setShowManualEntry(false)}
             >
-              <Text style={styles.secondaryButtonText}>Back to Scanner</Text>
+              <Text style={styles.secondaryButtonText}>{t('qr.backToScanner')}</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -397,7 +406,7 @@ const QRScanner: React.FC<QRScannerProps> = ({
             <Ionicons name="close" size={24} color="white" />
           </TouchableOpacity>
         )}
-        <Text style={styles.headerTitle}>Emergency QR Scanner</Text>
+        <Text style={styles.headerTitle}>{t('qr.emergencyQRScanner')}</Text>
         <TouchableOpacity onPress={() => setShowManualEntry(true)}>
           <Ionicons name="create-outline" size={24} color="white" />
         </TouchableOpacity>
@@ -428,7 +437,7 @@ const QRScanner: React.FC<QRScannerProps> = ({
               {isLoading && (
                 <View style={styles.loadingOverlay}>
                   <ActivityIndicator size="large" color={colors.primary.main} />
-                  <Text style={styles.loadingText}>Processing QR Code...</Text>
+                  <Text style={styles.loadingText}>{t('qr.processingQRCode')}</Text>
                 </View>
               )}
             </View>
@@ -439,18 +448,18 @@ const QRScanner: React.FC<QRScannerProps> = ({
       {/* Instructions */}
       <View style={styles.instructionsContainer}>
         <Text style={styles.instructionTitle}>
-          {scanned ? 'QR Code Scanned!' : 'Position QR Code in Frame'}
+          {scanned ? t('qr.qrCodeScannedSuccess') : t('qr.positionQRCodeInFrame')}
         </Text>
         <Text style={styles.instructionText}>
           {scanned 
-            ? 'Processing emergency medical information...'
-            : 'Hold your device steady and ensure the QR code is clearly visible within the frame above.'
+            ? t('qr.processingEmergencyInfo')
+            : t('qr.holdDeviceSteady')
           }
         </Text>
         
         {scanCount > 0 && (
           <Text style={styles.scanCountText}>
-            Scans completed: {scanCount}
+            {t('qr.scansCompleted', { count: scanCount })}
           </Text>
         )}
 
@@ -459,7 +468,7 @@ const QRScanner: React.FC<QRScannerProps> = ({
           {scanned && !isLoading && (
             <TouchableOpacity style={styles.primaryButton} onPress={resetScanner}>
               <Ionicons name="refresh" size={20} color="white" />
-              <Text style={styles.primaryButtonText}>Scan Another</Text>
+              <Text style={styles.primaryButtonText}>{t('qr.scanAnother')}</Text>
             </TouchableOpacity>
           )}
         </View>

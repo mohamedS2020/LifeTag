@@ -9,6 +9,7 @@ import {
   RefreshControl,
   Linking,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { MedicalProfessional } from '../../types';
 import { MedicalProfessionalApprovalService } from '../../services/medicalProfessionalApprovalService';
@@ -36,6 +37,7 @@ export const MedicalProfessionalProfile: React.FC<MedicalProfessionalProfileProp
   onEdit,
   onError,
 }) => {
+  const { t } = useTranslation();
   const [professional, setProfessional] = useState<MedicalProfessional | null>(initialProfessional || null);
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -62,9 +64,9 @@ export const MedicalProfessionalProfile: React.FC<MedicalProfessionalProfileProp
       setProfessional(loadedProfessional);
     } catch (error) {
       console.error('Error loading professional:', error);
-      const errorMessage = 'Failed to load professional information';
+      const errorMessage = t('medicalProfessional.failedToLoadProfessional');
       onError?.(errorMessage);
-      Alert.alert('Error', errorMessage);
+      Alert.alert(t('common.error'), errorMessage);
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
@@ -89,12 +91,12 @@ export const MedicalProfessionalProfile: React.FC<MedicalProfessionalProfileProp
         if (supported) {
           Linking.openURL(phoneUrl);
         } else {
-          Alert.alert('Error', 'Phone calls are not supported on this device');
+          Alert.alert(t('common.error'), t('medicalProfessional.phoneNotSupported'));
         }
       })
       .catch((error) => {
         console.error('Error opening phone:', error);
-        Alert.alert('Error', 'Failed to open phone app');
+        Alert.alert(t('common.error'), t('medicalProfessional.failedToOpenPhone'));
       });
   };
 
@@ -105,12 +107,12 @@ export const MedicalProfessionalProfile: React.FC<MedicalProfessionalProfileProp
         if (supported) {
           Linking.openURL(emailUrl);
         } else {
-          Alert.alert('Error', 'Email is not supported on this device');
+          Alert.alert(t('common.error'), t('medicalProfessional.emailNotSupported'));
         }
       })
       .catch((error) => {
         console.error('Error opening email:', error);
-        Alert.alert('Error', 'Failed to open email app');
+        Alert.alert(t('common.error'), t('medicalProfessional.failedToOpenEmail'));
       });
   };
 
@@ -118,15 +120,15 @@ export const MedicalProfessionalProfile: React.FC<MedicalProfessionalProfileProp
    * Format years of experience
    */
   const formatExperience = (years?: number): string => {
-    if (!years) return 'Not specified';
-    return years === 1 ? '1 year' : `${years} years`;
+    if (!years) return t('common.notSpecified');
+    return years === 1 ? t('medicalProfessional.oneYear') : t('medicalProfessional.yearsCount', { count: years });
   };
 
   /**
    * Format license expiry date
    */
   const formatLicenseExpiry = (date?: Date): { text: string; isExpiring: boolean; isExpired: boolean } => {
-    if (!date) return { text: 'Not specified', isExpiring: false, isExpired: false };
+    if (!date) return { text: t('common.notSpecified'), isExpiring: false, isExpired: false };
     
     const now = new Date();
     const expiryDate = new Date(date);
@@ -136,11 +138,11 @@ export const MedicalProfessionalProfile: React.FC<MedicalProfessionalProfileProp
     const isExpiring = daysDiff <= 30 && daysDiff >= 0;
     
     if (isExpired) {
-      return { text: `Expired ${Math.abs(daysDiff)} days ago`, isExpiring: false, isExpired: true };
+      return { text: t('medicalProfessional.expiredDaysAgo', { count: Math.abs(daysDiff) }), isExpiring: false, isExpired: true };
     } else if (isExpiring) {
-      return { text: `Expires in ${daysDiff} days`, isExpiring: true, isExpired: false };
+      return { text: t('medicalProfessional.expiresInDays', { count: daysDiff }), isExpiring: true, isExpired: false };
     } else {
-      return { text: `Expires ${expiryDate.toLocaleDateString()}`, isExpiring: false, isExpired: false };
+      return { text: t('medicalProfessional.expiresOnDate', { date: expiryDate.toLocaleDateString() }), isExpiring: false, isExpired: false };
     }
   };
 
@@ -204,13 +206,13 @@ export const MedicalProfessionalProfile: React.FC<MedicalProfessionalProfileProp
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Ionicons name="call" size={20} color="#FF6B6B" />
-          <Text style={styles.sectionTitle}>Contact Information</Text>
+          <Text style={styles.sectionTitle}>{t('medicalProfessional.contactInformation')}</Text>
         </View>
 
         <View style={styles.sectionContent}>
           <View style={styles.contactRow}>
             <Ionicons name="mail" size={16} color="#666666" />
-            <Text style={styles.label}>Email:</Text>
+            <Text style={styles.label}>{t('medicalProfessional.emailLabel')}</Text>
             <Text style={styles.value}>{email}</Text>
             {showContactButtons && (
               <TouchableOpacity
@@ -225,7 +227,7 @@ export const MedicalProfessionalProfile: React.FC<MedicalProfessionalProfileProp
           {phoneNumber && (
             <View style={styles.contactRow}>
               <Ionicons name="call" size={16} color="#666666" />
-              <Text style={styles.label}>Phone:</Text>
+              <Text style={styles.label}>{t('medicalProfessional.phoneLabel')}</Text>
               <Text style={styles.value}>{phoneNumber}</Text>
               {showContactButtons && (
                 <TouchableOpacity
@@ -255,25 +257,25 @@ export const MedicalProfessionalProfile: React.FC<MedicalProfessionalProfileProp
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Ionicons name="document-text" size={20} color="#FF6B6B" />
-          <Text style={styles.sectionTitle}>Professional Credentials</Text>
+          <Text style={styles.sectionTitle}>{t('medicalProfessional.professionalCredentials')}</Text>
         </View>
 
         <View style={styles.sectionContent}>
           <View style={styles.infoRow}>
-            <Text style={styles.label}>License Number:</Text>
+            <Text style={styles.label}>{t('medicalProfessional.licenseNumberLabel')}</Text>
             <Text style={styles.value}>{professionalInfo.licenseNumber}</Text>
           </View>
 
           {professionalInfo.licenseState && (
             <View style={styles.infoRow}>
-              <Text style={styles.label}>License State:</Text>
+              <Text style={styles.label}>{t('medicalProfessional.licenseStateLabel')}</Text>
               <Text style={styles.value}>{professionalInfo.licenseState}</Text>
             </View>
           )}
 
           {professionalInfo.licenseExpiryDate && (
             <View style={styles.infoRow}>
-              <Text style={styles.label}>License Expiry:</Text>
+              <Text style={styles.label}>{t('medicalProfessional.licenseExpiryLabel')}</Text>
               <Text style={[
                 styles.value,
                 licenseExpiry.isExpired && styles.expiredText,
@@ -293,7 +295,7 @@ export const MedicalProfessionalProfile: React.FC<MedicalProfessionalProfileProp
 
           {professionalInfo.yearsOfExperience && (
             <View style={styles.infoRow}>
-              <Text style={styles.label}>Experience:</Text>
+              <Text style={styles.label}>{t('medicalProfessional.experienceLabel')}</Text>
               <Text style={styles.value}>{formatExperience(professionalInfo.yearsOfExperience)}</Text>
             </View>
           )}
@@ -314,7 +316,7 @@ export const MedicalProfessionalProfile: React.FC<MedicalProfessionalProfileProp
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Ionicons name="shield-checkmark" size={20} color="#FF6B6B" />
-          <Text style={styles.sectionTitle}>Verification Status</Text>
+          <Text style={styles.sectionTitle}>{t('medicalProfessional.verificationStatus')}</Text>
         </View>
 
         <View style={styles.sectionContent}>
@@ -328,7 +330,7 @@ export const MedicalProfessionalProfile: React.FC<MedicalProfessionalProfileProp
 
           {verificationStatus.isVerified && verificationStatus.verifiedAt && (
             <View style={styles.infoRow}>
-              <Text style={styles.label}>Verified Date:</Text>
+              <Text style={styles.label}>{t('medicalProfessional.verifiedDateLabel')}</Text>
               <Text style={styles.value}>
                 {verificationStatus.verifiedAt.toLocaleDateString()}
               </Text>
@@ -337,14 +339,14 @@ export const MedicalProfessionalProfile: React.FC<MedicalProfessionalProfileProp
 
           {verificationStatus.verifiedBy && (
             <View style={styles.infoRow}>
-              <Text style={styles.label}>Verified By:</Text>
+              <Text style={styles.label}>{t('medicalProfessional.verifiedByLabel')}</Text>
               <Text style={styles.value}>{verificationStatus.verifiedBy}</Text>
             </View>
           )}
 
           {verificationStatus.verificationNotes && (
             <View style={styles.infoRow}>
-              <Text style={styles.label}>Notes:</Text>
+              <Text style={styles.label}>{t('medicalProfessional.notesLabel')}</Text>
               <Text style={styles.value}>{verificationStatus.verificationNotes}</Text>
             </View>
           )}
@@ -358,16 +360,16 @@ export const MedicalProfessionalProfile: React.FC<MedicalProfessionalProfileProp
   // =============================================
 
   if (isLoading && !professional) {
-    return <LoadingOverlay visible={true} message="Loading professional profile..." />;
+    return <LoadingOverlay visible={true} message={t('medicalProfessional.loadingProfile')} />;
   }
 
   if (!professional) {
     return (
       <View style={styles.errorContainer}>
         <Ionicons name="person-outline" size={64} color="#CCCCCC" />
-        <Text style={styles.errorTitle}>Professional Not Found</Text>
+        <Text style={styles.errorTitle}>{t('medicalProfessional.professionalNotFound')}</Text>
         <Text style={styles.errorText}>
-          The requested medical professional profile could not be loaded.
+          {t('medicalProfessional.professionalNotFoundMessage')}
         </Text>
       </View>
     );

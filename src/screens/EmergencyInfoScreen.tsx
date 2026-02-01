@@ -13,6 +13,7 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { EmergencyQRData } from '../services/qrService';
 import { profileService } from '../services';
 import { useAuth } from '../context/AuthContext';
@@ -54,6 +55,7 @@ interface EmergencyInfoScreenProps {
  */
 const EmergencyInfoScreen: React.FC = () => {
   // Navigation hooks
+  const { t } = useTranslation();
   const navigation = useNavigation<any>();
   const route = useRoute<EmergencyInfoScreenRouteProp>();
   const insets = useSafeAreaInsets();
@@ -130,25 +132,25 @@ const EmergencyInfoScreen: React.FC = () => {
    */
   const handleCallEmergencyContact = () => {
     if (!emergencyData.emergencyContact?.phone) {
-      Alert.alert('No Phone Number', 'No emergency contact phone number is available.');
+      Alert.alert(t('emergency.noPhoneNumber'), t('emergency.noPhoneAvailable'));
       return;
     }
 
     const phoneNumber = emergencyData.emergencyContact.phone;
     
     Alert.alert(
-      'Call Emergency Contact',
-      `Call ${emergencyData.emergencyContact.name} at ${phoneNumber}?`,
+      t('emergency.callEmergencyContact'),
+      t('emergency.confirmCall', { name: emergencyData.emergencyContact.name, phone: phoneNumber }),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         { 
-          text: 'Call', 
+          text: t('common.call'), 
           style: 'default',
           onPress: () => {
             const phoneUrl = `tel:${phoneNumber}`;
             Linking.openURL(phoneUrl).catch((err) => {
               console.error('Failed to open phone dialer:', err);
-              Alert.alert('Error', 'Could not open phone dialer');
+              Alert.alert(t('common.error'), 'Could not open phone dialer');
             });
           }
         }
@@ -189,7 +191,7 @@ const EmergencyInfoScreen: React.FC = () => {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
           <Ionicons name="close" size={24} color="white" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Emergency Medical Info</Text>
+        <Text style={styles.headerTitle}>{t('emergency.medicalInfo')}</Text>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
           <Ionicons name="qr-code" size={24} color="white" />
         </TouchableOpacity>
@@ -198,11 +200,11 @@ const EmergencyInfoScreen: React.FC = () => {
       <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.scrollContent}>
         {/* Patient Name - Most Prominent */}
         <View style={styles.patientNameSection}>
-          <Text style={styles.patientNameLabel}>PATIENT</Text>
+          <Text style={styles.patientNameLabel}>{t('emergency.patient')}</Text>
           <Text style={styles.patientName}>{emergencyData.name}</Text>
           {emergencyData.timestamp && (
             <Text style={styles.lastUpdated}>
-              Last Updated: {formatTimestamp(emergencyData.timestamp)}
+              {t('time.lastUpdated')}: {formatTimestamp(emergencyData.timestamp)}
             </Text>
           )}
         </View>
@@ -212,9 +214,9 @@ const EmergencyInfoScreen: React.FC = () => {
           {/* Blood Type */}
           <View style={[styles.criticalCard, styles.bloodTypeCard]}>
             <Ionicons name="water" size={24} color={colors.primary.main} />
-            <Text style={styles.criticalLabel}>BLOOD TYPE</Text>
+            <Text style={styles.criticalLabel}>{t('home.bloodType').toUpperCase()}</Text>
             <Text style={styles.criticalValue}>
-              {emergencyData.bloodType || 'UNKNOWN'}
+              {emergencyData.bloodType || t('common.unknown').toUpperCase()}
             </Text>
           </View>
 
@@ -225,7 +227,7 @@ const EmergencyInfoScreen: React.FC = () => {
               onPress={handleCallEmergencyContact}
             >
               <Ionicons name="call" size={24} color={colors.status.warning.main} />
-              <Text style={styles.criticalLabel}>EMERGENCY CONTACT</Text>
+              <Text style={styles.criticalLabel}>{t('home.emergencyContact').toUpperCase()}</Text>
               <Text style={styles.criticalValue}>
                 {emergencyData.emergencyContact.name}
               </Text>
@@ -244,7 +246,7 @@ const EmergencyInfoScreen: React.FC = () => {
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Ionicons name="warning" size={20} color={colors.status.warning.main} />
-              <Text style={styles.sectionTitle}>ALLERGIES & REACTIONS</Text>
+              <Text style={styles.sectionTitle}>{t('emergency.allergiesReactions')}</Text>
             </View>
             <View style={styles.allergiesList}>
               {emergencyData.allergies.map((allergy, index) => (
@@ -267,7 +269,7 @@ const EmergencyInfoScreen: React.FC = () => {
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Ionicons name="document-text" size={20} color={colors.primary.main} />
-              <Text style={styles.sectionTitle}>EMERGENCY NOTES</Text>
+              <Text style={styles.sectionTitle}>{t('emergency.emergencyNotes')}</Text>
             </View>
             <View style={styles.notesContainer}>
               <Text style={styles.notesText}>{emergencyData.emergencyNote}</Text>
@@ -279,18 +281,18 @@ const EmergencyInfoScreen: React.FC = () => {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Ionicons name="information-circle" size={20} color={colors.status.info.main} />
-            <Text style={styles.sectionTitle}>ADDITIONAL INFO</Text>
+            <Text style={styles.sectionTitle}>{t('emergency.additionalInfo')}</Text>
           </View>
           <View style={styles.additionalInfoContainer}>
             <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Profile Version:</Text>
+              <Text style={styles.infoLabel}>{t('emergency.profileVersion')}:</Text>
               <Text style={styles.infoValue}>{emergencyData.version}</Text>
             </View>
             {emergencyData.hasFullProfile && (
               <View style={styles.infoRow}>
                 <Ionicons name="phone-portrait" size={16} color={colors.status.warning.main} />
                 <Text style={styles.fullProfileText}>
-                  Full medical profile available in LifeTag app
+                  {t('emergency.fullProfileAvailable')}
                 </Text>
               </View>
             )}
@@ -308,8 +310,8 @@ const EmergencyInfoScreen: React.FC = () => {
               <Ionicons name="person" size={20} color="white" />
               <Text style={styles.fullProfileButtonText}>
                 {user?.userType === 'medical_professional' && user?.isVerified 
-                  ? 'View Full Profile' 
-                  : 'Full Profile'}
+                  ? t('emergency.viewFullProfile')
+                  : t('emergency.fullProfile')}
               </Text>
             </TouchableOpacity>
           )}
@@ -322,7 +324,7 @@ const EmergencyInfoScreen: React.FC = () => {
             >
               <Ionicons name="call" size={20} color="white" />
               <Text style={styles.emergencyCallText}>
-                Call {emergencyData.emergencyContact.name}
+                {t('emergency.callContact', { name: emergencyData.emergencyContact.name })}
               </Text>
             </TouchableOpacity>
           )}
@@ -331,12 +333,12 @@ const EmergencyInfoScreen: React.FC = () => {
           <View style={styles.secondaryButtons}>
             <TouchableOpacity style={styles.secondaryButton} onPress={() => navigation.goBack()}>
               <Ionicons name="qr-code" size={18} color={colors.text.secondary} />
-              <Text style={styles.secondaryButtonText}>Scan Another</Text>
+              <Text style={styles.secondaryButtonText}>{t('qr.scanAnother')}</Text>
             </TouchableOpacity>
             
             <TouchableOpacity style={styles.secondaryButton} onPress={() => navigation.goBack()}>
               <Ionicons name="close" size={18} color={colors.text.secondary} />
-              <Text style={styles.secondaryButtonText}>Close</Text>
+              <Text style={styles.secondaryButtonText}>{t('common.close')}</Text>
             </TouchableOpacity>
           </View>
         </View>

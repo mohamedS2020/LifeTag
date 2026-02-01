@@ -14,6 +14,7 @@ import {
 import Animated, { FadeInDown, FadeOutUp } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthError } from '../../utils/errorHandling';
+import { useTranslation } from 'react-i18next';
 import { colors, spacing, borderRadius, typography } from '../../theme';
 
 interface ErrorDisplayProps {
@@ -29,6 +30,7 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
   showDetails = false,
   style 
 }) => {
+  const { t } = useTranslation();
   if (!error) return null;
 
   const getErrorStyle = () => {
@@ -77,9 +79,9 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
 
   const handleShowDetails = () => {
     Alert.alert(
-      'Error Details',
-      `Code: ${error.code}\nMessage: ${error.message}`,
-      [{ text: 'OK' }]
+      t('errors.errorDetails'),
+      `${t('errors.code')}: ${error.code}\n${t('errors.message')}: ${error.message}`,
+      [{ text: t('common.ok') }]
     );
   };
 
@@ -99,7 +101,7 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
       <View style={styles.buttonContainer}>
         {showDetails && (
           <TouchableOpacity onPress={handleShowDetails} style={styles.detailsButton}>
-            <Text style={styles.detailsButtonText}>Details</Text>
+            <Text style={styles.detailsButtonText}>{t('common.details')}</Text>
           </TouchableOpacity>
         )}
         

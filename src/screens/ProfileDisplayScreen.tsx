@@ -11,6 +11,7 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { ProfileDisplay } from '../components/Profile/ProfileDisplay';
 import { useAuth } from '../context/AuthContext';
 import profileService from '../services/profileService';
@@ -44,6 +45,7 @@ type ProfileDisplayScreenNavigationProp = StackNavigationProp<
 >;
 
 export const ProfileDisplayScreen: React.FC = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<ProfileDisplayScreenNavigationProp>();
   const route = useRoute<ProfileDisplayScreenRouteProp>();
   const { user } = useAuth();
@@ -79,7 +81,7 @@ export const ProfileDisplayScreen: React.FC = () => {
       const targetProfileId = profileId || user?.id;
       
       if (!targetProfileId) {
-        setError('No profile ID available');
+        setError(t('profile.noProfileIdAvailable'));
         return;
       }
 
@@ -153,7 +155,7 @@ export const ProfileDisplayScreen: React.FC = () => {
     <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
       <View style={styles.headerContent}>
         <Text style={styles.headerTitle}>
-          {isViewingOtherProfile ? 'Patient Profile' : 'My Profile'}
+          {isViewingOtherProfile ? t('profile.patientProfile') : t('profile.myProfile')}
         </Text>
         {isMedicalProfessional && (
           <VerifiedBadge isVerified={true} style={styles.verifiedBadge} />
@@ -166,7 +168,7 @@ export const ProfileDisplayScreen: React.FC = () => {
           onPress={handleEditProfile}
           disabled={!profile}
         >
-          <Text style={styles.editButtonText}>Edit</Text>
+          <Text style={styles.editButtonText}>{t('common.edit')}</Text>
         </TouchableOpacity>
       )}
     </View>
@@ -174,9 +176,9 @@ export const ProfileDisplayScreen: React.FC = () => {
 
   const renderAccessPending = () => (
     <View style={styles.accessContainer}>
-      <Text style={styles.accessTitle}>Medical Professional Access</Text>
+      <Text style={styles.accessTitle}>{t('profile.medicalProfessionalAccess')}</Text>
       <Text style={styles.accessMessage}>
-        Requesting access to patient profile for emergency medical purposes.
+        {t('profile.requestingAccess')}
       </Text>
       {accessLoading && (
         <ActivityIndicator size="large" color={colors.primary.main} style={styles.accessLoader} />
@@ -186,7 +188,7 @@ export const ProfileDisplayScreen: React.FC = () => {
 
   const renderContent = () => {
     if (loading) {
-      return <LoadingOverlay visible={true} message="Loading profile..." />;
+      return <LoadingOverlay visible={true} message={t('profile.loadingProfile')} />;
     }
 
     if (error) {
@@ -194,7 +196,7 @@ export const ProfileDisplayScreen: React.FC = () => {
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>{error}</Text>
           <TouchableOpacity style={styles.retryButton} onPress={handleRetry}>
-            <Text style={styles.retryButtonText}>Retry</Text>
+            <Text style={styles.retryButtonText}>{t('common.retry')}</Text>
           </TouchableOpacity>
         </View>
       );
@@ -203,13 +205,13 @@ export const ProfileDisplayScreen: React.FC = () => {
     if (!profile) {
       return (
         <View style={styles.noProfileContainer}>
-          <Text style={styles.noProfileText}>No profile found</Text>
+          <Text style={styles.noProfileText}>{t('profile.noProfileFound')}</Text>
           {!isViewingOtherProfile && (
             <TouchableOpacity
               style={styles.createButton}
               onPress={() => navigation.navigate('ProfileForm', { mode: 'create' })}
             >
-              <Text style={styles.createButtonText}>Create Profile</Text>
+              <Text style={styles.createButtonText}>{t('profile.createProfile')}</Text>
             </TouchableOpacity>
           )}
         </View>

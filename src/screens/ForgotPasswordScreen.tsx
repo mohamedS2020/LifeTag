@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Button, TextInput, Card, H1, Body, BodySmall } from '../components/ui';
 import { colors, spacing, typography } from '../theme';
 import { sendPasswordResetEmail } from '../services/authService';
@@ -9,6 +10,7 @@ interface ForgotPasswordScreenProps {
 }
 
 const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation }) => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -20,9 +22,9 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
     setLoading(true);
     try {
       await sendPasswordResetEmail(email);
-      setSuccess('If this email is registered, you will receive a reset link.');
+      setSuccess(t('auth.resetLinkSent'));
     } catch (e: any) {
-      setError(e.message || 'Failed to send reset email.');
+      setError(e.message || t('errors.generic'));
     } finally {
       setLoading(false);
     }
@@ -34,11 +36,11 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <Card style={styles.card}>
-        <H1 style={styles.title}>Forgot Password</H1>
-        <Body style={styles.subtitle}>Enter your email to receive a password reset link.</Body>
+        <H1 style={styles.title}>{t('auth.forgotPasswordTitle')}</H1>
+        <Body style={styles.subtitle}>{t('auth.forgotPasswordSubtitle')}</Body>
         <TextInput
-          label="Email Address"
-          placeholder="Enter your email"
+          label={t('auth.email')}
+          placeholder={t('auth.email')}
           value={email}
           onChangeText={setEmail}
           keyboardType="email-address"
@@ -49,14 +51,14 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
         {error ? <Text style={styles.error}>{error}</Text> : null}
         {success ? <Text style={styles.success}>{success}</Text> : null}
         <Button
-          title="Send Reset Email"
+          title={t('auth.sendResetLink')}
           onPress={handleReset}
           loading={loading}
           disabled={loading || !email}
           style={styles.button}
         />
         <Button
-          title="Back to Login"
+          title={t('common.back')}
           onPress={() => navigation?.goBack()}
           variant="ghost"
           style={styles.backButton}

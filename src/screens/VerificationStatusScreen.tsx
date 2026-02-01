@@ -10,6 +10,7 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { useVerificationStatusTracking, VerificationStatusUpdate } from '../hooks/useVerificationStatusTracking';
 import { LoadingOverlay, VerifiedBadge } from '../components/common';
 import { colors, spacing } from '../theme';
@@ -37,6 +38,7 @@ const VerificationStatusScreen: React.FC<VerificationStatusScreenProps> = ({
   onNavigateToReapply,
   onError,
 }) => {
+  const { t } = useTranslation();
   // Verification status tracking
   const {
     professionalData,
@@ -69,7 +71,7 @@ const VerificationStatusScreen: React.FC<VerificationStatusScreenProps> = ({
    */
   const handleMarkAsRead = () => {
     markUpdatesAsRead();
-    Alert.alert('Updates Marked as Read', 'All recent updates have been marked as read.');
+    Alert.alert(t('medicalProfessional.statusUpdated'), t('verification.allUpdatesMarkedRead'));
   };
 
   /**
@@ -77,12 +79,12 @@ const VerificationStatusScreen: React.FC<VerificationStatusScreenProps> = ({
    */
   const handleReapply = () => {
     Alert.alert(
-      'Reapply for Verification',
-      'You can submit a new medical professional verification application. Would you like to proceed?',
+      t('verification.reapplyTitle'),
+      t('verification.reapplyMessage'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         { 
-          text: 'Proceed', 
+          text: t('common.confirm'), 
           onPress: () => onNavigateToReapply?.()
         }
       ]
@@ -113,15 +115,15 @@ const VerificationStatusScreen: React.FC<VerificationStatusScreenProps> = ({
           
           {currentStatus.status === 'verified' && currentStatus.verifiedAt && (
             <Text style={styles.statusSubtitle}>
-              Verified on {currentStatus.verifiedAt.toLocaleDateString()}
-              {currentStatus.verifiedBy && ` by ${currentStatus.verifiedBy}`}
+              {t('verification.verifiedOn', { date: currentStatus.verifiedAt.toLocaleDateString() })}
+              {currentStatus.verifiedBy && ` ${t('verification.by', { name: currentStatus.verifiedBy })}`}
             </Text>
           )}
           
           {currentStatus.status !== 'verified' && currentStatus.status !== 'not_registered' && (
             <Text style={styles.statusSubtitle}>
               {professionalData?.createdAt && 
-                `Submitted ${professionalData.createdAt.toLocaleDateString()}`
+                t('verification.submittedOn', { date: professionalData.createdAt.toLocaleDateString() })
               }
             </Text>
           )}
@@ -150,7 +152,7 @@ const VerificationStatusScreen: React.FC<VerificationStatusScreenProps> = ({
             onPress={onNavigateToRegistration}
           >
             <Ionicons name="person-add" size={20} color={colors.text.inverse} />
-            <Text style={styles.primaryButtonText}>Register as Medical Professional</Text>
+            <Text style={styles.primaryButtonText}>{t('verification.registerAsMedical')}</Text>
           </TouchableOpacity>
         </View>
       );
@@ -164,7 +166,7 @@ const VerificationStatusScreen: React.FC<VerificationStatusScreenProps> = ({
             onPress={handleReapply}
           >
             <Ionicons name="refresh" size={20} color={colors.text.inverse} />
-            <Text style={styles.primaryButtonText}>Reapply for Verification</Text>
+            <Text style={styles.primaryButtonText}>{t('verification.reapplyButton')}</Text>
           </TouchableOpacity>
         </View>
       );
@@ -178,7 +180,7 @@ const VerificationStatusScreen: React.FC<VerificationStatusScreenProps> = ({
             onPress={handleMarkAsRead}
           >
             <Ionicons name="checkmark-circle" size={20} color={colors.primary.main} />
-            <Text style={styles.secondaryButtonText}>Mark Updates as Read</Text>
+            <Text style={styles.secondaryButtonText}>{t('verification.markAsRead')}</Text>
           </TouchableOpacity>
         </View>
       );
@@ -199,10 +201,10 @@ const VerificationStatusScreen: React.FC<VerificationStatusScreenProps> = ({
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Ionicons name="notifications" size={20} color={colors.primary.main} />
-          <Text style={styles.sectionTitle}>Recent Updates</Text>
+          <Text style={styles.sectionTitle}>{t('verification.recentUpdates')}</Text>
           {hasUnreadUpdates && (
             <View style={styles.unreadBadge}>
-              <Text style={styles.unreadText}>New</Text>
+              <Text style={styles.unreadText}>{t('verification.new')}</Text>
             </View>
           )}
         </View>
@@ -219,7 +221,7 @@ const VerificationStatusScreen: React.FC<VerificationStatusScreenProps> = ({
                   <Text style={styles.updateNotes}>{update.notes}</Text>
                 )}
                 {update.adminName && (
-                  <Text style={styles.updateAdmin}>Updated by: {update.adminName}</Text>
+                  <Text style={styles.updateAdmin}>{t('verification.updatedBy')}: {update.adminName}</Text>
                 )}
               </View>
               <View style={[styles.updateStatusDot, { backgroundColor: getStatusColor(update.status) }]} />
@@ -242,32 +244,32 @@ const VerificationStatusScreen: React.FC<VerificationStatusScreenProps> = ({
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Ionicons name="person" size={20} color={colors.primary.main} />
-          <Text style={styles.sectionTitle}>Professional Information</Text>
+          <Text style={styles.sectionTitle}>{t('verification.professionalInfo')}</Text>
         </View>
 
         <View style={styles.sectionContent}>
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Name:</Text>
+            <Text style={styles.infoLabel}>{t('verification.nameLabel')}:</Text>
             <Text style={styles.infoValue}>
               {professionalData.personalInfo.firstName} {professionalData.personalInfo.lastName}
             </Text>
           </View>
 
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>License Number:</Text>
+            <Text style={styles.infoLabel}>{t('verification.licenseLabel')}:</Text>
             <Text style={styles.infoValue}>{professionalData.professionalInfo.licenseNumber}</Text>
           </View>
 
           {professionalData.professionalInfo.specialty && (
             <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Specialty:</Text>
+              <Text style={styles.infoLabel}>{t('verification.specialtyLabel')}:</Text>
               <Text style={styles.infoValue}>{professionalData.professionalInfo.specialty}</Text>
             </View>
           )}
 
           {professionalData.professionalInfo.hospitalAffiliation && (
             <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Hospital:</Text>
+              <Text style={styles.infoLabel}>{t('verification.hospitalLabel')}:</Text>
               <Text style={styles.infoValue}>{professionalData.professionalInfo.hospitalAffiliation}</Text>
             </View>
           )}
@@ -290,7 +292,7 @@ const VerificationStatusScreen: React.FC<VerificationStatusScreenProps> = ({
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Ionicons name="time" size={20} color={colors.primary.main} />
-          <Text style={styles.sectionTitle}>Status Timeline</Text>
+          <Text style={styles.sectionTitle}>{t('verification.statusTimeline')}</Text>
         </View>
 
         <View style={styles.sectionContent}>
@@ -307,7 +309,7 @@ const VerificationStatusScreen: React.FC<VerificationStatusScreenProps> = ({
                   {item.date.toLocaleDateString()} at {item.date.toLocaleTimeString()}
                 </Text>
                 {item.adminName && (
-                  <Text style={styles.timelineAdmin}>By: {item.adminName}</Text>
+                  <Text style={styles.timelineAdmin}>{t('verification.by', { name: '' })}{item.adminName}</Text>
                 )}
                 {item.notes && (
                   <Text style={styles.timelineNotes}>{item.notes}</Text>
@@ -322,7 +324,7 @@ const VerificationStatusScreen: React.FC<VerificationStatusScreenProps> = ({
               onPress={() => setShowFullTimeline(!showFullTimeline)}
             >
               <Text style={styles.toggleButtonText}>
-                {showFullTimeline ? 'Show Less' : `Show All (${statusTimeline.length})`}
+                {showFullTimeline ? t('verification.showLess') : t('verification.showAll', { count: statusTimeline.length })}
               </Text>
               <Ionicons 
                 name={showFullTimeline ? 'chevron-up' : 'chevron-down'} 
@@ -360,17 +362,17 @@ const VerificationStatusScreen: React.FC<VerificationStatusScreenProps> = ({
   // =============================================
 
   if (loading) {
-    return <LoadingOverlay visible={true} message="Loading verification status..." />;
+    return <LoadingOverlay visible={true} message={t('verification.loadingStatus')} />;
   }
 
   if (error) {
     return (
       <View style={styles.errorContainer}>
         <Ionicons name="alert-circle" size={48} color={colors.status.error.main} />
-        <Text style={styles.errorTitle}>Error Loading Status</Text>
+        <Text style={styles.errorTitle}>{t('verification.errorLoadingStatus')}</Text>
         <Text style={styles.errorText}>{error}</Text>
         <TouchableOpacity style={styles.retryButton} onPress={handleRefresh}>
-          <Text style={styles.retryButtonText}>Retry</Text>
+          <Text style={styles.retryButtonText}>{t('common.retry')}</Text>
         </TouchableOpacity>
       </View>
     );

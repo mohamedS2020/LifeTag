@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -10,9 +10,12 @@ import {
 } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { useNavigation } from '@react-navigation/native';
 import { Card, Button, Badge, H2, H4, Body, BodySmall } from '../components/ui';
+import { LanguageSelector } from '../components/common';
 import { colors, spacing, borderRadius, typography, shadows } from '../theme';
 
 /**
@@ -20,30 +23,35 @@ import { colors, spacing, borderRadius, typography, shadows } from '../theme';
  * Displays app settings and user actions
  */
 export const SettingsScreen: React.FC = () => {
+  const { t } = useTranslation();
   const { logout } = useAuth();
+  const { currentLanguage, getCurrentLanguageInfo } = useLanguage();
   const navigation = useNavigation();
+  const [languageSelectorVisible, setLanguageSelectorVisible] = useState(false);
+
+  const currentLanguageInfo = getCurrentLanguageInfo();
 
   /**
    * Handle user sign out
    */
   const handleSignOut = async () => {
     Alert.alert(
-      'Sign Out',
-      'Are you sure you want to sign out?',
+      t('auth.logout'),
+      t('auth.logoutConfirm'),
       [
         {
-          text: 'Cancel',
+          text: t('common.cancel'),
           style: 'cancel',
         },
         {
-          text: 'Sign Out',
+          text: t('auth.logout'),
           style: 'destructive',
           onPress: async () => {
             try {
               await logout();
             } catch (error) {
               console.error('Error signing out:', error);
-              Alert.alert('Error', 'Failed to sign out. Please try again.');
+              Alert.alert(t('common.error'), t('auth.logoutError'));
             }
           },
         },
@@ -59,72 +67,92 @@ export const SettingsScreen: React.FC = () => {
           <View style={styles.headerIconContainer}>
             <Ionicons name="settings-outline" size={36} color={colors.primary.main} />
           </View>
-          <H2 style={styles.headerTitle}>Settings</H2>
-          <Body color="secondary" align="center">Manage your account and preferences</Body>
+          <H2 style={styles.headerTitle}>{t('settings.title')}</H2>
+          <Body color="secondary" align="center">{t('settings.subtitle')}</Body>
+        </Animated.View>
+
+        {/* App Preferences Section */}
+        <Animated.View entering={FadeInDown.delay(200).duration(400)}>
+          <Card variant="default" style={styles.settingsSection}>
+            <H4 style={styles.sectionTitle}>{t('settings.appPreferences')}</H4>
+            
+            <TouchableOpacity 
+              style={styles.settingItem} 
+              onPress={() => setLanguageSelectorVisible(true)}
+              activeOpacity={0.7}
+            >
+              <View style={styles.settingIconBg}>
+                <Ionicons name="language-outline" size={20} color={colors.text.secondary} />
+              </View>
+              <Text style={styles.settingText}>{t('settings.language')}</Text>
+              <Text style={styles.settingValue}>{currentLanguageInfo?.nativeName || 'English'}</Text>
+              <Ionicons name="chevron-forward" size={20} color={colors.text.tertiary} />
+            </TouchableOpacity>
+          </Card>
         </Animated.View>
 
         {/* Coming Soon Section */}
-        <Animated.View entering={FadeInDown.delay(200).duration(400)}>
+        <Animated.View entering={FadeInDown.delay(300).duration(400)}>
           <Card variant="default" style={styles.comingSoonSection}>
             <Badge 
-              label="Coming Soon" 
+              label={t('common.comingSoon')} 
               variant="warning" 
               icon="time-outline" 
               size="lg"
               style={styles.comingSoonBadge}
             />
             <BodySmall color="secondary" align="center" style={styles.comingSoonDescription}>
-              More settings and customization options will be available in upcoming updates.
+              {t('settings.comingSoonDescription')}
             </BodySmall>
           </Card>
         </Animated.View>
 
         {/* Settings Sections */}
-        <Animated.View entering={FadeInDown.delay(300).duration(400)}>
+        <Animated.View entering={FadeInDown.delay(400).duration(400)}>
           <Card variant="default" style={styles.settingsSection}>
-            <H4 style={styles.sectionTitle}>Account & Privacy</H4>
+            <H4 style={styles.sectionTitle}>{t('settings.accountPrivacy')}</H4>
             
             <View style={styles.settingItem}>
               <View style={styles.settingIconBg}>
                 <Ionicons name="person-outline" size={20} color={colors.text.secondary} />
               </View>
-              <Text style={styles.settingText}>Profile Settings</Text>
-              <Badge label="Soon" variant="warning" size="sm" />
+              <Text style={styles.settingText}>{t('settings.profileSettings')}</Text>
+              <Badge label={t('common.soon')} variant="warning" size="sm" />
             </View>
             <View style={styles.settingItem}>
               <View style={styles.settingIconBg}>
                 <Ionicons name="shield-outline" size={20} color={colors.text.secondary} />
               </View>
-              <Text style={styles.settingText}>Privacy Controls</Text>
-              <Badge label="Soon" variant="warning" size="sm" />
+              <Text style={styles.settingText}>{t('settings.privacyControls')}</Text>
+              <Badge label={t('common.soon')} variant="warning" size="sm" />
             </View>
           </Card>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(400).duration(400)}>
+        <Animated.View entering={FadeInDown.delay(500).duration(400)}>
           <Card variant="default" style={styles.settingsSection}>
-            <H4 style={styles.sectionTitle}>Emergency Settings</H4>
+            <H4 style={styles.sectionTitle}>{t('settings.emergencySettings')}</H4>
             <View style={styles.settingItem}>
               <View style={styles.settingIconBg}>
                 <Ionicons name="medical-outline" size={20} color={colors.text.secondary} />
               </View>
-              <Text style={styles.settingText}>Emergency Contacts</Text>
-              <Badge label="Soon" variant="warning" size="sm" />
+              <Text style={styles.settingText}>{t('settings.emergencyContacts')}</Text>
+              <Badge label={t('common.soon')} variant="warning" size="sm" />
             </View>
             <View style={styles.settingItem}>
               <View style={styles.settingIconBg}>
                 <Ionicons name="notifications-outline" size={20} color={colors.text.secondary} />
               </View>
-              <Text style={styles.settingText}>Alert Preferences</Text>
-              <Badge label="Soon" variant="warning" size="sm" />
+              <Text style={styles.settingText}>{t('settings.alertPreferences')}</Text>
+              <Badge label={t('common.soon')} variant="warning" size="sm" />
             </View>
           </Card>
         </Animated.View>
 
         {/* Sign Out Button */}
-        <Animated.View entering={FadeInDown.delay(500).duration(400)} style={styles.signOutSection}>
+        <Animated.View entering={FadeInDown.delay(600).duration(400)} style={styles.signOutSection}>
           <Button
-            title="Sign Out"
+            title={t('settings.signOut')}
             onPress={handleSignOut}
             variant="outline"
             icon="log-out-outline"
@@ -134,6 +162,12 @@ export const SettingsScreen: React.FC = () => {
           />
         </Animated.View>
       </ScrollView>
+
+      {/* Language Selector Modal */}
+      <LanguageSelector
+        visible={languageSelectorVisible}
+        onClose={() => setLanguageSelectorVisible(false)}
+      />
     </SafeAreaView>
   );
 };
@@ -202,6 +236,11 @@ const styles = StyleSheet.create({
     ...typography.body,
     color: colors.text.primary,
     flex: 1,
+  },
+  settingValue: {
+    ...typography.body,
+    color: colors.text.secondary,
+    marginRight: spacing.sm,
   },
   signOutSection: {
     marginTop: spacing.xl,

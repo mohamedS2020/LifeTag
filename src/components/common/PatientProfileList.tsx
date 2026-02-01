@@ -14,6 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { UserProfile } from '../../types';
 import { profileService } from '../../services';
 import { useMedicalProfessionalAccess } from '../../hooks';
+import { useTranslation } from 'react-i18next';
 import { colors, spacing } from '../../theme';
 
 /**
@@ -39,6 +40,7 @@ const PatientProfileList: React.FC<PatientProfileListProps> = ({
   searchQuery = '',
   compactView = false,
 }) => {
+  const { t } = useTranslation();
   // State management
   const [profiles, setProfiles] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -90,7 +92,7 @@ const PatientProfileList: React.FC<PatientProfileListProps> = ({
       onProfilePress?.(profile);
     } catch (error) {
       console.error('Error logging profile access:', error);
-      Alert.alert('Error', 'Failed to access profile. Please try again.');
+      Alert.alert(t('common.error'), t('profile.failedToAccessProfile'));
     }
   };
 
@@ -140,7 +142,7 @@ const PatientProfileList: React.FC<PatientProfileListProps> = ({
             )}
             {profile.personalInfo.dateOfBirth && (
               <Text style={styles.profileDetail}>
-                DOB: {new Date(profile.personalInfo.dateOfBirth).toLocaleDateString()}
+                {t('profile.dateOfBirth')}: {new Date(profile.personalInfo.dateOfBirth).toLocaleDateString()}
               </Text>
             )}
           </View>
@@ -164,17 +166,17 @@ const PatientProfileList: React.FC<PatientProfileListProps> = ({
           <View style={styles.profileDetails}>
             {hasEmergencyContacts && (
               <Text style={styles.profileStat}>
-                {profile.emergencyContacts.length} Emergency Contact{profile.emergencyContacts.length !== 1 ? 's' : ''}
+                {profile.emergencyContacts.length} {profile.emergencyContacts.length !== 1 ? t('profile.emergencyContacts') : t('profile.emergencyContact')}
               </Text>
             )}
             {profile.personalInfo.phoneNumber && (
               <Text style={styles.profileStat}>
-                Phone: {profile.personalInfo.phoneNumber}
+                {t('profile.phone')}: {profile.personalInfo.phoneNumber}
               </Text>
             )}
             {profile.medicalInfo?.allergies && profile.medicalInfo.allergies.length > 0 && (
               <Text style={styles.alertText}>
-                ⚠️ {profile.medicalInfo.allergies.length} Allerg{profile.medicalInfo.allergies.length !== 1 ? 'ies' : 'y'}
+                ⚠️ {profile.medicalInfo.allergies.length} {profile.medicalInfo.allergies.length !== 1 ? t('profile.allergies') : t('profile.allergy')}
               </Text>
             )}
           </View>
@@ -189,11 +191,11 @@ const PatientProfileList: React.FC<PatientProfileListProps> = ({
   const renderEmptyState = () => (
     <View style={styles.emptyContainer}>
       <Ionicons name="people-outline" size={64} color={colors.text.tertiary} />
-      <Text style={styles.emptyTitle}>No Patient Profiles</Text>
+      <Text style={styles.emptyTitle}>{t('profile.noPatientProfiles')}</Text>
       <Text style={styles.emptyText}>
         {searchQuery 
-          ? 'No profiles match your search criteria.' 
-          : 'No patient profiles have enabled medical professional access yet.'
+          ? t('profile.noProfilesMatchSearch') 
+          : t('profile.noMedicalAccessEnabled')
         }
       </Text>
     </View>
@@ -205,10 +207,10 @@ const PatientProfileList: React.FC<PatientProfileListProps> = ({
   const renderErrorState = () => (
     <View style={styles.errorContainer}>
       <Ionicons name="alert-circle-outline" size={64} color={colors.status.error.main} />
-      <Text style={styles.errorTitle}>Error Loading Profiles</Text>
+      <Text style={styles.errorTitle}>{t('profile.errorLoadingProfiles')}</Text>
       <Text style={styles.errorText}>{error}</Text>
       <TouchableOpacity style={styles.retryButton} onPress={loadPatientProfiles}>
-        <Text style={styles.retryButtonText}>Retry</Text>
+        <Text style={styles.retryButtonText}>{t('common.retry')}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -223,7 +225,7 @@ const PatientProfileList: React.FC<PatientProfileListProps> = ({
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary.main} />
-        <Text style={styles.loadingText}>Loading patient profiles...</Text>
+        <Text style={styles.loadingText}>{t('profile.loadingPatientProfiles')}</Text>
       </View>
     );
   }

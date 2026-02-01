@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { UserProfile } from '../types';
 import { LoadingOverlay } from '../components/common';
@@ -41,6 +42,7 @@ interface QuickAction {
 }
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -63,11 +65,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         const completion = calculateProfileCompletion(profileResponse.data);
         setProfileCompletion(completion);
       } else {
-        setError(profileResponse.error?.message || 'Failed to load profile data');
+        setError(profileResponse.error?.message || t('home.failedLoadProfile'));
       }
     } catch (err) {
       console.error('Error loading dashboard data:', err);
-      setError('Failed to load dashboard data. Please try again.');
+      setError(t('home.failedLoadDashboard'));
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -115,24 +117,24 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     const actions: QuickAction[] = [
       {
         id: 'view-profile',
-        title: 'View Full Profile',
-        subtitle: 'See complete information',
+        title: t('home.viewFullProfile'),
+        subtitle: t('home.seeCompleteInfo'),
         icon: 'document-text',
         color: colors.status.info.main,
         onPress: () => navigation.navigate('ProfileDisplay'),
       },
       {
         id: 'edit-profile',
-        title: 'Edit Profile',
-        subtitle: 'Update emergency information',
+        title: t('home.editProfile'),
+        subtitle: t('home.updateEmergencyInfo'),
         icon: 'person-circle',
         color: colors.status.warning.main,
         onPress: () => navigation.navigate('ProfileForm'),
       },
       {
         id: 'access-history',
-        title: 'Profile Access History',
-        subtitle: 'View who accessed your profile',
+        title: t('home.accessHistory'),
+        subtitle: t('home.viewWhoAccessed'),
         icon: 'eye-outline',
         color: colors.primary.main,
         onPress: () => navigation.navigate('ProfileAccessHistory'),
@@ -143,8 +145,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     if (user?.userType === 'medical_professional' && user?.isVerified) {
       actions.push({
         id: 'professional-scanner',
-        title: 'Professional Scanner',
-        subtitle: 'Verified access scanning',
+        title: t('home.professionalScanner'),
+        subtitle: t('home.verifiedAccessScanning'),
         icon: 'medical',
         color: colors.status.error.main,
         onPress: () => navigation.navigate('MedPro'),
@@ -163,21 +165,21 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           </View>
           <View style={styles.welcomeText}>
             <H3 style={styles.welcomeTitle}>
-              Welcome back{profile?.personalInfo?.firstName ? `, ${profile.personalInfo.firstName}` : ''}!
+              {t('home.welcomeBack')}{profile?.personalInfo?.firstName ? `, ${profile.personalInfo.firstName}` : ''}!
             </H3>
             <BodySmall color="secondary">
               {user?.userType === 'medical_professional' && user?.isVerified 
-                ? 'Verified Medical Professional' 
+                ? t('home.verifiedProfessional') 
                 : user?.userType === 'medical_professional' && !user?.isVerified
-                ? 'Medical Professional - Awaiting Verification'
-                : 'Emergency Medical Information System'}
+                ? t('home.awaitingVerification')
+                : t('home.emergencySystem')}
             </BodySmall>
           </View>
         </View>
         
         {user?.userType === 'medical_professional' && user?.isVerified && (
           <Badge 
-            label="Verified Professional" 
+            label={t('home.verifiedProfessional')} 
             variant="success" 
             icon="checkmark-circle" 
             style={styles.statusBadge}
@@ -186,7 +188,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         
         {user?.userType === 'medical_professional' && !user?.isVerified && (
           <Badge 
-            label="Pending Verification" 
+            label={t('medicalProfessional.pendingVerification')} 
             variant="warning" 
             icon="time-outline"
             pulse
@@ -204,7 +206,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       <Animated.View entering={FadeInDown.delay(200).duration(400)}>
         <Card variant="default" style={styles.statusCard}>
           <View style={styles.statusHeader}>
-            <H4>Profile Status</H4>
+            <H4>{t('home.profileStatus')}</H4>
             <Text style={styles.completionPercentage}>{profileCompletion}%</Text>
           </View>
           
@@ -221,15 +223,15 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           
           <BodySmall color="secondary" style={styles.statusDescription}>
             {profileCompletion < 50 
-              ? 'Complete your profile for better emergency response'
+              ? t('home.profileCompleteMessage')
               : profileCompletion < 100 
-              ? 'Almost done! Add remaining details'
-              : 'Profile complete and ready for emergencies'}
+              ? t('home.almostDone')
+              : t('home.profileReady')}
           </BodySmall>
           
           {profileCompletion < 100 && (
             <Button
-              title="Complete Profile"
+              title={t('home.completeProfile')}
               onPress={() => navigation.navigate('ProfileForm')}
               icon="arrow-forward"
               iconPosition="right"
@@ -247,7 +249,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     
     return (
       <Animated.View entering={FadeInDown.delay(300).duration(400)} style={styles.quickActionsContainer}>
-        <H4 style={styles.sectionTitle}>Quick Actions</H4>
+        <H4 style={styles.sectionTitle}>{t('home.quickActions')}</H4>
         <View style={styles.actionsGrid}>
           {actions.map((action, index) => (
             <Animated.View 
@@ -290,20 +292,20 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         <Card variant="default" style={styles.emergencyCard}>
           <View style={styles.emergencyHeader}>
             <Ionicons name="warning" size={22} color={colors.medical.emergency} />
-            <Text style={styles.emergencyTitle}>Emergency Summary</Text>
+            <Text style={styles.emergencyTitle}>{t('home.emergencySummary')}</Text>
           </View>
           
           <View style={styles.emergencyContent}>
             {profile.medicalInfo?.bloodType && (
               <View style={styles.emergencyItem}>
-                <Text style={styles.emergencyLabel}>Blood Type:</Text>
+                <Text style={styles.emergencyLabel}>{t('home.bloodType')}:</Text>
                 <Text style={styles.emergencyValue}>{profile.medicalInfo.bloodType}</Text>
               </View>
             )}
             
             {profile.medicalInfo?.allergies && profile.medicalInfo.allergies.length > 0 && (
               <View style={styles.emergencyItem}>
-                <Text style={styles.emergencyLabel}>Allergies:</Text>
+                <Text style={styles.emergencyLabel}>{t('home.allergies')}:</Text>
                 <Text style={styles.emergencyValue}>
                   {profile.medicalInfo.allergies.join(', ')}
                 </Text>
@@ -312,7 +314,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             
             {profile.emergencyContacts && profile.emergencyContacts.length > 0 && (
               <View style={styles.emergencyItem}>
-                <Text style={styles.emergencyLabel}>Emergency Contact:</Text>
+                <Text style={styles.emergencyLabel}>{t('home.emergencyContact')}:</Text>
                 <Text style={styles.emergencyValue}>
                   {profile.emergencyContacts[0].name} ({profile.emergencyContacts[0].phoneNumber})
                 </Text>
@@ -321,7 +323,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           </View>
           
           <Button
-            title="Show Emergency QR Code"
+            title={t('home.showEmergencyQR')}
             onPress={() => navigation.navigate('QRDisplay')}
             variant="danger"
             icon="qr-code-outline"
@@ -332,7 +334,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   };
 
   if (loading) {
-    return <LoadingOverlay visible={true} message="Loading dashboard..." />;
+    return <LoadingOverlay visible={true} message={t('home.loadingDashboard')} />;
   }
 
   return (
@@ -358,7 +360,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
               <Text style={styles.errorText}>{error}</Text>
             </View>
             <Button
-              title="Retry"
+              title={t('common.retry')}
               onPress={loadDashboardData}
               variant="danger"
               size="sm"

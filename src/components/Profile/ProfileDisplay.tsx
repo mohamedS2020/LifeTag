@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { UserProfile, AuditLog } from '../../types';
 import { profileService, passwordService, MedicalProfessionalAccessService } from '../../services';
 import { LoadingOverlay } from '../common/LoadingOverlay';
@@ -28,8 +29,8 @@ interface ProfileDisplayProps {
 }
 
 // Helper function to safely format dates from Firestore
-const formatFirestoreDate = (date: any): string => {
-  if (!date) return 'Not provided';
+const formatFirestoreDate = (date: any, t: (key: string) => string): string => {
+  if (!date) return t('common.notProvided');
   
   try {
     // If it's already a Date object and valid - CHECK THIS FIRST!
@@ -39,7 +40,7 @@ const formatFirestoreDate = (date: any): string => {
     
     // Check if it's an empty object (after checking for Date)
     if (typeof date === 'object' && Object.keys(date).length === 0) {
-      return 'Date not set';
+      return t('profile.dateNotSet');
     }
     
     // If it's a Firestore timestamp object with seconds
@@ -55,7 +56,7 @@ const formatFirestoreDate = (date: any): string => {
     // If it's a string, try to parse it
     if (typeof date === 'string') {
       const parsed = new Date(date);
-      return !isNaN(parsed.getTime()) ? parsed.toLocaleDateString() : 'Invalid date';
+      return !isNaN(parsed.getTime()) ? parsed.toLocaleDateString() : t('profile.invalidDate');
     }
     
     // If it's an object with _seconds property
@@ -63,9 +64,9 @@ const formatFirestoreDate = (date: any): string => {
       return new Date(date._seconds * 1000).toLocaleDateString();
     }
     
-    return 'Invalid date format';
+    return t('profile.invalidDateFormat');
   } catch (error) {
-    return 'Invalid date';
+    return t('profile.invalidDate');
   }
 };
 
@@ -82,6 +83,7 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
   onEdit,
   onError,
 }) => {
+  const { t } = useTranslation();
   const { user: currentUser } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(initialProfile || null);
   const [isLoading, setIsLoading] = useState(false);
@@ -128,15 +130,15 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
       if (response.success && response.data) {
         setProfile(response.data);
       } else {
-        const errorMessage = response.error?.message || 'Failed to load profile';
+        const errorMessage = response.error?.message || t('profile.failedToLoadProfile');
         onError?.(errorMessage);
-        Alert.alert('Error', errorMessage);
+        Alert.alert(t('common.error'), errorMessage);
       }
     } catch (error: any) {
       console.error('Profile loading error:', error);
-      const errorMessage = 'An unexpected error occurred while loading the profile';
+      const errorMessage = t('profile.unexpectedLoadError');
       onError?.(errorMessage);
-      Alert.alert('Error', errorMessage);
+      Alert.alert(t('common.error'), errorMessage);
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
@@ -308,13 +310,13 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
       <Animated.View entering={FadeInDown.delay(100).duration(400)} style={styles.section}>
         <View style={styles.sectionHeader}>
           <Ionicons name="person" size={20} color={colors.status.info.main} />
-          <Text style={styles.sectionTitle}>Personal Information</Text>
+          <Text style={styles.sectionTitle}>{t('profile.personalInfo')}</Text>
         </View>
 
         <View style={styles.sectionContent}>
           {visibleFields?.name !== false && (personalInfo.firstName || personalInfo.lastName) && (
             <View style={styles.infoRow}>
-              <Text style={styles.label}>Full Name</Text>
+              <Text style={styles.label}>{t('profile.fullName')}</Text>
               <Text style={styles.value}>
                 {`${personalInfo.firstName || ''} ${personalInfo.lastName || ''}`.trim()}
               </Text>
@@ -323,30 +325,30 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
 
           {visibleFields?.dateOfBirth !== false && personalInfo.dateOfBirth && (
             <View style={styles.infoRow}>
-              <Text style={styles.label}>Date of Birth</Text>
+              <Text style={styles.label}>{t('profile.dateOfBirth')}</Text>
               <Text style={styles.value}>
-                {formatFirestoreDate(personalInfo.dateOfBirth)}
+                {formatFirestoreDate(personalInfo.dateOfBirth, t)}
               </Text>
             </View>
           )}
 
           {visibleFields?.gender !== false && personalInfo.gender && (
             <View style={styles.infoRow}>
-              <Text style={styles.label}>Gender</Text>
+              <Text style={styles.label}>{t('profile.gender')}</Text>
               <Text style={styles.value}>{personalInfo.gender}</Text>
             </View>
           )}
 
           {visibleFields?.phoneNumber !== false && personalInfo.phoneNumber && (
             <View style={styles.infoRow}>
-              <Text style={styles.label}>Phone Number</Text>
+              <Text style={styles.label}>{t('profile.phoneNumber')}</Text>
               <Text style={styles.value}>{personalInfo.phoneNumber}</Text>
             </View>
           )}
 
           {visibleFields?.address !== false && personalInfo.address && (
             <View style={styles.infoRow}>
-              <Text style={styles.label}>Address</Text>
+              <Text style={styles.label}>{t('profile.address')}</Text>
               <Text style={styles.value}>{formatAddress(personalInfo.address)}</Text>
             </View>
           )}
@@ -365,55 +367,55 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
       <Animated.View entering={FadeInDown.delay(200).duration(400)} style={styles.section}>
         <View style={styles.sectionHeader}>
           <Ionicons name="medical" size={20} color={colors.medical.emergency} />
-          <Text style={styles.sectionTitle}>Medical Information</Text>
+          <Text style={styles.sectionTitle}>{t('profile.medicalInfo')}</Text>
         </View>
 
         <View style={styles.sectionContent}>
           {visibleFields?.bloodType !== false && medicalInfo.bloodType && (
             <View style={styles.infoRow}>
-              <Text style={styles.label}>Blood Type</Text>
+              <Text style={styles.label}>{t('profile.bloodType')}</Text>
               <Text style={[styles.value, styles.criticalValue]}>{medicalInfo.bloodType}</Text>
             </View>
           )}
 
           {medicalInfo.height && (
             <View style={styles.infoRow}>
-              <Text style={styles.label}>Height</Text>
+              <Text style={styles.label}>{t('profile.height')}</Text>
               <Text style={styles.value}>{medicalInfo.height}</Text>
             </View>
           )}
 
           {medicalInfo.weight && (
             <View style={styles.infoRow}>
-              <Text style={styles.label}>Weight</Text>
+              <Text style={styles.label}>{t('profile.weight')}</Text>
               <Text style={styles.value}>{medicalInfo.weight}</Text>
             </View>
           )}
 
           {visibleFields?.allergies !== false && medicalInfo.allergies && (
             <View style={styles.infoRow}>
-              <Text style={styles.label}>Allergies</Text>
+              <Text style={styles.label}>{t('profile.allergies')}</Text>
               <Text style={[styles.value, styles.criticalValue]}>{formatMedicalConditions(medicalInfo.allergies)}</Text>
             </View>
           )}
 
           {visibleFields?.medications !== false && medicalInfo.medications && (
             <View style={styles.infoRow}>
-              <Text style={styles.label}>Current Medications</Text>
+              <Text style={styles.label}>{t('profile.currentMedications')}</Text>
               <Text style={styles.value}>{formatMedications(medicalInfo.medications)}</Text>
             </View>
           )}
 
           {visibleFields?.medicalConditions !== false && medicalInfo.medicalConditions && (
             <View style={styles.infoRow}>
-              <Text style={styles.label}>Medical Conditions</Text>
+              <Text style={styles.label}>{t('profile.conditions')}</Text>
               <Text style={styles.value}>{formatMedicalConditions(medicalInfo.medicalConditions)}</Text>
             </View>
           )}
 
           {visibleFields?.emergencyMedicalInfo !== false && medicalInfo.emergencyMedicalInfo && (
             <View style={styles.infoRow}>
-              <Text style={styles.label}>Emergency Medical Information</Text>
+              <Text style={styles.label}>{t('profile.emergencyMedicalInfo')}</Text>
               <Text style={[styles.value, styles.criticalValue]}>
                 {medicalInfo.emergencyMedicalInfo}
               </Text>
@@ -422,21 +424,21 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
 
           {medicalInfo.bloodDonorStatus !== undefined && (
             <View style={styles.infoRow}>
-              <Text style={styles.label}>Blood Donor</Text>
-              <Text style={styles.value}>{medicalInfo.bloodDonorStatus ? 'Yes' : 'No'}</Text>
+              <Text style={styles.label}>{t('profile.bloodDonor')}</Text>
+              <Text style={styles.value}>{medicalInfo.bloodDonorStatus ? t('common.yes') : t('common.no')}</Text>
             </View>
           )}
 
           {medicalInfo.organDonorStatus !== undefined && (
             <View style={styles.infoRow}>
-              <Text style={styles.label}>Organ Donor</Text>
-              <Text style={styles.value}>{medicalInfo.organDonorStatus ? 'Yes' : 'No'}</Text>
+              <Text style={styles.label}>{t('profile.organDonor')}</Text>
+              <Text style={styles.value}>{medicalInfo.organDonorStatus ? t('common.yes') : t('common.no')}</Text>
             </View>
           )}
 
           {visibleFields?.primaryPhysician !== false && medicalInfo.primaryPhysician && (
             <View style={styles.infoRow}>
-              <Text style={styles.label}>Primary Physician</Text>
+              <Text style={styles.label}>{t('profile.primaryPhysician')}</Text>
               <Text style={styles.value}>{formatHealthcareProvider(medicalInfo.primaryPhysician)}</Text>
             </View>
           )}
@@ -455,7 +457,7 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
       <Animated.View entering={FadeInDown.delay(300).duration(400)} style={styles.section}>
         <View style={styles.sectionHeader}>
           <Ionicons name="call" size={20} color={colors.status.warning.main} />
-          <Text style={styles.sectionTitle}>Emergency Contacts</Text>
+          <Text style={styles.sectionTitle}>{t('profile.emergencyContacts')}</Text>
         </View>
 
         <View style={styles.sectionContent}>
@@ -465,7 +467,7 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
                 <Text style={styles.contactName}>{contact.name}</Text>
                 {contact.isPrimary && (
                   <View style={styles.primaryBadge}>
-                    <Text style={styles.primaryBadgeText}>PRIMARY</Text>
+                    <Text style={styles.primaryBadgeText}>{t('profile.primaryContact').toUpperCase()}</Text>
                   </View>
                 )}
               </View>
@@ -506,33 +508,33 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
       <Animated.View entering={FadeInDown.delay(400).duration(400)} style={styles.section}>
         <View style={styles.sectionHeader}>
           <Ionicons name="shield-checkmark" size={20} color={colors.primary.main} />
-          <Text style={styles.sectionTitle}>Privacy & Security</Text>
+          <Text style={styles.sectionTitle}>{t('profile.privacySecurity')}</Text>
         </View>
 
         <View style={styles.sectionContent}>
           <View style={styles.privacyRow}>
-            <Text style={styles.privacyLabel}>Emergency Access</Text>
+            <Text style={styles.privacyLabel}>{t('profile.emergencyAccess')}</Text>
             <View style={[styles.statusBadge, privacySettings.allowEmergencyAccess ? styles.enabledBadge : styles.disabledBadge]}>
               <Text style={[styles.statusText, { color: privacySettings.allowEmergencyAccess ? colors.status.warning.main : colors.status.error.main }]}>
-                {privacySettings.allowEmergencyAccess ? 'Enabled' : 'Disabled'}
+                {privacySettings.allowEmergencyAccess ? t('common.enabled') : t('common.disabled')}
               </Text>
             </View>
           </View>
 
           <View style={styles.privacyRow}>
-            <Text style={styles.privacyLabel}>Medical Professional Access</Text>
+            <Text style={styles.privacyLabel}>{t('profile.medicalProAccess')}</Text>
             <View style={[styles.statusBadge, privacySettings.allowMedicalProfessionalAccess ? styles.enabledBadge : styles.disabledBadge]}>
               <Text style={[styles.statusText, { color: privacySettings.allowMedicalProfessionalAccess ? colors.status.warning.main : colors.status.error.main }]}>
-                {privacySettings.allowMedicalProfessionalAccess ? 'Enabled' : 'Disabled'}
+                {privacySettings.allowMedicalProfessionalAccess ? t('common.enabled') : t('common.disabled')}
               </Text>
             </View>
           </View>
 
           <View style={styles.privacyRow}>
-            <Text style={styles.privacyLabel}>Password Protection</Text>
+            <Text style={styles.privacyLabel}>{t('profile.passwordProtection')}</Text>
             <View style={[styles.statusBadge, privacySettings.requirePasswordForFullAccess ? styles.enabledBadge : styles.disabledBadge]}>
               <Text style={[styles.statusText, { color: privacySettings.requirePasswordForFullAccess ? colors.status.warning.main : colors.status.error.main }]}>
-                {privacySettings.requirePasswordForFullAccess ? 'Enabled' : 'Disabled'}
+                {privacySettings.requirePasswordForFullAccess ? t('common.enabled') : t('common.disabled')}
               </Text>
             </View>
           </View>
@@ -541,7 +543,7 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
             <View style={styles.accessTimeRow}>
               <Ionicons name="time" size={16} color={colors.status.info.main} />
               <Text style={styles.accessTimeText}>
-                Full access expires in {accessTimeRemaining} minutes
+                {t('profile.accessExpiresIn', { minutes: accessTimeRemaining })}
               </Text>
             </View>
           )}
@@ -556,9 +558,9 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
         <Ionicons name="lock-closed" size={64} color={colors.medical.emergency} />
       </View>
       
-      <Text style={styles.protectionTitle}>Profile Protected</Text>
+      <Text style={styles.protectionTitle}>{t('profile.profileProtected')}</Text>
       <Text style={styles.protectionMessage}>
-        This profile requires password verification to view sensitive medical information.
+        {t('profile.passwordRequiredMessage')}
       </Text>
 
       <TouchableOpacity
@@ -566,19 +568,19 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
         onPress={() => setShowPasswordModal(true)}
       >
         <Ionicons name="lock-open" size={20} color="white" />
-        <Text style={styles.unlockButtonText}>Enter Password</Text>
+        <Text style={styles.unlockButtonText}>{t('profile.enterPassword')}</Text>
       </TouchableOpacity>
 
       {/* Show basic emergency info even when locked */}
       {profile?.medicalInfo.bloodType && (
         <View style={styles.emergencyInfoCard}>
-          <Text style={styles.emergencyInfoTitle}>Emergency Information</Text>
+          <Text style={styles.emergencyInfoTitle}>{t('emergency.title')}</Text>
           <Text style={styles.emergencyInfoText}>
-            Blood Type: {profile.medicalInfo.bloodType}
+            {t('profile.bloodType')}: {profile.medicalInfo.bloodType}
           </Text>
           {profile.medicalInfo.allergies && profile.medicalInfo.allergies.length > 0 && (
             <Text style={styles.emergencyInfoText}>
-              Allergies: {formatMedicalConditions(profile.medicalInfo.allergies)}
+              {t('profile.allergies')}: {formatMedicalConditions(profile.medicalInfo.allergies)}
             </Text>
           )}
         </View>
@@ -591,19 +593,19 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
   // =============================================
 
   if (isLoading) {
-    return <LoadingOverlay visible={true} message="Loading profile..." />;
+    return <LoadingOverlay visible={true} message={t('profile.loadingProfile')} />;
   }
 
   if (!profile) {
     return (
       <View style={styles.errorContainer}>
         <Ionicons name="alert-circle" size={48} color={colors.status.error.main} />
-        <Text style={styles.errorTitle}>Profile Not Found</Text>
+        <Text style={styles.errorTitle}>{t('profile.notFound')}</Text>
         <Text style={styles.errorMessage}>
-          Unable to load profile information. Please try again.
+          {t('profile.unableToLoadProfile')}
         </Text>
         <TouchableOpacity style={styles.retryButton} onPress={() => loadProfile()}>
-          <Text style={styles.retryButtonText}>Retry</Text>
+          <Text style={styles.retryButtonText}>{t('common.retry')}</Text>
         </TouchableOpacity>
       </View>
     );
@@ -636,17 +638,17 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
               <Text style={styles.profileName}>
                 {profile.personalInfo?.firstName && profile.personalInfo?.lastName
                   ? `${profile.personalInfo.firstName} ${profile.personalInfo.lastName}`
-                  : 'User Profile'}
+                  : t('profile.userProfile')}
               </Text>
               <Text style={styles.lastUpdated}>
-                Last updated: {profile.updatedAt?.toLocaleDateString() || 'Unknown'}
+                {t('profile.lastUpdated')}: {profile.updatedAt?.toLocaleDateString() || t('common.unknown')}
               </Text>
             </View>
 
             {showEditButton && onEdit && (
               <TouchableOpacity style={styles.editButton} onPress={onEdit}>
                 <Ionicons name="create" size={20} color="white" />
-                <Text style={styles.editButtonText}>Edit</Text>
+                <Text style={styles.editButtonText}>{t('common.edit')}</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -660,10 +662,10 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
                 />
                 <View style={styles.medicalAccessText}>
                   <Text style={styles.medicalAccessTitle}>
-                    Medical Professional Access
+                    {t('profile.medicalProfessionalAccess')}
                   </Text>
                   <Text style={styles.medicalAccessSubtitle}>
-                    Accessed by: {MedicalProfessionalAccessService.formatProfessionalCredentials(medicalProfessionalData)}
+                    {t('profile.accessedBy')}: {MedicalProfessionalAccessService.formatProfessionalCredentials(medicalProfessionalData)}
                   </Text>
                 </View>
               </View>

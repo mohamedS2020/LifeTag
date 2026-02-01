@@ -15,6 +15,7 @@ import { useAuth } from '../../context';
 import { Button, TextInput, Card, H1, Body, Caption } from '../../components/ui';
 import { LoadingOverlay } from '../../components/common';
 import { colors, spacing } from '../../theme';
+import { useTranslation } from 'react-i18next';
 
 interface MedicalProfessionalRegisterProps {
   navigation?: any; // Will be properly typed when navigation is set up
@@ -50,6 +51,7 @@ const MedicalProfessionalRegister: React.FC<MedicalProfessionalRegisterProps> = 
   });
 
   const { register, loading } = useAuth();
+  const { t } = useTranslation();
 
   // Update form data
   const updateFormData = (field: string, value: string) => {
@@ -64,11 +66,11 @@ const MedicalProfessionalRegister: React.FC<MedicalProfessionalRegisterProps> = 
   const validateEmailField = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email) {
-      setErrors(prev => ({ ...prev, email: 'Email is required' }));
+      setErrors(prev => ({ ...prev, email: t('validation.emailRequired') }));
       return false;
     }
     if (!emailRegex.test(email)) {
-      setErrors(prev => ({ ...prev, email: 'Please enter a valid email address' }));
+      setErrors(prev => ({ ...prev, email: t('auth.invalidEmail') }));
       return false;
     }
     setErrors(prev => ({ ...prev, email: '' }));
@@ -77,23 +79,23 @@ const MedicalProfessionalRegister: React.FC<MedicalProfessionalRegisterProps> = 
 
   const validatePasswordField = (password: string): boolean => {
     if (!password) {
-      setErrors(prev => ({ ...prev, password: 'Password is required' }));
+      setErrors(prev => ({ ...prev, password: t('validation.passwordRequired') }));
       return false;
     }
     if (password.length < 8) {
-      setErrors(prev => ({ ...prev, password: 'Password must be at least 8 characters' }));
+      setErrors(prev => ({ ...prev, password: t('medicalProfessional.passwordMin8') }));
       return false;
     }
     if (!/(?=.*[a-z])/.test(password)) {
-      setErrors(prev => ({ ...prev, password: 'Password must contain at least one lowercase letter' }));
+      setErrors(prev => ({ ...prev, password: t('medicalProfessional.passwordLowercase') }));
       return false;
     }
     if (!/(?=.*[A-Z])/.test(password)) {
-      setErrors(prev => ({ ...prev, password: 'Password must contain at least one uppercase letter' }));
+      setErrors(prev => ({ ...prev, password: t('medicalProfessional.passwordUppercase') }));
       return false;
     }
     if (!/(?=.*\d)/.test(password)) {
-      setErrors(prev => ({ ...prev, password: 'Password must contain at least one number' }));
+      setErrors(prev => ({ ...prev, password: t('medicalProfessional.passwordNumber') }));
       return false;
     }
     setErrors(prev => ({ ...prev, password: '' }));
@@ -102,11 +104,11 @@ const MedicalProfessionalRegister: React.FC<MedicalProfessionalRegisterProps> = 
 
   const validateConfirmPasswordField = (confirmPassword: string, password: string): boolean => {
     if (!confirmPassword) {
-      setErrors(prev => ({ ...prev, confirmPassword: 'Please confirm your password' }));
+      setErrors(prev => ({ ...prev, confirmPassword: t('auth.confirmPasswordRequired') }));
       return false;
     }
     if (confirmPassword !== password) {
-      setErrors(prev => ({ ...prev, confirmPassword: 'Passwords do not match' }));
+      setErrors(prev => ({ ...prev, confirmPassword: t('auth.passwordsDoNotMatch') }));
       return false;
     }
     setErrors(prev => ({ ...prev, confirmPassword: '' }));
@@ -115,15 +117,15 @@ const MedicalProfessionalRegister: React.FC<MedicalProfessionalRegisterProps> = 
 
   const validateFullNameField = (fullName: string): boolean => {
     if (!fullName) {
-      setErrors(prev => ({ ...prev, fullName: 'Full name is required' }));
+      setErrors(prev => ({ ...prev, fullName: t('medicalProfessional.fullNameRequired') }));
       return false;
     }
     if (fullName.length < 2) {
-      setErrors(prev => ({ ...prev, fullName: 'Full name must be at least 2 characters' }));
+      setErrors(prev => ({ ...prev, fullName: t('medicalProfessional.fullNameMinLength') }));
       return false;
     }
     if (!/^[a-zA-Z\s'-]+$/.test(fullName)) {
-      setErrors(prev => ({ ...prev, fullName: 'Full name can only contain letters, spaces, hyphens, and apostrophes' }));
+      setErrors(prev => ({ ...prev, fullName: t('medicalProfessional.fullNameInvalidChars') }));
       return false;
     }
     setErrors(prev => ({ ...prev, fullName: '' }));
@@ -132,16 +134,16 @@ const MedicalProfessionalRegister: React.FC<MedicalProfessionalRegisterProps> = 
 
   const validateLicenseNumberField = (licenseNumber: string): boolean => {
     if (!licenseNumber) {
-      setErrors(prev => ({ ...prev, licenseNumber: 'License number is required' }));
+      setErrors(prev => ({ ...prev, licenseNumber: t('medicalProfessional.licenseRequired') }));
       return false;
     }
     if (licenseNumber.length < 3) {
-      setErrors(prev => ({ ...prev, licenseNumber: 'License number must be at least 3 characters' }));
+      setErrors(prev => ({ ...prev, licenseNumber: t('medicalProfessional.licenseMinLength') }));
       return false;
     }
     // Basic alphanumeric validation for license numbers
     if (!/^[A-Za-z0-9-]+$/.test(licenseNumber)) {
-      setErrors(prev => ({ ...prev, licenseNumber: 'License number can only contain letters, numbers, and hyphens' }));
+      setErrors(prev => ({ ...prev, licenseNumber: t('medicalProfessional.licenseInvalidChars') }));
       return false;
     }
     setErrors(prev => ({ ...prev, licenseNumber: '' }));
@@ -150,11 +152,11 @@ const MedicalProfessionalRegister: React.FC<MedicalProfessionalRegisterProps> = 
 
   const validateSpecialtyField = (specialty: string): boolean => {
     if (!specialty) {
-      setErrors(prev => ({ ...prev, specialty: 'Medical specialty is required' }));
+      setErrors(prev => ({ ...prev, specialty: t('medicalProfessional.specialtyRequired') }));
       return false;
     }
     if (specialty.length < 2) {
-      setErrors(prev => ({ ...prev, specialty: 'Specialty must be at least 2 characters' }));
+      setErrors(prev => ({ ...prev, specialty: t('medicalProfessional.specialtyMinLength') }));
       return false;
     }
     setErrors(prev => ({ ...prev, specialty: '' }));
@@ -163,11 +165,11 @@ const MedicalProfessionalRegister: React.FC<MedicalProfessionalRegisterProps> = 
 
   const validateInstitutionField = (institution: string): boolean => {
     if (!institution) {
-      setErrors(prev => ({ ...prev, institution: 'Institution/Hospital is required' }));
+      setErrors(prev => ({ ...prev, institution: t('medicalProfessional.institutionRequired') }));
       return false;
     }
     if (institution.length < 2) {
-      setErrors(prev => ({ ...prev, institution: 'Institution name must be at least 2 characters' }));
+      setErrors(prev => ({ ...prev, institution: t('medicalProfessional.institutionMinLength') }));
       return false;
     }
     setErrors(prev => ({ ...prev, institution: '' }));
@@ -216,8 +218,8 @@ const MedicalProfessionalRegister: React.FC<MedicalProfessionalRegisterProps> = 
       
       // Show success message with verification info
       Alert.alert(
-        'Registration Submitted!',
-        'Your medical professional account has been created. Please note that your account requires manual verification by our admin team before you can access full patient profiles. You will receive an email notification once your account is verified.',
+        t('medicalProfessional.registrationSubmitted'),
+        t('medicalProfessional.registrationSubmittedMessage'),
         [{ text: 'OK' }]
       );
       
@@ -230,8 +232,8 @@ const MedicalProfessionalRegister: React.FC<MedicalProfessionalRegisterProps> = 
       
     } catch (error: any) {
       Alert.alert(
-        'Registration Failed',
-        error.message || 'An error occurred during registration. Please try again.',
+        t('medicalProfessional.registrationFailed'),
+        error.message || t('medicalProfessional.registrationError'),
         [{ text: 'OK' }]
       );
     }
@@ -257,7 +259,7 @@ const MedicalProfessionalRegister: React.FC<MedicalProfessionalRegisterProps> = 
 
   return (
     <>
-      <LoadingOverlay visible={loading} message="Submitting registration..." />
+      <LoadingOverlay visible={loading} message={t('medicalProfessional.submittingRegistration')} />
       
       <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView 
@@ -281,8 +283,8 @@ const MedicalProfessionalRegister: React.FC<MedicalProfessionalRegisterProps> = 
               <View style={styles.logoContainer}>
                 <Ionicons name="medical" size={48} color={colors.primary.main} />
               </View>
-              <H1 style={styles.title}>Medical Professional</H1>
-              <Body style={styles.subtitle}>Register for verified access to patient profiles</Body>
+              <H1 style={styles.title}>{t('medicalProfessional.title')}</H1>
+              <Body style={styles.subtitle}>{t('medicalProfessional.registerSubtitle')}</Body>
             </View>
 
             {/* Verification Notice */}
@@ -290,11 +292,10 @@ const MedicalProfessionalRegister: React.FC<MedicalProfessionalRegisterProps> = 
               <Card variant="filled" style={styles.verificationNotice}>
                 <View style={styles.noticeHeader}>
                   <Ionicons name="shield-checkmark" size={24} color={colors.primary.main} />
-                  <Body style={styles.noticeTitle}>Verification Required</Body>
+                  <Body style={styles.noticeTitle}>{t('medicalProfessional.verificationRequired')}</Body>
                 </View>
                 <Caption style={styles.noticeText}>
-                  Medical professional accounts require manual verification. 
-                  You'll be notified via email once approved by our admin team.
+                  {t('medicalProfessional.verificationNotice')}
                 </Caption>
               </Card>
             </Animated.View>
@@ -302,8 +303,8 @@ const MedicalProfessionalRegister: React.FC<MedicalProfessionalRegisterProps> = 
             {/* Form */}
             <Animated.View entering={FadeInDown.duration(600).delay(200)}>
               <TextInput
-                label="Full Name"
-                placeholder="Dr. John Smith"
+                label={t('medicalProfessional.fullName')}
+                placeholder={t('medicalProfessional.fullNamePlaceholder')}
                 value={formData.fullName}
                 onChangeText={(text) => updateFormData('fullName', text)}
                 onBlur={() => validateFullNameField(formData.fullName)}
@@ -315,8 +316,8 @@ const MedicalProfessionalRegister: React.FC<MedicalProfessionalRegisterProps> = 
               />
 
               <TextInput
-                label="Medical License Number"
-                placeholder="e.g., MD123456 or 12345-MD"
+                label={t('medicalProfessional.licenseNumber')}
+                placeholder={t('medicalProfessional.licensePlaceholder')}
                 value={formData.licenseNumber}
                 onChangeText={(text) => updateFormData('licenseNumber', text)}
                 onBlur={() => validateLicenseNumberField(formData.licenseNumber)}
@@ -324,13 +325,13 @@ const MedicalProfessionalRegister: React.FC<MedicalProfessionalRegisterProps> = 
                 autoCorrect={false}
                 error={errors.licenseNumber}
                 leftIcon="card-outline"
-                hint="Enter your state medical license number (will be verified)"
+                hint={t('medicalProfessional.licenseHint')}
                 editable={!loading}
               />
 
               <TextInput
-                label="Medical Specialty"
-                placeholder="e.g., Emergency Medicine, Cardiology"
+                label={t('medicalProfessional.specialty')}
+                placeholder={t('medicalProfessional.specialtyPlaceholder')}
                 value={formData.specialty}
                 onChangeText={(text) => updateFormData('specialty', text)}
                 onBlur={() => validateSpecialtyField(formData.specialty)}
@@ -342,8 +343,8 @@ const MedicalProfessionalRegister: React.FC<MedicalProfessionalRegisterProps> = 
               />
 
               <TextInput
-                label="Institution/Hospital"
-                placeholder="e.g., City General Hospital"
+                label={t('medicalProfessional.institution')}
+                placeholder={t('medicalProfessional.institutionPlaceholder')}
                 value={formData.institution}
                 onChangeText={(text) => updateFormData('institution', text)}
                 onBlur={() => validateInstitutionField(formData.institution)}
@@ -355,8 +356,8 @@ const MedicalProfessionalRegister: React.FC<MedicalProfessionalRegisterProps> = 
               />
 
               <TextInput
-                label="Professional Email Address"
-                placeholder="doctor@hospital.com"
+                label={t('medicalProfessional.professionalEmail')}
+                placeholder={t('medicalProfessional.emailPlaceholder')}
                 value={formData.email}
                 onChangeText={(text) => updateFormData('email', text)}
                 onBlur={() => validateEmailField(formData.email)}
@@ -365,13 +366,13 @@ const MedicalProfessionalRegister: React.FC<MedicalProfessionalRegisterProps> = 
                 autoCorrect={false}
                 error={errors.email}
                 leftIcon="mail-outline"
-                hint="Use your professional/institutional email address"
+                hint={t('medicalProfessional.emailHint')}
                 editable={!loading}
               />
 
               <TextInput
-                label="Password"
-                placeholder="Create a secure password"
+                label={t('auth.password')}
+                placeholder={t('auth.createSecurePassword')}
                 value={formData.password}
                 onChangeText={(text) => updateFormData('password', text)}
                 onBlur={() => validatePasswordField(formData.password)}
@@ -380,13 +381,13 @@ const MedicalProfessionalRegister: React.FC<MedicalProfessionalRegisterProps> = 
                 autoCorrect={false}
                 error={errors.password}
                 leftIcon="lock-closed-outline"
-                hint="8+ characters with uppercase, lowercase, and number"
+                hint={t('medicalProfessional.passwordHint')}
                 editable={!loading}
               />
 
               <TextInput
-                label="Confirm Password"
-                placeholder="Confirm your password"
+                label={t('auth.confirmPassword')}
+                placeholder={t('auth.confirmYourPassword')}
                 value={formData.confirmPassword}
                 onChangeText={(text) => updateFormData('confirmPassword', text)}
                 onBlur={() => validateConfirmPasswordField(formData.confirmPassword, formData.password)}
@@ -399,7 +400,7 @@ const MedicalProfessionalRegister: React.FC<MedicalProfessionalRegisterProps> = 
               />
 
               <Button
-                title="Submit for Verification"
+                title={t('medicalProfessional.submitForVerification')}
                 onPress={handleRegister}
                 loading={loading}
                 disabled={loading}
@@ -410,16 +411,16 @@ const MedicalProfessionalRegister: React.FC<MedicalProfessionalRegisterProps> = 
             {/* Navigation Links */}
             <Animated.View style={styles.navigationContainer} entering={FadeInDown.duration(600).delay(300)}>
               <Button
-                title="Register as Individual"
+                title={t('medicalProfessional.registerAsIndividual')}
                 variant="ghost"
                 onPress={handleNavigateToRegularRegister}
                 disabled={loading}
               />
               
               <View style={styles.loginContainer}>
-                <Body style={styles.loginText}>Already have an account? </Body>
+                <Body style={styles.loginText}>{t('auth.alreadyHaveAccount')}</Body>
                 <Button
-                  title="Sign In"
+                  title={t('auth.signIn')}
                   variant="ghost"
                   size="sm"
                   onPress={handleNavigateToLogin}

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { colors, spacing, borderRadius, typography } from '../../theme';
 
 /**
@@ -34,6 +35,7 @@ const VerifiedBadge: React.FC<VerifiedBadgeProps> = ({
   verifiedAt,
   verifiedBy,
 }) => {
+  const { t } = useTranslation();
   /**
    * Get size-specific styles
    */
@@ -72,7 +74,7 @@ const VerifiedBadge: React.FC<VerifiedBadgeProps> = ({
         textColor: colors.status.success.main,
         iconColor: colors.status.success.main,
         iconName: 'checkmark-circle' as const,
-        label: 'Verified',
+        label: t('verification.verified'),
       };
     } else {
       return {
@@ -81,7 +83,7 @@ const VerifiedBadge: React.FC<VerifiedBadgeProps> = ({
         textColor: colors.status.warning.main,
         iconColor: colors.status.warning.main,
         iconName: 'time' as const,
-        label: 'Pending',
+        label: t('verification.pending'),
       };
     }
   };
@@ -143,8 +145,8 @@ const VerifiedBadge: React.FC<VerifiedBadgeProps> = ({
       
       {isVerified && verifiedAt && size === 'large' && (
         <Text style={[styles.verificationDetails, { color: colorScheme.textColor }]}>
-          Verified {formatVerificationDate(verifiedAt)}
-          {verifiedBy && ` by ${verifiedBy}`}
+          {t('verification.verifiedOnDate', { date: formatVerificationDate(verifiedAt) })}
+          {verifiedBy && ` ${t('medicalProfessional.byAdmin', { admin: verifiedBy })}`}
         </Text>
       )}
     </View>
@@ -177,6 +179,7 @@ export const VerifiedProfessionalIndicator: React.FC<VerifiedProfessionalIndicat
   verificationStatus,
   compact = false,
 }) => {
+  const { t } = useTranslation();
   if (compact) {
     return (
       <View style={styles.compactIndicator}>
@@ -187,7 +190,7 @@ export const VerifiedProfessionalIndicator: React.FC<VerifiedProfessionalIndicat
           iconOnly
         />
         {isVerified && (
-          <Text style={styles.compactText}>Medical Professional</Text>
+          <Text style={styles.compactText}>{t('medicalProfessional.title')}</Text>
         )}
       </View>
     );
@@ -211,7 +214,7 @@ export const VerifiedProfessionalIndicator: React.FC<VerifiedProfessionalIndicat
           )}
           {professionalInfo.licenseNumber && (
             <Text style={styles.licenseText}>
-              License: {professionalInfo.licenseNumber}
+              {t('medicalProfessional.license')}: {professionalInfo.licenseNumber}
             </Text>
           )}
           {professionalInfo.hospitalAffiliation && (

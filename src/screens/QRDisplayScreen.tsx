@@ -22,6 +22,7 @@ import { LoadingOverlay } from '../components/common';
 import { profileService } from '../services';
 import { Button, Card, H3, Body, BodySmall } from '../components/ui';
 import { colors, spacing, borderRadius, typography, shadows } from '../theme';
+import { useTranslation } from 'react-i18next';
 
 interface QRDisplayScreenProps {
   navigation: any;
@@ -36,6 +37,7 @@ interface QRDisplayScreenProps {
 const QRDisplayScreen: React.FC<QRDisplayScreenProps> = ({ navigation, route }) => {
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -99,7 +101,7 @@ const QRDisplayScreen: React.FC<QRDisplayScreenProps> = ({ navigation, route }) 
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
-        <LoadingOverlay visible={true} message="Loading QR code..." />
+        <LoadingOverlay visible={true} message={t('qr.loadingQR')} />
       </SafeAreaView>
     );
   }
@@ -112,7 +114,7 @@ const QRDisplayScreen: React.FC<QRDisplayScreenProps> = ({ navigation, route }) 
           <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
             <Ionicons name="close" size={24} color={colors.text.primary} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>QR Code</Text>
+          <Text style={styles.headerTitle}>{t('qr.qrCode')}</Text>
           <View style={styles.placeholder} />
         </View>
 
@@ -120,14 +122,14 @@ const QRDisplayScreen: React.FC<QRDisplayScreenProps> = ({ navigation, route }) 
           <View style={styles.errorIconContainer}>
             <Ionicons name="warning" size={40} color={colors.medical.emergency} />
           </View>
-          <H3 style={styles.errorTitle}>Unable to Display QR Code</H3>
+          <H3 style={styles.errorTitle}>{t('qr.unableToDisplayQR')}</H3>
           <Body color="secondary" align="center" style={styles.errorMessage}>
-            {error || 'Profile data is required to generate your emergency QR code.'}
+            {error || t('qr.profileDataRequired')}
           </Body>
           
           <View style={styles.errorActions}>
             <Button
-              title="Retry"
+              title={t('common.retry')}
               onPress={loadProfile}
               variant="danger"
               icon="refresh"
@@ -135,7 +137,7 @@ const QRDisplayScreen: React.FC<QRDisplayScreenProps> = ({ navigation, route }) 
             
             {!profileId && ( // Only show edit button for current user
               <Button
-                title="Edit Profile"
+                title={t('profile.editProfile')}
                 onPress={handleEditProfile}
                 variant="outline"
                 icon="person-circle"
@@ -155,7 +157,7 @@ const QRDisplayScreen: React.FC<QRDisplayScreenProps> = ({ navigation, route }) 
           <Ionicons name="close" size={24} color={colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>
-          {emergencyMode ? 'Emergency QR Code' : 'My QR Code'}
+          {emergencyMode ? t('qr.emergencyQRCode') : t('qr.myQRCode')}
         </Text>
         <TouchableOpacity style={styles.headerEditButton} onPress={handleEditProfile}>
           <Ionicons name="create" size={20} color={colors.primary.main} />

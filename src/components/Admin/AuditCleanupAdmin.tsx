@@ -11,6 +11,7 @@ import {
 import { auditRetentionManager, CleanupResult } from '../../utils/auditRetention';
 import { auditCleanupService } from '../../services/auditCleanupService';
 import { colors, spacing } from '../../theme';
+import { useTranslation } from 'react-i18next';
 
 interface AuditCleanupAdminProps {
   onClose?: () => void;
@@ -41,6 +42,7 @@ export const AuditCleanupAdmin: React.FC<AuditCleanupAdminProps> = ({ onClose })
   const [retentionStatus, setRetentionStatus] = useState<RetentionStatus | null>(null);
   const [lastCleanupResult, setLastCleanupResult] = useState<CleanupResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     loadRetentionStatus();
@@ -56,7 +58,7 @@ export const AuditCleanupAdmin: React.FC<AuditCleanupAdminProps> = ({ onClose })
       
     } catch (err: any) {
       console.error('Error loading retention status:', err);
-      setError('Failed to load retention status');
+      setError(t('admin.failedLoadRetentionStatus'));
     } finally {
       setLoading(false);
     }
@@ -64,12 +66,12 @@ export const AuditCleanupAdmin: React.FC<AuditCleanupAdminProps> = ({ onClose })
 
   const handleManualCleanup = async () => {
     Alert.alert(
-      'Run Audit Log Cleanup',
-      'This will permanently delete old audit logs according to the retention policy. This action cannot be undone.\n\nContinue?',
+      t('admin.runAuditCleanup'),
+      t('admin.cleanupWarningMessage'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Run Cleanup',
+          text: t('admin.runCleanup'),
           style: 'destructive',
           onPress: executeCleanup
         }
@@ -86,13 +88,13 @@ export const AuditCleanupAdmin: React.FC<AuditCleanupAdminProps> = ({ onClose })
       
       if (result.success) {
         Alert.alert(
-          'Cleanup Completed',
-          `Successfully deleted ${result.deletedCount} audit logs.\n\nExecution time: ${result.executionTimeMs}ms`
+          t('admin.cleanupCompleted'),
+          t('admin.cleanupSuccessMessage', { count: result.deletedCount, time: result.executionTimeMs })
         );
       } else {
         Alert.alert(
-          'Cleanup Failed',
-          `Cleanup encountered errors:\n\n${result.errors.join('\n')}`
+          t('admin.cleanupFailed'),
+          t('admin.cleanupFailedMessage')
         );
       }
       
@@ -101,7 +103,7 @@ export const AuditCleanupAdmin: React.FC<AuditCleanupAdminProps> = ({ onClose })
       
     } catch (error: any) {
       console.error('Cleanup execution error:', error);
-      Alert.alert('Error', 'Failed to execute cleanup: ' + error.message);
+      Alert.alert(t('common.error'), t('admin.failedExecuteCleanup'));
     } finally {
       setCleanupLoading(false);
     }
@@ -127,7 +129,7 @@ export const AuditCleanupAdmin: React.FC<AuditCleanupAdminProps> = ({ onClose })
     return (
       <View style={styles.centerContainer}>
         <ActivityIndicator size="large" color={colors.primary.main} />
-        <Text style={styles.loadingText}>Loading retention status...</Text>
+        <Text style={styles.loadingText}>{t('admin.loadingRetentionStatus')}</Text>
       </View>
     );
   }
@@ -137,7 +139,7 @@ export const AuditCleanupAdmin: React.FC<AuditCleanupAdminProps> = ({ onClose })
       <View style={styles.centerContainer}>
         <Text style={styles.errorText}>❌ {error}</Text>
         <TouchableOpacity style={styles.retryButton} onPress={loadRetentionStatus}>
-          <Text style={styles.retryButtonText}>Retry</Text>
+          <Text style={styles.retryButtonText}>{t('common.retry')}</Text>
         </TouchableOpacity>
       </View>
     );
@@ -147,7 +149,7 @@ export const AuditCleanupAdmin: React.FC<AuditCleanupAdminProps> = ({ onClose })
     <ScrollView style={styles.container}>
       {onClose && (
         <View style={styles.header}>
-          <Text style={styles.title}>Audit Log Cleanup Admin</Text>
+          <Text style={styles.title}>{t('admin.auditLogCleanupAdmin')}</Text>
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
             <Text style={styles.closeButtonText}>✕</Text>
           </TouchableOpacity>
@@ -158,27 +160,27 @@ export const AuditCleanupAdmin: React.FC<AuditCleanupAdminProps> = ({ onClose })
         <>
           {/* Retention Policy */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>📋 Retention Policy</Text>
+            <Text style={styles.sectionTitle}>{t('admin.retentionPolicy')}</Text>
             <View style={styles.policyInfo}>
               <Text style={styles.policyText}>
-                Retention Period: {retentionStatus.policy.retentionDays} days
+                {t('admin.retentionPeriod')} {retentionStatus.policy.retentionDays} {t('common.days')}
               </Text>
               <Text style={styles.policyText}>
-                Max Logs per Profile: {retentionStatus.policy.maxLogsPerProfile}
+                {t('admin.maxLogsPerProfile')} {retentionStatus.policy.maxLogsPerProfile}
               </Text>
             </View>
           </View>
 
           {/* Current Status */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>📊 Current Status</Text>
+            <Text style={styles.sectionTitle}>{t('admin.currentStatus')}</Text>
             <View style={styles.statusInfo}>
               <Text style={styles.statusText}>
-                Total Audit Logs: {retentionStatus.current.totalLogs}
+                {t('admin.totalAuditLogs')} {retentionStatus.current.totalLogs}
               </Text>
               {retentionStatus.current.oldestLogAge !== undefined && (
                 <Text style={styles.statusText}>
-                  Oldest Log: {retentionStatus.current.oldestLogAge} days ago
+                  {t('admin.oldestLog')} {retentionStatus.current.oldestLogAge} {t('admin.daysAgo')}
                 </Text>
               )}
               <View style={[
@@ -186,7 +188,7 @@ export const AuditCleanupAdmin: React.FC<AuditCleanupAdminProps> = ({ onClose })
                 { backgroundColor: retentionStatus.current.cleanupNeeded ? colors.status.warning.main : colors.status.success.main }
               ]}>
                 <Text style={styles.statusBadgeText}>
-                  {retentionStatus.current.cleanupNeeded ? 'Cleanup Needed' : 'No Cleanup Needed'}
+                  {retentionStatus.current.cleanupNeeded ? t('admin.cleanupNeeded') : t('admin.noCleanupNeeded')}
                 </Text>
               </View>
               {retentionStatus.current.reason && (
@@ -199,22 +201,22 @@ export const AuditCleanupAdmin: React.FC<AuditCleanupAdminProps> = ({ onClose })
 
           {/* Cleanup History */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>🕒 Cleanup History</Text>
+            <Text style={styles.sectionTitle}>{t('admin.cleanupHistory')}</Text>
             <View style={styles.historyInfo}>
               {retentionStatus.status.lastCleanupRun ? (
                 <Text style={styles.historyText}>
-                  Last Run: {formatDate(retentionStatus.status.lastCleanupRun)}
+                  {t('admin.lastRun')} {formatDate(retentionStatus.status.lastCleanupRun)}
                 </Text>
               ) : (
                 <Text style={styles.historyText}>
-                  No previous cleanup runs recorded
+                  {t('admin.noPreviousCleanups')}
                 </Text>
               )}
               <Text style={styles.historyText}>
-                Next Recommended: {formatDate(retentionStatus.status.nextRecommendedRun)}
+                {t('admin.nextRecommended')} {formatDate(retentionStatus.status.nextRecommendedRun)}
               </Text>
               <Text style={styles.historyText}>
-                Status: {retentionStatus.status.isCleanupRunning ? 'Running' : 'Idle'}
+                {t('common.status')} {retentionStatus.status.isCleanupRunning ? t('common.running') : t('common.idle')}
               </Text>
             </View>
           </View>
@@ -222,29 +224,29 @@ export const AuditCleanupAdmin: React.FC<AuditCleanupAdminProps> = ({ onClose })
           {/* Last Cleanup Result */}
           {lastCleanupResult && (
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>📈 Last Cleanup Result</Text>
+              <Text style={styles.sectionTitle}>{t('admin.lastCleanupResult')}</Text>
               <View style={styles.resultInfo}>
                 <Text style={[
                   styles.resultText,
                   { color: lastCleanupResult.success ? colors.status.success.main : colors.status.error.main }
                 ]}>
-                  {lastCleanupResult.success ? '✅ Success' : '❌ Failed'}
+                  {lastCleanupResult.success ? t('common.success') : t('common.failed')}
                 </Text>
                 <Text style={styles.resultText}>
-                  Deleted: {lastCleanupResult.deletedCount} logs
+                  {t('admin.deleted')} {lastCleanupResult.deletedCount} {t('admin.logs')}
                 </Text>
                 <Text style={styles.resultText}>
-                  Profiles Processed: {lastCleanupResult.profilesProcessed}
+                  {t('admin.profilesProcessed')} {lastCleanupResult.profilesProcessed}
                 </Text>
                 <Text style={styles.resultText}>
-                  Execution Time: {formatDuration(lastCleanupResult.executionTimeMs)}
+                  {t('admin.executionTime')} {formatDuration(lastCleanupResult.executionTimeMs)}
                 </Text>
                 <Text style={styles.resultText}>
-                  Timestamp: {formatDate(lastCleanupResult.timestamp)}
+                  {t('admin.timestamp')} {formatDate(lastCleanupResult.timestamp)}
                 </Text>
                 {lastCleanupResult.errors.length > 0 && (
                   <View style={styles.errorContainer}>
-                    <Text style={styles.errorLabel}>Errors:</Text>
+                    <Text style={styles.errorLabel}>{t('common.errors')}</Text>
                     {lastCleanupResult.errors.map((error, index) => (
                       <Text key={index} style={styles.errorItem}>• {error}</Text>
                     ))}
@@ -256,7 +258,7 @@ export const AuditCleanupAdmin: React.FC<AuditCleanupAdminProps> = ({ onClose })
 
           {/* Actions */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>🔧 Actions</Text>
+            <Text style={styles.sectionTitle}>{t('admin.actions')}</Text>
             <View style={styles.actionButtons}>
               <TouchableOpacity
                 style={[
@@ -270,7 +272,7 @@ export const AuditCleanupAdmin: React.FC<AuditCleanupAdminProps> = ({ onClose })
                 {cleanupLoading ? (
                   <ActivityIndicator size="small" color={colors.text.inverse} />
                 ) : (
-                  <Text style={styles.actionButtonText}>🗑️ Run Manual Cleanup</Text>
+                  <Text style={styles.actionButtonText}>{t('admin.runManualCleanup')}</Text>
                 )}
               </TouchableOpacity>
 
@@ -278,20 +280,16 @@ export const AuditCleanupAdmin: React.FC<AuditCleanupAdminProps> = ({ onClose })
                 style={[styles.actionButton, styles.refreshButton]}
                 onPress={loadRetentionStatus}
               >
-                <Text style={styles.actionButtonText}>🔄 Refresh Status</Text>
+                <Text style={styles.actionButtonText}>{t('admin.refreshStatus')}</Text>
               </TouchableOpacity>
             </View>
           </View>
 
           {/* Information */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>ℹ️ Information</Text>
+            <Text style={styles.sectionTitle}>{t('admin.information')}</Text>
             <Text style={styles.infoText}>
-              • Audit logs are automatically cleaned up based on retention policies
-              {'\n'}• Logs older than {retentionStatus.policy.retentionDays} days are deleted
-              {'\n'}• Only the most recent {retentionStatus.policy.maxLogsPerProfile} logs are kept per profile
-              {'\n'}• Cleanup operations are logged for audit purposes
-              {'\n'}• This process is irreversible - deleted logs cannot be recovered
+              {t('admin.cleanupInfoText', { days: retentionStatus.policy.retentionDays, maxLogs: retentionStatus.policy.maxLogsPerProfile })}
             </Text>
           </View>
         </>

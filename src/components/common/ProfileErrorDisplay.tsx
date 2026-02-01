@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 interface ProfileError {
   code: string;
@@ -29,6 +30,7 @@ export const ProfileErrorDisplay: React.FC<ProfileErrorDisplayProps> = ({
   showDetails = false,
   style,
 }) => {
+  const { t } = useTranslation();
   if (!error) return null;
 
   const getErrorIcon = () => {
@@ -71,32 +73,32 @@ export const ProfileErrorDisplay: React.FC<ProfileErrorDisplayProps> = ({
   const showDetailsModal = () => {
     const details = JSON.stringify(error.details, null, 2);
     Alert.alert(
-      'Error Details',
-      `Code: ${error.code}\nMessage: ${error.message}\n\nDetails:\n${details}`,
-      [{ text: 'OK' }]
+      t('errors.errorDetails'),
+      `${t('errors.code')}: ${error.code}\n${t('errors.message')}: ${error.message}\n\n${t('common.details')}:\n${details}`,
+      [{ text: t('common.ok') }]
     );
   };
 
   const getErrorSuggestion = () => {
     switch (error.code) {
       case 'VALIDATION_ERROR':
-        return 'Please check all required fields and try again.';
+        return t('errors.suggestions.validation');
       case 'NETWORK_ERROR':
-        return 'Check your internet connection and try again.';
+        return t('errors.suggestions.network');
       case 'PERMISSION_ERROR':
-        return 'You may need to log in again to perform this action.';
+        return t('errors.suggestions.permission');
       case 'PROFILE_NOT_FOUND':
-        return 'The profile may have been deleted. Try refreshing the page.';
+        return t('errors.suggestions.profileNotFound');
       case 'PASSWORD_REQUIRED':
-        return 'This profile requires password verification to access.';
+        return t('errors.suggestions.passwordRequired');
       case 'INVALID_PASSWORD':
-        return 'The password you entered is incorrect.';
+        return t('errors.suggestions.invalidPassword');
       case 'SESSION_EXPIRED':
-        return 'Your session has expired. Please log in again.';
+        return t('errors.suggestions.sessionExpired');
       case 'DATA_CORRUPTION':
-        return 'There may be an issue with the data. Contact support if this persists.';
+        return t('errors.suggestions.dataCorruption');
       default:
-        return 'Try again in a moment. Contact support if the problem continues.';
+        return t('errors.suggestions.default');
     }
   };
 
@@ -106,11 +108,11 @@ export const ProfileErrorDisplay: React.FC<ProfileErrorDisplayProps> = ({
         <Ionicons name={getErrorIcon()} size={24} color={getErrorColor()} />
         <View style={styles.headerText}>
           <Text style={[styles.title, { color: getErrorColor() }]}>
-            {error.severity === 'error' ? 'Error' : 
-             error.severity === 'warning' ? 'Warning' : 'Information'}
+            {error.severity === 'error' ? t('errors.error') : 
+             error.severity === 'warning' ? t('errors.warning') : t('errors.information')}
           </Text>
           {error.field && (
-            <Text style={styles.fieldName}>in {error.field}</Text>
+            <Text style={styles.fieldName}>{t('errors.inField', { field: error.field })}</Text>
           )}
         </View>
       </View>
@@ -122,20 +124,20 @@ export const ProfileErrorDisplay: React.FC<ProfileErrorDisplayProps> = ({
       <View style={styles.actions}>
         {onDismiss && (
           <TouchableOpacity style={styles.dismissButton} onPress={onDismiss}>
-            <Text style={styles.dismissButtonText}>Dismiss</Text>
+            <Text style={styles.dismissButtonText}>{t('common.dismiss')}</Text>
           </TouchableOpacity>
         )}
 
         {showDetails && error.details && (
           <TouchableOpacity style={styles.detailsButton} onPress={showDetailsModal}>
-            <Text style={styles.detailsButtonText}>Details</Text>
+            <Text style={styles.detailsButtonText}>{t('common.details')}</Text>
           </TouchableOpacity>
         )}
 
         {onRetry && getRetryable() && (
           <TouchableOpacity style={styles.retryButton} onPress={onRetry}>
             <Ionicons name="refresh" size={16} color="white" />
-            <Text style={styles.retryButtonText}>Retry</Text>
+            <Text style={styles.retryButtonText}>{t('common.retry')}</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -160,6 +162,7 @@ export const ProfileSuccessDisplay: React.FC<ProfileSuccessDisplayProps> = ({
   autoHide = true,
   style,
 }) => {
+  const { t } = useTranslation();
   React.useEffect(() => {
     if (message && autoHide && onDismiss) {
       const timer = setTimeout(onDismiss, 3000);
@@ -173,7 +176,7 @@ export const ProfileSuccessDisplay: React.FC<ProfileSuccessDisplayProps> = ({
     <View style={[styles.successContainer, style]}>
       <View style={styles.successHeader}>
         <Ionicons name="checkmark-circle" size={24} color="#4ECDC4" />
-        <Text style={styles.successTitle}>Success</Text>
+        <Text style={styles.successTitle}>{t('common.success')}</Text>
       </View>
       <Text style={styles.successMessage}>{message}</Text>
       {onDismiss && (

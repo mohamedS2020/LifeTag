@@ -18,6 +18,7 @@ import { useAuth } from '../context/AuthContext';
 import { QRScanner } from '../components/QR';
 import { EmergencyQRData } from '../services/qrService';
 import { colors, spacing } from '../theme';
+import { useTranslation } from 'react-i18next';
 
 interface QRScannerScreenProps {
   navigation: any;
@@ -32,6 +33,7 @@ interface QRScannerScreenProps {
 const QRScannerScreen: React.FC<QRScannerScreenProps> = ({ navigation, route }) => {
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const [scanResult, setScanResult] = useState<{
     qrData: string;
     emergencyData: EmergencyQRData | null;
@@ -48,19 +50,19 @@ const QRScannerScreen: React.FC<QRScannerScreenProps> = ({ navigation, route }) 
       if (emergencyData.hasFullProfile && emergencyData.profileId) {
         // This QR code has a full profile available in the app
         Alert.alert(
-          'Emergency Information Found',
-          `Found emergency information for ${emergencyData.name}. Would you like to view the full profile or just the emergency summary?`,
+          t('qr.emergencyInfoFound'),
+          t('qr.foundEmergencyInfoFor', { name: emergencyData.name }),
           [
             {
-              text: 'Emergency Only',
+              text: t('qr.emergencyOnly'),
               onPress: () => navigateToEmergencyInfo(emergencyData),
             },
             {
-              text: 'Full Profile',
+              text: t('qr.fullProfile'),
               onPress: () => navigateToFullProfile(emergencyData.profileId!),
             },
             {
-              text: 'Cancel',
+              text: t('common.cancel'),
               style: 'cancel',
               onPress: () => setScanResult(null),
             },
@@ -73,11 +75,11 @@ const QRScannerScreen: React.FC<QRScannerScreenProps> = ({ navigation, route }) 
     } else {
       // Could not parse as emergency QR data
       Alert.alert(
-        'QR Code Scanned',
-        'This QR code does not contain LifeTag emergency information. The raw data has been copied for your reference.',
+        t('qr.qrCodeScanned'),
+        t('qr.notLifeTagQR'),
         [
-          { text: 'Scan Another', onPress: () => setScanResult(null) },
-          { text: 'Close', onPress: handleClose },
+          { text: t('qr.scanAnother'), onPress: () => setScanResult(null) },
+          { text: t('common.close'), onPress: handleClose },
         ]
       );
     }
@@ -103,11 +105,11 @@ const QRScannerScreen: React.FC<QRScannerScreenProps> = ({ navigation, route }) 
 
   const handleError = (error: string) => {
     Alert.alert(
-      'Scanner Error',
+      t('qr.scannerError'),
       error,
       [
-        { text: 'Retry', onPress: () => setScanResult(null) },
-        { text: 'Close', onPress: handleClose },
+        { text: t('common.retry'), onPress: () => setScanResult(null) },
+        { text: t('common.close'), onPress: handleClose },
       ]
     );
   };
@@ -128,7 +130,7 @@ const QRScannerScreen: React.FC<QRScannerScreenProps> = ({ navigation, route }) 
           <Ionicons name="close" size={24} color={colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>
-          {medicalProfessionalMode ? 'Medical Scanner' : 'Scan QR Code'}
+          {medicalProfessionalMode ? t('qr.medicalScanner') : t('qr.scanTitle')}
         </Text>
         <View style={styles.placeholder} />
       </View>
@@ -136,20 +138,20 @@ const QRScannerScreen: React.FC<QRScannerScreenProps> = ({ navigation, route }) 
       {user?.userType === 'medical_professional' && user?.isVerified && (
         <View style={styles.professionalBanner}>
           <Ionicons name="medical" size={20} color={colors.status.success.main} />
-          <Text style={styles.professionalText}>Verified Medical Professional Access</Text>
+          <Text style={styles.professionalText}>{t('qr.verifiedMedicalAccess')}</Text>
         </View>
       )}
 
       <View style={styles.instructionsContainer}>
         <Text style={styles.instructionsTitle}>
           {medicalProfessionalMode 
-            ? 'Scan Emergency QR Code' 
-            : 'Point camera at LifeTag QR code'}
+            ? t('qr.scanEmergencyQR') 
+            : t('qr.pointCameraAtQR')}
         </Text>
         <Text style={styles.instructionsText}>
           {medicalProfessionalMode
-            ? 'As a verified medical professional, you can access full emergency profiles when available.'
-            : 'Scanning will display emergency medical information including allergies, blood type, and emergency contacts.'}
+            ? t('qr.professionalScanAccess')
+            : t('qr.scanDisplaysInfo')}
         </Text>
       </View>
 
@@ -163,7 +165,7 @@ const QRScannerScreen: React.FC<QRScannerScreenProps> = ({ navigation, route }) 
         <View style={styles.footerContent}>
           <Ionicons name="shield-checkmark" size={16} color={colors.text.secondary} />
           <Text style={styles.footerText}>
-            Scan results are logged for security and audit purposes
+            {t('qr.scanResultsLogged')}
           </Text>
         </View>
         
@@ -173,7 +175,7 @@ const QRScannerScreen: React.FC<QRScannerScreenProps> = ({ navigation, route }) 
             onPress={() => navigation.navigate('ProfileAccessHistoryScreen')}
           >
             <Ionicons name="time" size={16} color={colors.primary.main} />
-            <Text style={styles.historyButtonText}>View Scan History</Text>
+            <Text style={styles.historyButtonText}>{t('qr.viewScanHistory')}</Text>
           </TouchableOpacity>
         )}
       </View>

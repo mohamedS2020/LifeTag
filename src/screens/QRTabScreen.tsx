@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { colors, spacing } from '../theme';
 import { Card, H1, Body, Caption, Badge } from '../components/ui';
@@ -22,6 +23,7 @@ interface QRTabScreenProps {
 }
 
 const QRTabScreen: React.FC<QRTabScreenProps> = ({ navigation }) => {
+  const { t } = useTranslation();
   const { user } = useAuth();
 
   const handleShowMyQR = () => {
@@ -41,8 +43,8 @@ const QRTabScreen: React.FC<QRTabScreenProps> = ({ navigation }) => {
           <View style={styles.iconContainer}>
             <Ionicons name="qr-code" size={48} color={colors.primary.main} />
           </View>
-          <H1 style={styles.title}>QR Code Features</H1>
-          <Body style={styles.subtitle}>Quick access to emergency QR codes</Body>
+          <H1 style={styles.title}>{t('qr.features')}</H1>
+          <Body style={styles.subtitle}>{t('qr.quickAccess')}</Body>
         </Animated.View>
 
         <View style={styles.actionsContainer}>
@@ -53,8 +55,8 @@ const QRTabScreen: React.FC<QRTabScreenProps> = ({ navigation }) => {
                   <Ionicons name="qr-code" size={28} color={colors.medical.verified} />
                 </View>
                 <View style={styles.actionContent}>
-                  <Text style={styles.actionTitle}>Show My QR Code</Text>
-                  <Caption>Display your emergency information QR code</Caption>
+                  <Text style={styles.actionTitle}>{t('qr.showMyQR')}</Text>
+                  <Caption>{t('qr.showMyQRSubtitle')}</Caption>
                 </View>
                 <Ionicons name="chevron-forward" size={20} color={colors.text.tertiary} />
               </Card>
@@ -68,10 +70,10 @@ const QRTabScreen: React.FC<QRTabScreenProps> = ({ navigation }) => {
                   <Ionicons name="scan" size={28} color={colors.primary.main} />
                 </View>
                 <View style={styles.actionContent}>
-                  <Text style={styles.actionTitle}>Scan QR Code</Text>
+                  <Text style={styles.actionTitle}>{t('qr.scanQR')}</Text>
                   <Caption>
-                    Scan emergency information from others
-                    {user?.userType === 'medical_professional' && user?.isVerified && ' (Professional Mode)'}
+                    {t('qr.scanOthers')}
+                    {user?.userType === 'medical_professional' && user?.isVerified && ` (${t('qr.professionalMode')})`}
                   </Caption>
                 </View>
                 <Ionicons name="chevron-forward" size={20} color={colors.text.tertiary} />
@@ -85,10 +87,10 @@ const QRTabScreen: React.FC<QRTabScreenProps> = ({ navigation }) => {
             <Card variant="filled" style={styles.professionalSection}>
               <View style={styles.professionalBadge}>
                 <Ionicons name="medical" size={20} color={colors.medical.verified} />
-                <Text style={styles.professionalText}>Medical Professional Features</Text>
+                <Text style={styles.professionalText}>{t('qr.medicalProFeatures')}</Text>
               </View>
               <Caption style={styles.professionalDescription}>
-                As a verified medical professional, you have enhanced access to full emergency profiles when scanning QR codes.
+                {t('qr.enhancedAccess')}
               </Caption>
             </Card>
           </Animated.View>

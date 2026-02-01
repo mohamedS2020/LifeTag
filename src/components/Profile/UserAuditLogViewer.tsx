@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing } from '../../theme';
 import { useAuth } from '../../context/AuthContext';
@@ -34,6 +35,7 @@ interface AccessorInfo {
  * Shows regular users who has accessed their profile
  */
 const UserAuditLogViewer: React.FC<UserAuditLogViewerProps> = ({ profileId }) => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [accessorInfos, setAccessorInfos] = useState<{ [userId: string]: AccessorInfo }>({});
@@ -56,7 +58,7 @@ const UserAuditLogViewer: React.FC<UserAuditLogViewerProps> = ({ profileId }) =>
         const logEntry = logs.find(log => log.accessedBy === userId);
         if (logEntry?.accessorType === 'admin') {
           newAccessorInfos[userId] = {
-            name: 'Admin',
+            name: t('admin.administrator'),
             isMedicalProfessional: false,
           };
           continue;
@@ -125,11 +127,11 @@ const UserAuditLogViewer: React.FC<UserAuditLogViewerProps> = ({ profileId }) =>
         setAuditLogs(filteredLogs);
         await fetchAccessorInfos(filteredLogs);
       } else {
-        Alert.alert('Error', 'Failed to load access history');
+        Alert.alert(t('common.error'), t('profile.failedLoadAccessHistory'));
       }
     } catch (error) {
       console.error('Error fetching audit logs:', error);
-      Alert.alert('Error', 'Failed to load access history');
+      Alert.alert(t('common.error'), t('profile.failedLoadAccessHistory'));
     } finally {
       setLoading(false);
     }
@@ -144,7 +146,7 @@ const UserAuditLogViewer: React.FC<UserAuditLogViewerProps> = ({ profileId }) =>
    */
   const renderAuditLogItem = ({ item }: { item: AuditLog }) => {
     const accessorInfo = accessorInfos[item.accessedBy] || {
-      name: item.accessedBy === 'anonymous' ? 'Anonymous User' : `User (${item.accessedBy.substring(0, 8)}...)`,
+      name: item.accessedBy === 'anonymous' ? t('profile.anonymousUser') : `${t('profile.user')} (${item.accessedBy.substring(0, 8)}...)`,
       isMedicalProfessional: false,
     };
 
@@ -164,13 +166,13 @@ const UserAuditLogViewer: React.FC<UserAuditLogViewerProps> = ({ profileId }) =>
     const getAccessTypeLabel = () => {
       switch (item.accessType) {
         case 'qr_scan':
-          return 'QR Code Scan';
+          return t('profile.qrCodeScan');
         case 'full_profile':
-          return 'Full Profile View';
+          return t('profile.fullProfileView');
         case 'emergency_access':
-          return 'Emergency Access';
+          return t('profile.emergencyAccess');
         default:
-          return 'Profile Access';
+          return t('profile.profileAccess');
       }
     };
 
@@ -181,10 +183,10 @@ const UserAuditLogViewer: React.FC<UserAuditLogViewerProps> = ({ profileId }) =>
       const diffHours = Math.floor(diffMs / 3600000);
       const diffDays = Math.floor(diffMs / 86400000);
 
-      if (diffMins < 1) return 'Just now';
-      if (diffMins < 60) return `${diffMins} minutes ago`;
-      if (diffHours < 24) return `${diffHours} hours ago`;
-      if (diffDays < 7) return `${diffDays} days ago`;
+      if (diffMins < 1) return t('time.justNow');
+      if (diffMins < 60) return t('time.minutesAgo', { count: diffMins });
+      if (diffHours < 24) return t('time.hoursAgo', { count: diffHours });
+      if (diffDays < 7) return t('time.daysAgo', { count: diffDays });
       
       return date.toLocaleDateString('en-US', {
         month: 'short',
@@ -243,7 +245,7 @@ const UserAuditLogViewer: React.FC<UserAuditLogViewerProps> = ({ profileId }) =>
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary.main} />
-        <Text style={styles.loadingText}>Loading access history...</Text>
+        <Text style={styles.loadingText}>{t('profile.loadingAccessHistory')}</Text>
       </View>
     );
   }
@@ -252,9 +254,9 @@ const UserAuditLogViewer: React.FC<UserAuditLogViewerProps> = ({ profileId }) =>
     return (
       <View style={styles.emptyStateContainer}>
         <Ionicons name="shield-checkmark-outline" size={64} color={colors.status.success.main} />
-        <Text style={styles.emptyStateTitle}>No Profile Access Yet</Text>
+        <Text style={styles.emptyStateTitle}>{t('profile.noProfileAccessYet')}</Text>
         <Text style={styles.emptyStateText}>
-          Your profile access history will appear here when others view your profile.
+          {t('profile.profileAccessHistoryWillAppear')}
         </Text>
       </View>
     );
@@ -262,9 +264,9 @@ const UserAuditLogViewer: React.FC<UserAuditLogViewerProps> = ({ profileId }) =>
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Profile Access History</Text>
+      <Text style={styles.title}>{t('profile.accessHistory')}</Text>
       <Text style={styles.subtitle}>
-        People who have accessed your profile ({auditLogs.length} total)
+        {t('profile.peopleWhoAccessedProfile', { count: auditLogs.length })}
       </Text>
       
       <FlatList

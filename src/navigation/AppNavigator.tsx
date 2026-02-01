@@ -11,6 +11,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity, Alert } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { LoginScreen, RegisterScreen, MedicalProfessionalRegister } from '../components/Auth';
 import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
@@ -89,12 +90,13 @@ const Tab = createBottomTabNavigator<TabParamList>();
 
 // Loading Screen Component
 const LoadingScreen: React.FC = () => {
+  const { t } = useTranslation();
   return (
     <View style={styles.loadingContainer}>
       <Text style={styles.appTitle}>LifeTag</Text>
-      <Text style={styles.appSubtitle}>Emergency Medical Information System</Text>
+      <Text style={styles.appSubtitle}>{t('home.emergencySystem')}</Text>
       <ActivityIndicator size="large" color={colors.primary.main} style={styles.spinner} />
-      <Text style={styles.loadingText}>Loading...</Text>
+      <Text style={styles.loadingText}>{t('common.loading')}</Text>
     </View>
   );
 };
@@ -114,6 +116,7 @@ const QRPlaceholderScreen = () => <PlaceholderScreen title="QR Scanner" />;
 
 // Authenticated Tab Navigator with conditional medical professional and admin features
 const AuthenticatedTabs: React.FC = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const isVerifiedMedicalProfessional = user?.userType === 'medical_professional' && user?.isVerified;
   const isAdmin = user?.userType === 'admin';
@@ -175,7 +178,7 @@ const AuthenticatedTabs: React.FC = () => {
           name="Home" 
           component={HomeScreen}
           options={{ 
-            tabBarLabel: 'Home',
+            tabBarLabel: t('home.title'),
             title: 'LifeTag'
           }}
         />
@@ -185,8 +188,8 @@ const AuthenticatedTabs: React.FC = () => {
           name="QR" 
           component={QRTabScreen}
           options={{ 
-            tabBarLabel: 'QR Code',
-            title: 'QR Scanner'
+            tabBarLabel: t('qr.title'),
+            title: t('qr.scanTitle')
           }}
         />
       )}
@@ -197,8 +200,8 @@ const AuthenticatedTabs: React.FC = () => {
           name="MedPro" 
           component={MedicalProfessionalScreen}
           options={{ 
-            tabBarLabel: 'Medical',
-            title: 'Medical Professional Dashboard'
+            tabBarLabel: t('medicalProfessional.title'),
+            title: t('medicalProfessional.dashboard')
           }}
         />
       )}
@@ -209,8 +212,8 @@ const AuthenticatedTabs: React.FC = () => {
           name="Admin" 
           component={AdminScreen}
           options={{ 
-            tabBarLabel: 'Admin',
-            title: 'Admin Dashboard'
+            tabBarLabel: t('admin.title'),
+            title: t('admin.dashboard')
           }}
         />
       )}
@@ -221,8 +224,8 @@ const AuthenticatedTabs: React.FC = () => {
           name="Settings" 
           component={SettingsScreen}
           options={{ 
-            tabBarLabel: 'Settings',
-            title: 'Settings'
+            tabBarLabel: t('settings.title'),
+            title: t('settings.title')
           }}
         />
       )}

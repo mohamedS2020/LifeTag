@@ -10,6 +10,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { passwordService } from '../../services';
 import { colors, spacing } from '../../theme';
@@ -33,6 +34,7 @@ export const PasswordVerificationModal: React.FC<PasswordVerificationModalProps>
   profilePassword,
   userFirstName = 'User',
 }) => {
+  const { t } = useTranslation();
   const [password, setPassword] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -79,7 +81,7 @@ export const PasswordVerificationModal: React.FC<PasswordVerificationModalProps>
 
   const handleVerify = async () => {
     if (!password.trim()) {
-      Alert.alert('Error', 'Please enter the profile password');
+      Alert.alert(t('common.error'), t('passwordModal.pleaseEnterPassword'));
       return;
     }
 
@@ -100,8 +102,8 @@ export const PasswordVerificationModal: React.FC<PasswordVerificationModalProps>
         onVerified();
         
         Alert.alert(
-          'Access Granted',
-          `You now have temporary access to ${userFirstName}'s profile for ${timeLeft} minutes.`
+          t('passwordModal.accessGranted'),
+          t('passwordModal.tempAccessGranted', { name: userFirstName, minutes: timeLeft })
         );
       } else {
         const newAttemptCount = attemptCount + 1;
@@ -109,14 +111,14 @@ export const PasswordVerificationModal: React.FC<PasswordVerificationModalProps>
         
         if (newAttemptCount >= 3) {
           Alert.alert(
-            'Access Denied',
-            'Too many incorrect attempts. Please try again later.',
-            [{ text: 'OK', onPress: onCancel }]
+            t('passwordModal.accessDenied'),
+            t('passwordModal.tooManyAttempts'),
+            [{ text: t('common.ok'), onPress: onCancel }]
           );
         } else {
           Alert.alert(
-            'Incorrect Password',
-            `Incorrect password. ${3 - newAttemptCount} attempts remaining.`
+            t('passwordModal.incorrectPassword'),
+            t('passwordModal.attemptsRemaining', { count: 3 - newAttemptCount })
           );
         }
         
@@ -124,7 +126,7 @@ export const PasswordVerificationModal: React.FC<PasswordVerificationModalProps>
       }
     } catch (error) {
       console.error('Password verification error:', error);
-      Alert.alert('Error', 'An error occurred while verifying the password');
+      Alert.alert(t('common.error'), t('passwordModal.verificationError'));
     } finally {
       setIsVerifying(false);
     }
@@ -166,9 +168,9 @@ export const PasswordVerificationModal: React.FC<PasswordVerificationModalProps>
             {/* Header */}
             <View style={styles.header}>
               <Ionicons name="lock-closed" size={32} color="#FF6B6B" />
-              <Text style={styles.title}>Profile Access Required</Text>
+              <Text style={styles.title}>{t('passwordModal.title')}</Text>
               <Text style={styles.subtitle}>
-                {userFirstName}'s profile is password protected
+                {t('passwordModal.profileProtected', { name: userFirstName })}
               </Text>
             </View>
 
@@ -177,18 +179,18 @@ export const PasswordVerificationModal: React.FC<PasswordVerificationModalProps>
               <View style={styles.accessInfo}>
                 <Ionicons name="time" size={16} color="#4ECDC4" />
                 <Text style={styles.accessText}>
-                  Access expires in {remainingTime} minutes
+                  {t('passwordModal.accessExpiresIn', { minutes: remainingTime })}
                 </Text>
               </View>
             )}
 
             {/* Password Input */}
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Enter Profile Password</Text>
+              <Text style={styles.label}>{t('passwordModal.enterPassword')}</Text>
               <View style={styles.passwordContainer}>
                 <TextInput
                   style={[styles.input, attemptCount >= 3 && styles.inputDisabled]}
-                  placeholder="Profile password"
+                  placeholder={t('passwordModal.passwordPlaceholder')}
                   placeholderTextColor={colors.text.secondary}
                   value={password}
                   onChangeText={setPassword}
@@ -214,8 +216,8 @@ export const PasswordVerificationModal: React.FC<PasswordVerificationModalProps>
               {attemptCount > 0 && (
                 <Text style={styles.attemptWarning}>
                   {attemptCount >= 3
-                    ? 'Too many incorrect attempts'
-                    : `${3 - attemptCount} attempts remaining`}
+                    ? t('passwordModal.tooManyAttemptsShort')
+                    : t('passwordModal.attemptsRemaining', { count: 3 - attemptCount })}
                 </Text>
               )}
             </View>
@@ -227,7 +229,7 @@ export const PasswordVerificationModal: React.FC<PasswordVerificationModalProps>
                 onPress={handleCancel}
                 disabled={isVerifying}
               >
-                <Text style={styles.cancelButtonText}>Cancel</Text>
+                <Text style={styles.cancelButtonText}>{t('common.cancel')}</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -240,15 +242,15 @@ export const PasswordVerificationModal: React.FC<PasswordVerificationModalProps>
                 disabled={attemptCount >= 3 || isVerifying || !password.trim()}
               >
                 <Text style={styles.verifyButtonText}>
-                  {isVerifying ? 'Verifying...' : 'Verify & Access'}
+                  {isVerifying ? t('passwordModal.verifying') : t('passwordModal.verifyAndAccess')}
                 </Text>
               </TouchableOpacity>
             </View>
 
             {/* Help Text */}
             <Text style={styles.helpText}>
-              This password was set by {userFirstName} to protect their medical information.
-              {'\n'}Access will be granted for 30 minutes once verified.
+              {t('passwordModal.helpText', { name: userFirstName })}
+              {'\n'}{t('passwordModal.accessDuration')}
             </Text>
           </View>
         </View>

@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { UserProfile } from '../types';
 import { ProfileForm } from '../components/Profile';
@@ -34,6 +35,7 @@ interface ProfileFormScreenProps {
 }
 
 const ProfileFormScreen: React.FC<ProfileFormScreenProps> = ({ navigation, route }) => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -88,14 +90,14 @@ const ProfileFormScreen: React.FC<ProfileFormScreenProps> = ({ navigation, route
     setSaving(false);
     
     const isCreate = mode === 'create' || !profile;
-    const actionText = isCreate ? 'created' : 'updated';
+    const message = isCreate ? t('profile.profileCreated') : t('profile.profileUpdated');
     
     Alert.alert(
-      'Profile Saved',
-      `Your profile has been ${actionText} successfully.`,
+      t('profile.profileSaved'),
+      message,
       [
         {
-          text: 'OK',
+          text: t('common.ok'),
           onPress: () => {
             if (returnTo) {
               navigation.navigate(returnTo);
@@ -112,20 +114,20 @@ const ProfileFormScreen: React.FC<ProfileFormScreenProps> = ({ navigation, route
     setSaving(false);
     setError(errorMessage);
     Alert.alert(
-      'Save Error',
+      t('profile.saveError'),
       errorMessage,
-      [{ text: 'OK' }]
+      [{ text: t('common.ok') }]
     );
   };
 
   const handleCancel = () => {
     Alert.alert(
-      'Discard Changes',
-      'Are you sure you want to discard your changes?',
+      t('profile.discardChanges'),
+      t('profile.discardConfirm'),
       [
-        { text: 'Keep Editing', style: 'cancel' },
+        { text: t('profile.keepEditing'), style: 'cancel' },
         {
-          text: 'Discard',
+          text: t('profile.discard'),
           style: 'destructive',
           onPress: () => {
             if (returnTo) {
@@ -141,28 +143,28 @@ const ProfileFormScreen: React.FC<ProfileFormScreenProps> = ({ navigation, route
 
   const getScreenTitle = () => {
     if (profileId && profileId !== user?.id) {
-      return 'Edit Profile'; // Medical professional editing someone else's profile
+      return t('profile.editProfile'); // Medical professional editing someone else's profile
     }
     
     const isCreate = mode === 'create' || !profile;
-    return isCreate ? 'Create Profile' : 'Edit Profile';
+    return isCreate ? t('profile.createProfile') : t('profile.editProfile');
   };
 
   const getScreenSubtitle = () => {
     if (profileId && profileId !== user?.id) {
-      return 'Medical professional access';
+      return t('profile.medicalProfessionalAccess');
     }
     
     const isCreate = mode === 'create' || !profile;
     return isCreate 
-      ? 'Set up your emergency medical information'
-      : 'Update your emergency medical information';
+      ? t('profile.setupEmergencyInfo')
+      : t('profile.updateEmergencyInfo');
   };
 
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
-        <LoadingOverlay visible={true} message="Loading profile..." />
+        <LoadingOverlay visible={true} message={t('profile.loadingProfile')} />
       </SafeAreaView>
     );
   }
@@ -175,7 +177,7 @@ const ProfileFormScreen: React.FC<ProfileFormScreenProps> = ({ navigation, route
           <TouchableOpacity style={styles.closeButton} onPress={() => navigation.goBack()}>
             <Ionicons name="close" size={24} color={colors.text.primary} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Profile Error</Text>
+          <Text style={styles.headerTitle}>{t('profile.profileError')}</Text>
           <View style={styles.placeholder} />
         </View>
 
@@ -183,19 +185,19 @@ const ProfileFormScreen: React.FC<ProfileFormScreenProps> = ({ navigation, route
           <View style={styles.errorIconContainer}>
             <Ionicons name="warning" size={48} color={colors.status.error.main} />
           </View>
-          <Text style={styles.errorTitle}>Unable to Load Profile</Text>
+          <Text style={styles.errorTitle}>{t('profile.unableToLoad')}</Text>
           <Text style={styles.errorMessage}>{error}</Text>
           
           <View style={styles.errorActions}>
             <Button
-              title="Retry"
+              title={t('common.retry')}
               onPress={loadProfile}
               icon="refresh"
               style={styles.retryButton}
             />
             
             <Button
-              title="Create New Profile"
+              title={t('profile.createNewProfile')}
               variant="outline"
               onPress={() => {
                 setError(null);
@@ -216,12 +218,12 @@ const ProfileFormScreen: React.FC<ProfileFormScreenProps> = ({ navigation, route
           <View style={styles.errorIconContainer}>
             <Ionicons name="person-remove" size={48} color={colors.status.error.main} />
           </View>
-          <Text style={styles.errorTitle}>No User Available</Text>
+          <Text style={styles.errorTitle}>{t('profile.noUserAvailable')}</Text>
           <Text style={styles.errorMessage}>
-            Unable to create or edit profile without user information.
+            {t('profile.noUserMessage')}
           </Text>
           <Button
-            title="Close"
+            title={t('common.close')}
             variant="outline"
             onPress={() => navigation.goBack()}
           />
@@ -245,7 +247,7 @@ const ProfileFormScreen: React.FC<ProfileFormScreenProps> = ({ navigation, route
       </View>
 
       {saving && (
-        <LoadingOverlay visible={true} message="Saving profile..." />
+        <LoadingOverlay visible={true} message={t('common.loading')} />
       )}
 
       <ProfileForm

@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context';
 import { 
   handleAuthError,
@@ -37,6 +38,7 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({
   onNavigateToMedicalRegister,
   onRegisterSuccess 
 }) => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -238,8 +240,8 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({
               <View style={styles.logoContainer}>
                 <Ionicons name="person-add" size={48} color={colors.primary.main} />
               </View>
-              <H1 style={styles.title}>Create Account</H1>
-              <Body style={styles.subtitle}>Join LifeTag to create your emergency medical profile</Body>
+              <H1 style={styles.title}>{t('auth.createAccount')}</H1>
+              <Body style={styles.subtitle}>{t('auth.createAccountSubtitle')}</Body>
             </View>
 
             {/* Error Display */}
@@ -259,8 +261,8 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({
             {/* Form */}
             <Animated.View entering={FadeInDown.duration(600).delay(100)}>
               <TextInput
-                label="First Name"
-                placeholder="Enter your first name"
+                label={t('auth.firstName')}
+                placeholder={t('auth.enterFirstName')}
                 value={formData.firstName}
                 onChangeText={(text) => updateFormData('firstName', text)}
                 onBlur={() => validateName(formData.firstName, 'firstName')}
@@ -272,8 +274,8 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({
               />
 
               <TextInput
-                label="Last Name"
-                placeholder="Enter your last name"
+                label={t('auth.lastName')}
+                placeholder={t('auth.enterLastName')}
                 value={formData.lastName}
                 onChangeText={(text) => updateFormData('lastName', text)}
                 onBlur={() => validateName(formData.lastName, 'lastName')}
@@ -285,8 +287,8 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({
               />
 
               <TextInput
-                label="Email Address"
-                placeholder="your.email@example.com"
+                label={t('auth.emailAddress')}
+                placeholder={t('auth.enterEmail')}
                 value={formData.email}
                 onChangeText={(text) => updateFormData('email', text)}
                 onBlur={() => validateEmail(formData.email)}
@@ -299,8 +301,8 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({
               />
 
               <TextInput
-                label="Password"
-                placeholder="Create a secure password"
+                label={t('auth.password')}
+                placeholder={t('auth.createSecurePassword')}
                 value={formData.password}
                 onChangeText={(text) => updateFormData('password', text)}
                 onBlur={() => validatePassword(formData.password)}
@@ -309,13 +311,13 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({
                 autoCorrect={false}
                 error={errors.password}
                 leftIcon="lock-closed-outline"
-                hint="6+ characters with at least one letter and one number"
+                hint={t('auth.passwordHint')}
                 editable={!loading && !isSubmitting}
               />
 
               <TextInput
-                label="Confirm Password"
-                placeholder="Confirm your password"
+                label={t('auth.confirmPassword')}
+                placeholder={t('auth.confirmYourPassword')}
                 value={formData.confirmPassword}
                 onChangeText={(text) => updateFormData('confirmPassword', text)}
                 onBlur={() => validateConfirmPassword(formData.confirmPassword, formData.password)}
@@ -328,7 +330,7 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({
               />
 
               <Button
-                title="Create Account"
+                title={t('auth.createAccount')}
                 onPress={handleRegister}
                 loading={loading}
                 disabled={loading || isSubmitting}
@@ -342,12 +344,12 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({
                 <View style={styles.medicalProfessionalContent}>
                   <Ionicons name="medical" size={24} color={colors.primary.main} />
                   <View style={styles.medicalProfessionalText}>
-                    <Body style={styles.medicalQuestion}>Are you a medical professional?</Body>
-                    <Caption>Register for verified access to patient profiles</Caption>
+                    <Body style={styles.medicalQuestion}>{t('auth.areYouMedicalProfessional')}</Body>
+                    <Caption>{t('auth.registerForVerifiedAccess')}</Caption>
                   </View>
                 </View>
                 <Button
-                  title="Register as Medical Professional"
+                  title={t('auth.registerAsMedicalProfessional')}
                   variant="outline"
                   onPress={handleNavigateToMedicalRegister}
                   disabled={loading}
@@ -358,9 +360,9 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({
 
             {/* Login Link */}
             <Animated.View style={styles.loginContainer} entering={FadeInDown.duration(600).delay(300)}>
-              <Body style={styles.loginText}>Already have an account? </Body>
+              <Body style={styles.loginText}>{t('auth.alreadyHaveAccount')} </Body>
               <Button
-                title="Sign In"
+                title={t('auth.signIn')}
                 variant="ghost"
                 size="sm"
                 onPress={handleNavigateToLogin}

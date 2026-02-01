@@ -13,6 +13,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { colors, spacing } from '../../theme';
 
 interface DatePickerProps {
@@ -28,12 +29,14 @@ interface DatePickerProps {
 export const DatePicker: React.FC<DatePickerProps> = ({
   value,
   onDateChange,
-  placeholder = 'Select date of birth',
+  placeholder,
   label,
   required = false,
   error,
   style,
 }) => {
+  const { t } = useTranslation();
+  const defaultPlaceholder = placeholder || t('datePicker.selectDateOfBirth');
   // Helper function to safely convert value to Date
   const getValidDate = (val: Date | null | undefined): Date | null => {
     console.log('🗓️ DatePicker: Converting value to date:', val, 'Type:', typeof val);
@@ -111,8 +114,10 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   const maxYear = currentYear;
 
   const months = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
+    t('datePicker.months.january'), t('datePicker.months.february'), t('datePicker.months.march'),
+    t('datePicker.months.april'), t('datePicker.months.may'), t('datePicker.months.june'),
+    t('datePicker.months.july'), t('datePicker.months.august'), t('datePicker.months.september'),
+    t('datePicker.months.october'), t('datePicker.months.november'), t('datePicker.months.december')
   ];
 
   const formatDate = (date: Date | null): string => {
@@ -258,7 +263,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
           styles.dateText,
           !validDate && styles.placeholderText,
         ]}>
-          {validDate ? formatDate(validDate) : placeholder}
+          {validDate ? formatDate(validDate) : defaultPlaceholder}
         </Text>
         
         <View style={styles.iconContainer}>
@@ -291,11 +296,11 @@ export const DatePicker: React.FC<DatePickerProps> = ({
           <View style={styles.modalContent}>
             <View style={styles.pickerHeader}>
               <TouchableOpacity onPress={handleDateCancel}>
-                <Text style={styles.cancelButton}>Cancel</Text>
+                <Text style={styles.cancelButton}>{t('common.cancel')}</Text>
               </TouchableOpacity>
-              <Text style={styles.pickerTitle}>Select Date of Birth</Text>
+              <Text style={styles.pickerTitle}>{t('datePicker.selectDateOfBirth')}</Text>
               <TouchableOpacity onPress={handleDateConfirm}>
-                <Text style={styles.confirmButton}>Done</Text>
+                <Text style={styles.confirmButton}>{t('common.done')}</Text>
               </TouchableOpacity>
             </View>
             

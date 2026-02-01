@@ -8,6 +8,7 @@ export * from './ErrorDisplay';
 export * from './PasswordVerificationModal';
 export * from './ProfileErrorDisplay';
 export * from './DatePicker';
+export * from './LanguageSelector';
 export { default as VerifiedBadge, VerifiedProfessionalIndicator, ProfileHeaderBadge } from './VerifiedBadge';
 export { default as MedicalProfessionalList } from './MedicalProfessionalList';
 export { default as PatientProfileList } from './PatientProfileList';

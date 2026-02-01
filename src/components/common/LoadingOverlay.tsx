@@ -13,6 +13,7 @@ import {
   TouchableWithoutFeedback 
 } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import { useTranslation } from 'react-i18next';
 import { colors, spacing, borderRadius, typography, shadows } from '../../theme';
 
 interface LoadingOverlayProps {
@@ -24,10 +25,12 @@ interface LoadingOverlayProps {
 
 export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({ 
   visible, 
-  message = 'Loading...', 
+  message, 
   cancelable = false,
   onCancel 
 }) => {
+  const { t } = useTranslation();
+  const displayMessage = message || t('common.loading');
   const handleBackdropPress = () => {
     if (cancelable && onCancel) {
       onCancel();
@@ -49,9 +52,9 @@ export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
               style={styles.container}
             >
               <ActivityIndicator size="large" color={colors.primary.main} style={styles.spinner} />
-              <Text style={styles.message}>{message}</Text>
+              <Text style={styles.message}>{displayMessage}</Text>
               {cancelable && (
-                <Text style={styles.cancelHint}>Tap outside to cancel</Text>
+                <Text style={styles.cancelHint}>{t('common.tapOutsideToCancel')}</Text>
               )}
             </Animated.View>
           </TouchableWithoutFeedback>
@@ -70,15 +73,17 @@ interface InlineLoadingProps {
 
 export const InlineLoading: React.FC<InlineLoadingProps> = ({ 
   visible, 
-  message = 'Loading...', 
+  message, 
   size = 'small' 
 }) => {
+  const { t } = useTranslation();
+  const displayMessage = message || t('common.loading');
   if (!visible) return null;
 
   return (
     <View style={styles.inlineContainer}>
       <ActivityIndicator size={size} color={colors.primary.main} style={styles.inlineSpinner} />
-      <Text style={styles.inlineMessage}>{message}</Text>
+      <Text style={styles.inlineMessage}>{displayMessage}</Text>
     </View>
   );
 };

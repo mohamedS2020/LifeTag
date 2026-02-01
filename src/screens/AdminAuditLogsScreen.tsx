@@ -13,6 +13,7 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useTranslation } from 'react-i18next';
 import { AuditLog } from '../types';
 import profileService from '../services/profileService';
 import { RootStackParamList } from '../navigation/AppNavigator';
@@ -25,6 +26,7 @@ type AdminAuditLogsNavigationProp = StackNavigationProp<RootStackParamList>;
  * Shows all system audit logs for admin oversight
  */
 const AdminAuditLogsScreen: React.FC = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<AdminAuditLogsNavigationProp>();
   const insets = useSafeAreaInsets();
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
@@ -43,11 +45,11 @@ const AdminAuditLogsScreen: React.FC = () => {
       if (response.success && response.data) {
         setAuditLogs(response.data);
       } else {
-        Alert.alert('Error', 'Failed to load audit logs');
+        Alert.alert(t('common.error'), t('admin.failedLoadAuditLogs'));
       }
     } catch (error) {
       console.error('Error fetching audit logs:', error);
-      Alert.alert('Error', 'Failed to load audit logs');
+      Alert.alert(t('common.error'), t('admin.failedLoadAuditLogs'));
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -117,30 +119,30 @@ const AdminAuditLogsScreen: React.FC = () => {
     const getAccessTypeLabel = () => {
       switch (item.accessType) {
         case 'qr_scan':
-          return 'QR Scan';
+          return t('admin.accessLabels.qrScan');
         case 'full_profile':
-          return 'Full Profile';
+          return t('admin.accessLabels.fullProfile');
         case 'emergency_access':
-          return 'Emergency';
+          return t('admin.accessLabels.emergency');
         case 'profile_edit':
-          return 'Profile Edit';
+          return t('admin.accessLabels.profileEdit');
         default:
-          return 'Access';
+          return t('admin.accessLabels.access');
       }
     };
 
     const getUserTypeLabel = () => {
       switch (item.accessorType) {
         case 'medical_professional':
-          return 'Medical Pro';
+          return t('admin.userTypes.medicalPro');
         case 'admin':
-          return 'Admin';
+          return t('admin.userTypes.admin');
         case 'individual':
-          return 'User';
+          return t('admin.userTypes.user');
         case 'anonymous':
-          return 'Anonymous';
+          return t('admin.userTypes.anonymous');
         default:
-          return 'Unknown';
+          return t('common.unknown');
       }
     };
 
@@ -151,10 +153,10 @@ const AdminAuditLogsScreen: React.FC = () => {
       const diffHours = Math.floor(diffMs / 3600000);
       const diffDays = Math.floor(diffMs / 86400000);
 
-      if (diffMins < 1) return 'Just now';
-      if (diffMins < 60) return `${diffMins}m ago`;
-      if (diffHours < 24) return `${diffHours}h ago`;
-      if (diffDays < 7) return `${diffDays}d ago`;
+      if (diffMins < 1) return t('time.justNow');
+      if (diffMins < 60) return t('time.minutesAgo', { count: diffMins });
+      if (diffHours < 24) return t('time.hoursAgo', { count: diffHours });
+      if (diffDays < 7) return t('time.daysAgo', { count: diffDays });
       
       return date.toLocaleDateString('en-US', {
         month: 'short',
@@ -182,7 +184,7 @@ const AdminAuditLogsScreen: React.FC = () => {
               </View>
             </View>
             <Text style={styles.logProfileId} numberOfLines={1}>
-              Profile: {item.profileId.substring(0, 12)}...
+              {t('admin.profileLabel')}: {item.profileId.substring(0, 12)}...
             </Text>
             <Text style={styles.logTimestamp}>{formatTimestamp(item.timestamp)}</Text>
           </View>
@@ -199,12 +201,12 @@ const AdminAuditLogsScreen: React.FC = () => {
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
             <Ionicons name="arrow-back" size={24} color={colors.text.inverse} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>System Audit Logs</Text>
+          <Text style={styles.headerTitle}>{t('admin.systemAuditLogs')}</Text>
           <View style={styles.headerRight} />
         </View>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={colors.primary.main} />
-          <Text style={styles.loadingText}>Loading audit logs...</Text>
+          <Text style={styles.loadingText}>{t('admin.loadingAuditLogs')}</Text>
         </View>
       </SafeAreaView>
     );
@@ -216,7 +218,7 @@ const AdminAuditLogsScreen: React.FC = () => {
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color={colors.text.primary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>System Audit Logs</Text>
+        <Text style={styles.headerTitle}>{t('admin.systemAuditLogs')}</Text>
         <View style={styles.headerRight}>
           <TouchableOpacity style={styles.refreshButton} onPress={handleRefresh}>
             <Ionicons name="refresh" size={20} color={colors.text.primary} />
@@ -227,10 +229,10 @@ const AdminAuditLogsScreen: React.FC = () => {
       <View style={styles.content}>
         <View style={styles.statsHeader}>
           <Text style={styles.statsText}>
-            Total Logs: {auditLogs.length}
+            {t('admin.totalLogs')}: {auditLogs.length}
           </Text>
           <Text style={styles.statsSubtext}>
-            Tap any log to view full details
+            {t('common.tapToView')}
           </Text>
         </View>
 

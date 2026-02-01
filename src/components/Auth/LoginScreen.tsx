@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context';
 import { 
   validateEmailAddress, 
@@ -41,6 +42,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
   onNavigateToRegister,
   onLoginSuccess 
 }) => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [emailError, setEmailError] = useState<string>('');
@@ -58,7 +60,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email) {
-      setEmailError('Email is required');
+      setEmailError(t('auth.requiredField'));
       return false;
     }
     
@@ -72,12 +74,12 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
     // Security check for malicious input
     const securityCheck = isSecureInput(email);
     if (!securityCheck.isSecure) {
-      setEmailError('Invalid email format');
+      setEmailError(t('auth.invalidEmail'));
       return false;
     }
     
     if (!emailRegex.test(email)) {
-      setEmailError('Please enter a valid email address');
+      setEmailError(t('auth.invalidEmail'));
       return false;
     }
     setEmailError('');
@@ -87,19 +89,19 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
   // Password validation with security checks
   const validatePassword = (password: string): boolean => {
     if (!password) {
-      setPasswordError('Password is required');
+      setPasswordError(t('auth.requiredField'));
       return false;
     }
     
     // Security check for malicious input
     const securityCheck = isSecureInput(password);
     if (!securityCheck.isSecure) {
-      setPasswordError('Invalid password format');
+      setPasswordError(t('auth.invalidEmail'));
       return false;
     }
     
     if (password.length < 6) {
-      setPasswordError('Password must be at least 6 characters');
+      setPasswordError(t('auth.passwordMinLength'));
       return false;
     }
     setPasswordError('');
@@ -224,9 +226,9 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
           {/* Header */}
           <Animated.View entering={FadeInDown.delay(100).duration(400)} style={styles.header}>
             <H1 style={styles.title}>LifeTag</H1>
-            <Body color="secondary" style={styles.subtitle}>Emergency Medical Information</Body>
+            <Body color="secondary" style={styles.subtitle}>{t('home.emergencySystem')}</Body>
             <BodySmall color="tertiary" align="center" style={styles.description}>
-              Sign in to access your medical profile and QR code
+              {t('auth.loginSubtitle')}
             </BodySmall>
           </Animated.View>
 
@@ -248,8 +250,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
 
             {/* Email Input */}
             <TextInput
-              label="Email Address"
-              placeholder="Enter your email"
+              label={t('auth.email')}
+              placeholder={t('auth.email')}
               value={email}
               onChangeText={(text) => {
                 setEmail(text);
@@ -267,8 +269,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
 
             {/* Password Input */}
             <TextInput
-              label="Password"
-              placeholder="Enter your password"
+              label={t('auth.password')}
+              placeholder={t('auth.password')}
               value={password}
               onChangeText={(text) => {
                 setPassword(text);
@@ -291,14 +293,14 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
                 disabled={loading || isSubmitting}
               >
                 <Text style={[styles.forgotPasswordLink, (loading || isSubmitting) ? styles.linkDisabled : null]}>
-                  Forgot Password?
+                  {t('auth.forgotPassword')}
                 </Text>
               </TouchableOpacity>
             </View>
 
             {/* Login Button */}
             <Button
-              title="Sign In"
+              title={t('auth.signIn')}
               onPress={handleLogin}
               loading={loading || isSubmitting}
               disabled={loading || isSubmitting}
@@ -309,13 +311,13 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
 
             {/* Register Link */}
             <View style={styles.registerContainer}>
-              <BodySmall color="secondary">Don't have an account? </BodySmall>
+              <BodySmall color="secondary">{t('auth.noAccount')} </BodySmall>
               <TouchableOpacity 
                 onPress={handleNavigateToRegister}
                 disabled={loading || isSubmitting}
               >
                 <Text style={[styles.registerLink, (loading || isSubmitting) ? styles.linkDisabled : null]}>
-                  Create Account
+                  {t('auth.createAccount')}
                 </Text>
               </TouchableOpacity>
             </View>

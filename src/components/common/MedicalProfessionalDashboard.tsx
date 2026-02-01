@@ -22,6 +22,7 @@ import { ProfileDisplay } from '../Profile';
 import { QRScanner } from '../QR';
 import { useMedicalProfessionalAccess } from '../../hooks';
 import { colors, spacing } from '../../theme';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Medical Professional Dashboard Props
@@ -54,6 +55,9 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
     getFormattedCredentials,
   } = useMedicalProfessionalAccess();
 
+  // Translation hook
+  const { t } = useTranslation();
+
   // Dashboard state
   const [activeTab, setActiveTab] = useState<'scanner' | 'profiles' | 'history'>('scanner');
   const [showQRScanner, setShowQRScanner] = useState(false);
@@ -73,9 +77,9 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
   useEffect(() => {
     if (!isVerifiedProfessional && !professionalLoading) {
       Alert.alert(
-        'Access Denied',
-        'This dashboard is only available to verified medical professionals.',
-        [{ text: 'OK', onPress: () => onError?.('Access denied - not a verified medical professional') }]
+        t('errors.unauthorized'),
+        t('medicalProfessional.dashboardAccessDenied'),
+        [{ text: t('common.ok'), onPress: () => onError?.('Access denied - not a verified medical professional') }]
       );
     }
   }, [isVerifiedProfessional, professionalLoading]);
@@ -112,9 +116,9 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
 
       if (!profileId) {
         Alert.alert(
-          'Invalid QR Code',
-          'This QR code does not contain a valid LifeTag profile link.',
-          [{ text: 'Scan Another', onPress: () => setShowQRScanner(true) }]
+          t('qr.invalidQR'),
+          t('qr.noValidProfileLink'),
+          [{ text: t('qr.scanAnother'), onPress: () => setShowQRScanner(true) }]
         );
         return;
       }
@@ -124,9 +128,9 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
       
       if (!profileResponse.success || !profileResponse.data) {
         Alert.alert(
-          'Profile Not Found',
-          'The profile linked to this QR code could not be found.',
-          [{ text: 'Scan Another', onPress: () => setShowQRScanner(true) }]
+          t('profile.notFound'),
+          t('profile.profileLinkedNotFound'),
+          [{ text: t('qr.scanAnother'), onPress: () => setShowQRScanner(true) }]
         );
         return;
       }
@@ -144,9 +148,9 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
 
       if (!accessResult.canAccess) {
         Alert.alert(
-          'Access Denied',
+          t('errors.unauthorized'),
           accessResult.reason,
-          [{ text: 'Scan Another', onPress: () => setShowQRScanner(true) }]
+          [{ text: t('qr.scanAnother'), onPress: () => setShowQRScanner(true) }]
         );
         return;
       }
@@ -163,17 +167,17 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
       setShowProfileModal(true);
 
       Alert.alert(
-        '✅ Profile Access Granted',
-        `You now have privileged access to ${profile.personalInfo.firstName} ${profile.personalInfo.lastName}'s medical profile.`,
-        [{ text: 'View Profile', onPress: () => setShowProfileModal(true) }]
+        `✅ ${t('profile.profileAccess')}`,
+        t('medicalProfessional.privilegedAccessGranted', { name: `${profile.personalInfo.firstName} ${profile.personalInfo.lastName}` }),
+        [{ text: t('profile.viewFullProfile'), onPress: () => setShowProfileModal(true) }]
       );
 
     } catch (error) {
       console.error('Error processing QR scan:', error);
       Alert.alert(
-        'Scan Error',
-        'An error occurred while processing the QR code. Please try again.',
-        [{ text: 'Retry', onPress: () => setShowQRScanner(true) }]
+        t('qr.scanError'),
+        t('qr.scanErrorMessage'),
+        [{ text: t('common.retry'), onPress: () => setShowQRScanner(true) }]
       );
     } finally {
       setIsLoading(false);
@@ -231,11 +235,11 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
         await fetchPatientNames(response.data);
       } else {
         console.error('Failed to fetch access history:', response.error);
-        Alert.alert('Error', 'Failed to load access history');
+        Alert.alert(t('common.error'), t('profile.failedToLoadAccessHistory'));
       }
     } catch (error) {
       console.error('Error fetching medical professional logs:', error);
-      Alert.alert('Error', 'Failed to load access history');
+      Alert.alert(t('common.error'), t('profile.failedToLoadAccessHistory'));
     } finally {
       setHistoryLoading(false);
     }
@@ -267,10 +271,10 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
         />
         <View style={styles.verificationText}>
           <Text style={styles.verificationTitle}>
-            Medical Professional Dashboard
+            {t('medicalProfessional.dashboard')}
           </Text>
           <Text style={styles.verificationSubtitle}>
-            {isVerifiedProfessional ? getFormattedCredentials() : 'Verification Required'}
+            {isVerifiedProfessional ? getFormattedCredentials() : t('medicalProfessional.verificationRequired')}
           </Text>
         </View>
       </View>
@@ -293,7 +297,7 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
           color={activeTab === 'scanner' ? colors.primary.main : colors.text.secondary} 
         />
         <Text style={[styles.tabText, activeTab === 'scanner' && styles.activeTabText]}>
-          QR Scanner
+          {t('qr.qrScanner')}
         </Text>
       </TouchableOpacity>
 
@@ -307,7 +311,7 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
           color={activeTab === 'profiles' ? colors.primary.main : colors.text.secondary} 
         />
         <Text style={[styles.tabText, activeTab === 'profiles' && styles.activeTabText]}>
-          Profiles
+          {t('profile.profiles')}
         </Text>
       </TouchableOpacity>
 
@@ -321,7 +325,7 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
           color={activeTab === 'history' ? colors.primary.main : colors.text.secondary} 
         />
         <Text style={[styles.tabText, activeTab === 'history' && styles.activeTabText]}>
-          History
+          {t('medicalProfessional.history')}
         </Text>
       </TouchableOpacity>
     </View>
@@ -334,9 +338,9 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
     <View style={styles.tabContent}>
       <View style={styles.scannerCard}>
         <Ionicons name="qr-code" size={64} color={colors.primary.main} />
-        <Text style={styles.scannerTitle}>Scan Patient QR Code</Text>
+        <Text style={styles.scannerTitle}>{t('medicalProfessional.scanPatientQRCode')}</Text>
         <Text style={styles.scannerDescription}>
-          Scan a LifeTag QR code to instantly access patient medical information with your verified professional status.
+          {t('medicalProfessional.scanPatientDescription')}
         </Text>
         
         <TouchableOpacity
@@ -345,13 +349,13 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
           disabled={!isVerifiedProfessional}
         >
           <Ionicons name="camera" size={20} color={colors.text.inverse} />
-          <Text style={styles.scanButtonText}>Start Scanning</Text>
+          <Text style={styles.scanButtonText}>{t('medicalProfessional.startScanning')}</Text>
         </TouchableOpacity>
 
         <View style={styles.privilegeNotice}>
           <Ionicons name="shield-checkmark" size={16} color={colors.status.success.main} />
           <Text style={styles.privilegeText}>
-            Verified professionals bypass password requirements
+            {t('medicalProfessional.bypassPasswordRequirements')}
           </Text>
         </View>
       </View>
@@ -382,7 +386,7 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
       return (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={colors.primary.main} />
-          <Text style={styles.loadingText}>Loading access history...</Text>
+          <Text style={styles.loadingText}>{t('profile.loadingAccessHistory')}</Text>
         </View>
       );
     }
@@ -391,9 +395,9 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
       return (
         <View style={styles.emptyStateContainer}>
           <Ionicons name="document-text-outline" size={64} color={colors.text.tertiary} />
-          <Text style={styles.emptyStateTitle}>No Access History</Text>
+          <Text style={styles.emptyStateTitle}>{t('profile.noAccessHistory')}</Text>
           <Text style={styles.emptyStateText}>
-            Your profile access history will appear here after scanning QR codes or viewing patient profiles.
+            {t('profile.accessHistoryDescription')}
           </Text>
         </View>
       );
@@ -401,9 +405,9 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
 
     return (
       <View style={styles.tabContent}>
-        <Text style={styles.historyTitle}>Your Profile Access History</Text>
+        <Text style={styles.historyTitle}>{t('profile.yourAccessHistory')}</Text>
         <Text style={styles.historySubtitle}>
-          Showing your last {auditLogs.length} profile accesses for compliance tracking
+          {t('profile.showingAccessHistory', { count: auditLogs.length })}
         </Text>
         
         <FlatList
@@ -473,15 +477,15 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
     const getAccessTypeLabel = () => {
       switch (item.accessType) {
         case 'qr_scan':
-          return 'QR Code Scan';
+          return t('profile.qrCodeScan');
         case 'full_profile':
-          return 'Full Profile View';
+          return t('profile.fullProfileView');
         case 'emergency_access':
-          return 'Emergency Access';
+          return t('profile.emergencyAccess');
         case 'profile_edit':
-          return 'Profile Modified';
+          return t('profile.profileModified');
         default:
-          return 'Profile Access';
+          return t('profile.profileAccess');
       }
     };
 
@@ -540,10 +544,10 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
 
-    if (diffMins < 1) return 'Just now';
-    if (diffMins < 60) return `${diffMins} minutes ago`;
-    if (diffHours < 24) return `${diffHours} hours ago`;
-    if (diffDays < 7) return `${diffDays} days ago`;
+    if (diffMins < 1) return t('time.justNow');
+    if (diffMins < 60) return t('time.minutesAgo', { count: diffMins });
+    if (diffHours < 24) return t('time.hoursAgo', { count: diffHours });
+    if (diffDays < 7) return t('time.daysAgo', { count: diffDays });
     
     return date.toLocaleDateString('en-US', {
       month: 'short',
@@ -558,16 +562,16 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
   // =============================================
 
   if (professionalLoading) {
-    return <LoadingOverlay visible={true} message="Verifying professional status..." />;
+    return <LoadingOverlay visible={true} message={t('medicalProfessional.verifyingProfessionalStatus')} />;
   }
 
   if (!isVerifiedProfessional) {
     return (
       <View style={styles.accessDeniedContainer}>
         <Ionicons name="shield-outline" size={64} color={colors.status.error.main} />
-        <Text style={styles.accessDeniedTitle}>Access Denied</Text>
+        <Text style={styles.accessDeniedTitle}>{t('errors.unauthorized')}</Text>
         <Text style={styles.accessDeniedText}>
-          This dashboard is only available to verified medical professionals.
+          {t('medicalProfessional.dashboardAccessDenied')}
         </Text>
       </View>
     );
@@ -616,7 +620,7 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
             <TouchableOpacity onPress={() => setShowProfileModal(false)}>
               <Ionicons name="close" size={24} color={colors.text.primary} />
             </TouchableOpacity>
-            <Text style={styles.profileModalTitle}>Patient Profile</Text>
+            <Text style={styles.profileModalTitle}>{t('profile.patientProfile')}</Text>
             <View style={{ width: 24 }} />
           </View>
           
@@ -639,7 +643,7 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
 
       {/* Loading Overlay */}
       {isLoading && (
-        <LoadingOverlay visible={true} message="Processing QR code..." />
+        <LoadingOverlay visible={true} message={t('qr.processingQRCode')} />
       )}
     </SafeAreaView>
   );

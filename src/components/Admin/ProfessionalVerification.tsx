@@ -12,6 +12,7 @@ import {
   Modal
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { MedicalProfessional } from '../../types';
 import { MedicalProfessionalApprovalService } from '../../services/medicalProfessionalApprovalService';
 import { VerifiedBadge } from '../common';
@@ -54,6 +55,8 @@ const ProfessionalVerification: React.FC<ProfessionalVerificationProps> = ({
   const [verificationNotes, setVerificationNotes] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
 
+  const { t } = useTranslation();
+
   /**
    * Load medical professionals based on filter
    */
@@ -85,7 +88,7 @@ const ProfessionalVerification: React.FC<ProfessionalVerificationProps> = ({
       setProfessionals(loadedProfessionals);
     } catch (error) {
       console.error('Error loading professionals:', error);
-      Alert.alert('Error', 'Failed to load medical professionals');
+      Alert.alert(t('common.error'), t('admin.failedLoadProfessionals'));
     } finally {
       setLoading(false);
     }
@@ -112,9 +115,10 @@ const ProfessionalVerification: React.FC<ProfessionalVerificationProps> = ({
 
       onProfessionalVerified?.(selectedProfessional.id);
       
+      const fullName = `${selectedProfessional.personalInfo.firstName} ${selectedProfessional.personalInfo.lastName}`;
       Alert.alert(
-        'Professional Verified',
-        `${selectedProfessional.personalInfo.firstName} ${selectedProfessional.personalInfo.lastName} has been verified and can now access the application.`
+        t('admin.professionalVerified'),
+        t('admin.professionalVerifiedMessage', { name: fullName })
       );
       
       setShowDetailModal(false);
@@ -125,7 +129,7 @@ const ProfessionalVerification: React.FC<ProfessionalVerificationProps> = ({
       loadProfessionals();
     } catch (error) {
       console.error('Error approving professional:', error);
-      Alert.alert('Error', 'Failed to approve medical professional');
+      Alert.alert(t('common.error'), t('admin.failedApproveProfessional'));
     } finally {
       setActionLoading(false);
     }
@@ -138,7 +142,7 @@ const ProfessionalVerification: React.FC<ProfessionalVerificationProps> = ({
     if (!selectedProfessional) return;
 
     if (!verificationNotes.trim()) {
-      Alert.alert('Rejection Reason Required', 'Please provide a reason for rejecting this application.');
+      Alert.alert(t('admin.rejectionReasonRequired'), t('admin.provideRejectionReason'));
       return;
     }
 
@@ -157,9 +161,10 @@ const ProfessionalVerification: React.FC<ProfessionalVerificationProps> = ({
 
       onProfessionalRejected?.(selectedProfessional.id);
       
+      const fullName = `${selectedProfessional.personalInfo.firstName} ${selectedProfessional.personalInfo.lastName}`;
       Alert.alert(
-        'Application Rejected',
-        `${selectedProfessional.personalInfo.firstName} ${selectedProfessional.personalInfo.lastName}'s application has been rejected.`
+        t('admin.applicationRejected'),
+        t('admin.applicationRejectedMessage', { name: fullName })
       );
       
       setShowDetailModal(false);
@@ -170,7 +175,7 @@ const ProfessionalVerification: React.FC<ProfessionalVerificationProps> = ({
       loadProfessionals();
     } catch (error) {
       console.error('Error rejecting professional:', error);
-      Alert.alert('Error', 'Failed to reject medical professional');
+      Alert.alert(t('common.error'), t('admin.failedRejectProfessional'));
     } finally {
       setActionLoading(false);
     }
@@ -221,10 +226,10 @@ const ProfessionalVerification: React.FC<ProfessionalVerificationProps> = ({
               />
             </View>
             <Text style={styles.professionalSpecialty}>
-              {professional.professionalInfo.specialty || 'General Practice'}
+              {professional.professionalInfo.specialty || t('admin.generalPractice')}
             </Text>
             <Text style={styles.professionalHospital}>
-              {professional.professionalInfo.hospitalAffiliation || 'Independent Practice'}
+              {professional.professionalInfo.hospitalAffiliation || t('admin.independentPractice')}
             </Text>
           </View>
         </View>
@@ -236,17 +241,17 @@ const ProfessionalVerification: React.FC<ProfessionalVerificationProps> = ({
         </View>
         <View style={styles.detailRow}>
           <Ionicons name="document-text" size={14} color={colors.text.tertiary} />
-          <Text style={styles.detailText}>License: {professional.professionalInfo.licenseNumber}</Text>
+          <Text style={styles.detailText}>{t('medicalProfessional.licenseNumber')}: {professional.professionalInfo.licenseNumber}</Text>
         </View>
         <View style={styles.detailRow}>
           <Ionicons name="time" size={14} color={colors.text.tertiary} />
-          <Text style={styles.detailText}>Applied: {formatDate(professional.createdAt)}</Text>
+          <Text style={styles.detailText}>{t('admin.applied')}: {formatDate(professional.createdAt)}</Text>
         </View>
       </View>
 
       <View style={styles.cardFooter}>
         <Ionicons name="chevron-forward" size={16} color={colors.text.tertiary} />
-        <Text style={styles.reviewText}>Tap to review</Text>
+        <Text style={styles.reviewText}>{t('admin.tapToReview')}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -269,7 +274,7 @@ const ProfessionalVerification: React.FC<ProfessionalVerificationProps> = ({
             styles.filterButtonText,
             filter === filterOption && styles.activeFilterButtonText
           ]}>
-            {filterOption.charAt(0).toUpperCase() + filterOption.slice(1)}
+            {t(`admin.filter${filterOption.charAt(0).toUpperCase() + filterOption.slice(1)}`)}
           </Text>
         </TouchableOpacity>
       ))}
@@ -283,7 +288,7 @@ const ProfessionalVerification: React.FC<ProfessionalVerificationProps> = ({
         <TouchableOpacity onPress={onClose}>
           <Ionicons name="close" size={24} color={colors.text.primary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Medical Professional Verification</Text>
+        <Text style={styles.headerTitle}>{t('admin.medicalProfVerification')}</Text>
         <View style={{ width: 24 }} />
       </View>
 
@@ -294,18 +299,18 @@ const ProfessionalVerification: React.FC<ProfessionalVerificationProps> = ({
       {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={colors.primary.main} />
-          <Text style={styles.loadingText}>Loading professionals...</Text>
+          <Text style={styles.loadingText}>{t('admin.loadingProfessionals')}</Text>
         </View>
       ) : (
         <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.scrollContent}>
           {professionals.length === 0 ? (
             <View style={styles.emptyContainer}>
               <Ionicons name="document-text-outline" size={64} color={colors.text.tertiary} />
-              <Text style={styles.emptyTitle}>No Applications Found</Text>
+              <Text style={styles.emptyTitle}>{t('admin.noApplicationsFound')}</Text>
               <Text style={styles.emptyText}>
                 {filter === 'pending' 
-                  ? 'No pending medical professional applications at this time.'
-                  : `No ${filter} medical professionals found.`
+                  ? t('admin.noPendingApplications')
+                  : t('admin.noFilteredApplications', { filter })
                 }
               </Text>
             </View>
@@ -330,28 +335,28 @@ const ProfessionalVerification: React.FC<ProfessionalVerificationProps> = ({
                 <TouchableOpacity onPress={() => setShowDetailModal(false)}>
                   <Ionicons name="close" size={24} color={colors.text.primary} />
                 </TouchableOpacity>
-                <Text style={styles.modalTitle}>Verification Review</Text>
+                <Text style={styles.modalTitle}>{t('admin.verificationReview')}</Text>
                 <View style={{ width: 24 }} />
               </View>
 
               <ScrollView style={styles.modalContent}>
                 {/* Professional Information */}
                 <View style={styles.section}>
-                  <Text style={styles.sectionTitle}>Professional Information</Text>
+                  <Text style={styles.sectionTitle}>{t('admin.professionalInformation')}</Text>
                   <View style={styles.infoCard}>
                     <View style={styles.infoRow}>
-                      <Text style={styles.infoLabel}>Name:</Text>
+                      <Text style={styles.infoLabel}>{t('profile.fullName')}:</Text>
                       <Text style={styles.infoValue}>
                         {selectedProfessional.personalInfo.firstName} {selectedProfessional.personalInfo.lastName}
                       </Text>
                     </View>
                     <View style={styles.infoRow}>
-                      <Text style={styles.infoLabel}>Email:</Text>
+                      <Text style={styles.infoLabel}>{t('auth.email')}:</Text>
                       <Text style={styles.infoValue}>{selectedProfessional.personalInfo.email}</Text>
                     </View>
                     {selectedProfessional.personalInfo.phoneNumber && (
                       <View style={styles.infoRow}>
-                        <Text style={styles.infoLabel}>Phone:</Text>
+                        <Text style={styles.infoLabel}>{t('profile.phoneNumber')}:</Text>
                         <Text style={styles.infoValue}>{selectedProfessional.personalInfo.phoneNumber}</Text>
                       </View>
                     )}
@@ -360,33 +365,33 @@ const ProfessionalVerification: React.FC<ProfessionalVerificationProps> = ({
 
                 {/* License Information */}
                 <View style={styles.section}>
-                  <Text style={styles.sectionTitle}>License Information</Text>
+                  <Text style={styles.sectionTitle}>{t('admin.licenseInformation')}</Text>
                   <View style={styles.infoCard}>
                     <View style={styles.infoRow}>
-                      <Text style={styles.infoLabel}>License Number:</Text>
+                      <Text style={styles.infoLabel}>{t('medicalProfessional.licenseNumber')}:</Text>
                       <Text style={styles.infoValue}>{selectedProfessional.professionalInfo.licenseNumber}</Text>
                     </View>
                     {selectedProfessional.professionalInfo.licenseState && (
                       <View style={styles.infoRow}>
-                        <Text style={styles.infoLabel}>License State:</Text>
+                        <Text style={styles.infoLabel}>{t('medicalProfessional.licenseState')}:</Text>
                         <Text style={styles.infoValue}>{selectedProfessional.professionalInfo.licenseState}</Text>
                       </View>
                     )}
                     {selectedProfessional.professionalInfo.specialty && (
                       <View style={styles.infoRow}>
-                        <Text style={styles.infoLabel}>Specialty:</Text>
+                        <Text style={styles.infoLabel}>{t('medicalProfessional.specialty')}:</Text>
                         <Text style={styles.infoValue}>{selectedProfessional.professionalInfo.specialty}</Text>
                       </View>
                     )}
                     {selectedProfessional.professionalInfo.hospitalAffiliation && (
                       <View style={styles.infoRow}>
-                        <Text style={styles.infoLabel}>Hospital/Institution:</Text>
+                        <Text style={styles.infoLabel}>{t('medicalProfessional.hospital')}:</Text>
                         <Text style={styles.infoValue}>{selectedProfessional.professionalInfo.hospitalAffiliation}</Text>
                       </View>
                     )}
                     {selectedProfessional.professionalInfo.yearsOfExperience && (
                       <View style={styles.infoRow}>
-                        <Text style={styles.infoLabel}>Years of Experience:</Text>
+                        <Text style={styles.infoLabel}>{t('medicalProfessional.yearsOfExperience')}:</Text>
                         <Text style={styles.infoValue}>{selectedProfessional.professionalInfo.yearsOfExperience}</Text>
                       </View>
                     )}
@@ -395,12 +400,12 @@ const ProfessionalVerification: React.FC<ProfessionalVerificationProps> = ({
 
                 {/* Verification Notes */}
                 <View style={styles.section}>
-                  <Text style={styles.sectionTitle}>Verification Notes</Text>
+                  <Text style={styles.sectionTitle}>{t('admin.verificationNotes')}</Text>
                   <TextInput
                     style={styles.notesInput}
                     value={verificationNotes}
                     onChangeText={setVerificationNotes}
-                    placeholder="Add verification notes or rejection reason..."
+                    placeholder={t('admin.verificationNotesPlaceholder')}
                     placeholderTextColor={colors.text.tertiary}
                     multiline
                     numberOfLines={4}
@@ -421,7 +426,7 @@ const ProfessionalVerification: React.FC<ProfessionalVerificationProps> = ({
                   ) : (
                     <>
                       <Ionicons name="close-circle" size={20} color="white" />
-                      <Text style={styles.rejectButtonText}>Reject</Text>
+                      <Text style={styles.rejectButtonText}>{t('admin.reject')}</Text>
                     </>
                   )}
                 </TouchableOpacity>
@@ -436,7 +441,7 @@ const ProfessionalVerification: React.FC<ProfessionalVerificationProps> = ({
                   ) : (
                     <>
                       <Ionicons name="checkmark-circle" size={20} color="white" />
-                      <Text style={styles.approveButtonText}>Approve</Text>
+                      <Text style={styles.approveButtonText}>{t('admin.approve')}</Text>
                     </>
                   )}
                 </TouchableOpacity>

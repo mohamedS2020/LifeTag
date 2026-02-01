@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { MedicalProfessional } from '../../types';
 import { MedicalProfessionalApprovalService } from '../../services/medicalProfessionalApprovalService';
 import VerifiedBadge, { VerifiedProfessionalIndicator } from './VerifiedBadge';
+import { useTranslation } from 'react-i18next';
 import { colors, spacing } from '../../theme';
 
 /**
@@ -42,6 +43,7 @@ const MedicalProfessionalList: React.FC<MedicalProfessionalListProps> = ({
   compactView = false,
   showVerificationDetails = true,
 }) => {
+  const { t } = useTranslation();
   // State management
   const [professionals, setProfessionals] = useState<MedicalProfessional[]>([]);
   const [loading, setLoading] = useState(true);
@@ -142,7 +144,7 @@ const MedicalProfessionalList: React.FC<MedicalProfessionalListProps> = ({
    */
   const formatExperience = (years?: number): string => {
     if (!years) return '';
-    return years === 1 ? '1 year exp.' : `${years} years exp.`;
+    return years === 1 ? t('medicalProfessional.oneYearExp') : t('medicalProfessional.yearsExp', { years });
   };
 
   /**
@@ -167,7 +169,7 @@ const MedicalProfessionalList: React.FC<MedicalProfessionalListProps> = ({
         </View>
         
         <Text style={styles.compactSpecialty}>
-          {item.professionalInfo.specialty || 'General Practice'}
+          {item.professionalInfo.specialty || t('medicalProfessional.generalPractice')}
         </Text>
         
         {item.professionalInfo.hospitalAffiliation && (
@@ -206,7 +208,7 @@ const MedicalProfessionalList: React.FC<MedicalProfessionalListProps> = ({
         <View style={styles.detailRow}>
           <Ionicons name="medical" size={16} color={colors.text.secondary} />
           <Text style={styles.detailText}>
-            {item.professionalInfo.specialty || 'General Practice'}
+            {item.professionalInfo.specialty || t('medicalProfessional.generalPractice')}
           </Text>
         </View>
 
@@ -222,7 +224,7 @@ const MedicalProfessionalList: React.FC<MedicalProfessionalListProps> = ({
         <View style={styles.detailRow}>
           <Ionicons name="document-text" size={16} color={colors.text.secondary} />
           <Text style={styles.detailText}>
-            License: {item.professionalInfo.licenseNumber}
+            {t('medicalProfessional.license')}: {item.professionalInfo.licenseNumber}
             {item.professionalInfo.licenseState && ` (${item.professionalInfo.licenseState})`}
           </Text>
         </View>
@@ -239,8 +241,8 @@ const MedicalProfessionalList: React.FC<MedicalProfessionalListProps> = ({
         {showVerificationDetails && item.verificationStatus.verifiedAt && (
           <View style={styles.verificationInfo}>
             <Text style={styles.verificationText}>
-              Verified {item.verificationStatus.verifiedAt.toLocaleDateString()}
-              {item.verificationStatus.verifiedBy && ` by ${item.verificationStatus.verifiedBy}`}
+              {t('medicalProfessional.verifiedOn', { date: item.verificationStatus.verifiedAt.toLocaleDateString() })}
+              {item.verificationStatus.verifiedBy && ` ${t('medicalProfessional.byAdmin', { admin: item.verificationStatus.verifiedBy })}`}
             </Text>
           </View>
         )}
@@ -256,18 +258,18 @@ const MedicalProfessionalList: React.FC<MedicalProfessionalListProps> = ({
       <Ionicons name="people-outline" size={64} color={colors.text.tertiary} />
       <Text style={styles.emptyTitle}>
         {searchQuery 
-          ? 'No professionals found' 
+          ? t('medicalProfessional.noProfessionalsFound') 
           : showOnlyVerified 
-            ? 'No verified professionals'
-            : 'No medical professionals'
+            ? t('medicalProfessional.noVerifiedProfessionals')
+            : t('medicalProfessional.noMedicalProfessionals')
         }
       </Text>
       <Text style={styles.emptyText}>
         {searchQuery 
-          ? 'Try adjusting your search terms'
+          ? t('medicalProfessional.tryAdjustingSearch')
           : showOnlyVerified
-            ? 'No medical professionals have been verified yet'
-            : 'No medical professionals have registered yet'
+            ? t('medicalProfessional.noVerifiedYet')
+            : t('medicalProfessional.noRegisteredYet')
         }
       </Text>
     </View>
@@ -280,7 +282,7 @@ const MedicalProfessionalList: React.FC<MedicalProfessionalListProps> = ({
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary.main} />
-        <Text style={styles.loadingText}>Loading professionals...</Text>
+        <Text style={styles.loadingText}>{t('medicalProfessional.loadingProfessionals')}</Text>
       </View>
     );
   }
@@ -292,10 +294,10 @@ const MedicalProfessionalList: React.FC<MedicalProfessionalListProps> = ({
     return (
       <View style={styles.errorContainer}>
         <Ionicons name="alert-circle" size={48} color={colors.status.error.main} />
-        <Text style={styles.errorTitle}>Error Loading Professionals</Text>
+        <Text style={styles.errorTitle}>{t('medicalProfessional.errorLoadingProfessionals')}</Text>
         <Text style={styles.errorText}>{error}</Text>
         <TouchableOpacity style={styles.retryButton} onPress={loadProfessionals}>
-          <Text style={styles.retryButtonText}>Retry</Text>
+          <Text style={styles.retryButtonText}>{t('common.retry')}</Text>
         </TouchableOpacity>
       </View>
     );

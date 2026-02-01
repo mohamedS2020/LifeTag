@@ -11,6 +11,7 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useTranslation } from 'react-i18next';
 import { AuditLog } from '../types';
 import profileService from '../services/profileService';
 import authService from '../services/authService';
@@ -30,6 +31,7 @@ type AdminAuditLogDetailNavigationProp = StackNavigationProp<RootStackParamList>
  * Shows comprehensive details of a specific audit log
  */
 const AdminAuditLogDetailScreen: React.FC = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation<AdminAuditLogDetailNavigationProp>();
   const route = useRoute();
   const insets = useSafeAreaInsets();
@@ -67,8 +69,8 @@ const AdminAuditLogDetailScreen: React.FC = () => {
           if (medProf) {
             setAccessorInfo({
               name: `Dr. ${medProf.personalInfo.firstName} ${medProf.personalInfo.lastName}`,
-              type: 'Medical Professional',
-              details: `${medProf.professionalInfo.specialty || 'General'} • License: ${medProf.professionalInfo.licenseNumber}`
+              type: t('admin.medicalProfessional'),
+              details: `${medProf.professionalInfo.specialty || t('admin.general')} • ${t('admin.license')}: ${medProf.professionalInfo.licenseNumber}`
             });
           }
         } else {
@@ -78,8 +80,8 @@ const AdminAuditLogDetailScreen: React.FC = () => {
             const profile = userProfileResponse.data;
             setAccessorInfo({
               name: `${profile.personalInfo.firstName} ${profile.personalInfo.lastName}`,
-              type: logData.accessorType === 'admin' ? 'Administrator' : 'Regular User',
-              details: `User ID: ${logData.accessedBy.substring(0, 8)}...`
+              type: logData.accessorType === 'admin' ? t('admin.administrator') : t('admin.regularUser'),
+              details: `${t('admin.userId')}: ${logData.accessedBy.substring(0, 8)}...`
             });
           } else {
             // Fallback: try to get name from users collection (set during registration)
@@ -87,25 +89,25 @@ const AdminAuditLogDetailScreen: React.FC = () => {
             if (userBasicInfo?.firstName || userBasicInfo?.lastName) {
               const name = `${userBasicInfo.firstName || ''} ${userBasicInfo.lastName || ''}`.trim();
               setAccessorInfo({
-                name: name || `User (${logData.accessedBy.substring(0, 8)}...)`,
-                type: logData.accessorType === 'admin' ? 'Administrator' : 'Regular User',
-                details: 'No profile created yet'
+                name: name || `${t('admin.user')} (${logData.accessedBy.substring(0, 8)}...)`,
+                type: logData.accessorType === 'admin' ? t('admin.administrator') : t('admin.regularUser'),
+                details: t('admin.noProfileCreated')
               });
             } else {
               // Final fallback if no name found anywhere
               setAccessorInfo({
-                name: `User (${logData.accessedBy.substring(0, 8)}...)`,
-                type: logData.accessorType === 'admin' ? 'Administrator' : 'Regular User',
-                details: 'No profile created yet'
+                name: `${t('admin.user')} (${logData.accessedBy.substring(0, 8)}...)`,
+                type: logData.accessorType === 'admin' ? t('admin.administrator') : t('admin.regularUser'),
+                details: t('admin.noProfileCreated')
               });
             }
           }
         }
       } else {
         setAccessorInfo({
-          name: 'Anonymous User',
-          type: 'Anonymous Access',
-          details: 'No user identification available'
+          name: t('admin.anonymousUser'),
+          type: t('admin.anonymousAccess'),
+          details: t('admin.noUserIdentification')
         });
       }
 
@@ -119,8 +121,8 @@ const AdminAuditLogDetailScreen: React.FC = () => {
         });
       } else {
         setProfileInfo({
-          name: 'Profile Not Found',
-          details: `Profile ID: ${logData.profileId}`
+          name: t('profile.notFound'),
+          details: `${t('admin.profileId')}: ${logData.profileId}`
         });
       }
     } catch (error) {
@@ -149,36 +151,36 @@ const AdminAuditLogDetailScreen: React.FC = () => {
     switch (logData.accessType) {
       case 'qr_scan':
         return {
-          title: 'QR Code Scan',
-          description: 'User scanned QR code to access emergency information',
+          title: t('admin.accessTypes.qrScan'),
+          description: t('admin.accessTypes.qrScanDesc'),
           icon: 'qr-code',
           color: colors.primary.main
         };
       case 'full_profile':
         return {
-          title: 'Full Profile Access',
-          description: 'Complete profile information was accessed',
+          title: t('admin.accessTypes.fullProfile'),
+          description: t('admin.accessTypes.fullProfileDesc'),
           icon: 'person-outline',
           color: colors.status.success.main
         };
       case 'emergency_access':
         return {
-          title: 'Emergency Access',
-          description: 'Emergency medical information was accessed',
+          title: t('admin.accessTypes.emergencyAccess'),
+          description: t('admin.accessTypes.emergencyAccessDesc'),
           icon: 'medical-outline',
           color: colors.status.error.main
         };
       case 'profile_edit':
         return {
-          title: 'Profile Modification',
-          description: 'Profile data was modified or updated',
+          title: t('admin.accessTypes.profileEdit'),
+          description: t('admin.accessTypes.profileEditDesc'),
           icon: 'create-outline',
           color: colors.status.warning.main
         };
       default:
         return {
-          title: 'Profile Access',
-          description: 'Profile was accessed',
+          title: t('admin.accessTypes.profileAccess'),
+          description: t('admin.accessTypes.profileAccessDesc'),
           icon: 'eye-outline',
           color: colors.text.tertiary
         };
@@ -193,7 +195,7 @@ const AdminAuditLogDetailScreen: React.FC = () => {
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} color={colors.text.primary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Audit Log Details</Text>
+        <Text style={styles.headerTitle}>{t('admin.auditLogDetails')}</Text>
         <View style={styles.headerRight} />
       </View>
 
@@ -211,7 +213,7 @@ const AdminAuditLogDetailScreen: React.FC = () => {
 
         {/* Timestamp Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Timestamp</Text>
+          <Text style={styles.sectionTitle}>{t('admin.timestamp')}</Text>
           <View style={styles.infoCard}>
             <Ionicons name="time-outline" size={20} color={colors.primary.main} />
             <Text style={styles.infoText}>{formatFullTimestamp(logData.timestamp)}</Text>
@@ -220,12 +222,12 @@ const AdminAuditLogDetailScreen: React.FC = () => {
 
         {/* Accessor Information */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Accessed By</Text>
+          <Text style={styles.sectionTitle}>{t('admin.accessedBy')}</Text>
           <View style={styles.infoCard}>
             <Ionicons name="person-outline" size={20} color={colors.status.success.main} />
             <View style={styles.infoContent}>
               <Text style={styles.infoMainText}>
-                {accessorInfo?.name || 'Loading...'}
+                {accessorInfo?.name || t('common.loading')}
               </Text>
               <Text style={styles.infoSubText}>
                 {accessorInfo?.type || ''}
@@ -239,12 +241,12 @@ const AdminAuditLogDetailScreen: React.FC = () => {
 
         {/* Profile Information */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Profile Accessed</Text>
+          <Text style={styles.sectionTitle}>{t('admin.profileAccessed')}</Text>
           <View style={styles.infoCard}>
             <Ionicons name="document-text-outline" size={20} color={colors.status.warning.main} />
             <View style={styles.infoContent}>
               <Text style={styles.infoMainText}>
-                {profileInfo?.name || 'Loading...'}
+                {profileInfo?.name || t('common.loading')}
               </Text>
               <Text style={styles.infoDetailsText}>
                 {profileInfo?.details || ''}
@@ -255,7 +257,7 @@ const AdminAuditLogDetailScreen: React.FC = () => {
 
         {/* Access Method */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Access Method</Text>
+          <Text style={styles.sectionTitle}>{t('admin.accessMethod')}</Text>
           <View style={styles.infoCard}>
             <Ionicons 
               name={logData.accessMethod === 'qr_code' ? 'qr-code-outline' : 'phone-portrait-outline'} 
@@ -263,7 +265,7 @@ const AdminAuditLogDetailScreen: React.FC = () => {
               color={colors.text.tertiary} 
             />
             <Text style={styles.infoText}>
-              {logData.accessMethod === 'qr_code' ? 'QR Code Scanner' : 'Mobile Application'}
+              {logData.accessMethod === 'qr_code' ? t('qr.scanQR') : t('admin.mobileApplication')}
             </Text>
           </View>
         </View>
@@ -271,7 +273,7 @@ const AdminAuditLogDetailScreen: React.FC = () => {
         {/* Fields Accessed */}
         {logData.fieldsAccessed && logData.fieldsAccessed.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Fields Accessed</Text>
+            <Text style={styles.sectionTitle}>{t('admin.fieldsAccessed')}</Text>
             <View style={styles.infoCard}>
               <Ionicons name="list-outline" size={20} color={colors.status.info.main} />
               <View style={styles.infoContent}>
@@ -288,7 +290,7 @@ const AdminAuditLogDetailScreen: React.FC = () => {
         {/* Additional Notes */}
         {logData.notes && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Additional Notes</Text>
+            <Text style={styles.sectionTitle}>{t('admin.additionalNotes')}</Text>
             <View style={styles.notesCard}>
               <Text style={styles.notesText}>{logData.notes}</Text>
             </View>
@@ -297,29 +299,29 @@ const AdminAuditLogDetailScreen: React.FC = () => {
 
         {/* Technical Details */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Technical Details</Text>
+          <Text style={styles.sectionTitle}>{t('admin.technicalDetails')}</Text>
           <View style={styles.technicalCard}>
             <View style={styles.technicalRow}>
-              <Text style={styles.technicalLabel}>Log ID:</Text>
+              <Text style={styles.technicalLabel}>{t('admin.logId')}:</Text>
               <Text style={styles.technicalValue}>{logData.id}</Text>
             </View>
             <View style={styles.technicalRow}>
-              <Text style={styles.technicalLabel}>User ID:</Text>
-              <Text style={styles.technicalValue}>{logData.accessedBy || 'Anonymous'}</Text>
+              <Text style={styles.technicalLabel}>{t('admin.accessedBy')}:</Text>
+              <Text style={styles.technicalValue}>{logData.accessedBy || t('admin.anonymous')}</Text>
             </View>
             <View style={styles.technicalRow}>
-              <Text style={styles.technicalLabel}>Profile ID:</Text>
+              <Text style={styles.technicalLabel}>{t('admin.profileId')}:</Text>
               <Text style={styles.technicalValue}>{logData.profileId}</Text>
             </View>
             <View style={styles.technicalRow}>
-              <Text style={styles.technicalLabel}>Data Modified:</Text>
+              <Text style={styles.technicalLabel}>{t('admin.dataModified')}:</Text>
               <Text style={styles.technicalValue}>
-                {logData.dataModified ? 'Yes' : 'No'}
+                {logData.dataModified ? t('common.yes') : t('common.no')}
               </Text>
             </View>
             {logData.sessionId && (
               <View style={styles.technicalRow}>
-                <Text style={styles.technicalLabel}>Session ID:</Text>
+                <Text style={styles.technicalLabel}>{t('admin.sessionId')}:</Text>
                 <Text style={styles.technicalValue}>{logData.sessionId}</Text>
               </View>
             )}

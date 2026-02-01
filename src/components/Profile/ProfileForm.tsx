@@ -17,6 +17,7 @@ import {
   Alert,
   Platform,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import Animated, { FadeInRight, FadeOutLeft } from 'react-native-reanimated';
 import { 
   UserProfile, 
@@ -102,6 +103,8 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
   // =============================================
   // STATE MANAGEMENT
   // =============================================
+  
+  const { t } = useTranslation();
 
   const [formState, setFormState] = useState<FormState>({
     personalInfo: {},
@@ -152,7 +155,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [wantToChangePassword, setWantToChangePassword] = useState(false);
 
-  const steps = ['Personal Info', 'Medical Info', 'Emergency Contacts', 'Privacy'];
+  const steps = [t('profile.form.steps.personalInfo'), t('profile.form.steps.medicalInfo'), t('profile.form.steps.emergencyContacts'), t('profile.form.steps.privacy')];
 
   // Check if user has existing password
   const hasExistingPassword = mode === 'edit' && initialProfile?.privacySettings?.profilePassword;
@@ -176,11 +179,11 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
       if (response.success && response.data) {
         populateForm(response.data);
       } else {
-        setErrors({ general: 'Failed to load profile data' });
+        setErrors({ general: t('profile.form.errors.failedToLoadProfile') });
       }
     } catch (error) {
       console.error('Load profile error:', error);
-      setErrors({ general: 'Failed to load profile data' });
+      setErrors({ general: t('profile.form.errors.failedToLoadProfile') });
     } finally {
       setIsLoadingProfile(false);
     }
@@ -292,38 +295,38 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
     switch (currentStep) {
       case 0: // Personal Info
         if (!formState.personalInfo.firstName?.trim()) {
-          newErrors.firstName = 'First name is required';
+          newErrors.firstName = t('profile.form.validation.firstNameRequired');
           isValid = false;
         }
         if (!formState.personalInfo.lastName?.trim()) {
-          newErrors.lastName = 'Last name is required';
+          newErrors.lastName = t('profile.form.validation.lastNameRequired');
           isValid = false;
         }
         if (!formState.personalInfo.dateOfBirth) {
-          newErrors.dateOfBirth = 'Date of birth is required';
+          newErrors.dateOfBirth = t('profile.form.validation.dateOfBirthRequired');
           isValid = false;
         }
         break;
 
       case 1: // Medical Info
         if (!formState.medicalInfo.bloodType) {
-          newErrors.bloodType = 'Blood type is required';
+          newErrors.bloodType = t('profile.form.validation.bloodTypeRequired');
           isValid = false;
         }
         break;
 
       case 2: // Emergency Contacts
         if (formState.emergencyContacts.length === 0) {
-          newErrors.emergencyContacts = 'At least one emergency contact is required';
+          newErrors.emergencyContacts = t('profile.form.validation.emergencyContactRequired');
           isValid = false;
         }
         formState.emergencyContacts.forEach((contact, index) => {
           if (!contact.name.trim()) {
-            newErrors[`contact_${index}_name`] = 'Contact name is required';
+            newErrors[`contact_${index}_name`] = t('profile.form.validation.contactNameRequired');
             isValid = false;
           }
           if (!contact.phoneNumber.trim()) {
-            newErrors[`contact_${index}_phone`] = 'Contact phone number is required';
+            newErrors[`contact_${index}_phone`] = t('profile.form.validation.contactPhoneRequired');
             isValid = false;
           }
         });
@@ -339,15 +342,15 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
           } else {
             // Either creating new profile, no existing password, or user wants to change password
             if (!profilePassword.trim()) {
-              setPasswordError('Password is required when password protection is enabled');
+              setPasswordError(t('profile.form.validation.passwordRequiredForProtection'));
               isValid = false;
             } else if (profilePassword !== confirmPassword) {
-              setPasswordError('Passwords do not match');
+              setPasswordError(t('validation.passwordMismatch'));
               isValid = false;
             } else {
               const passwordValidation = passwordService.validateProfilePassword(profilePassword);
               if (!passwordValidation.isValid) {
-                setPasswordError(passwordValidation.error || 'Invalid password');
+                setPasswordError(passwordValidation.error || t('profile.form.validation.invalidPassword'));
                 isValid = false;
               } else {
                 setPasswordError('');
@@ -374,7 +377,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
 
     const validation = validateProfile(profileData);
     if (!validation.isValid) {
-      setErrors({ general: validation.error || 'Please check all fields and try again' });
+      setErrors({ general: validation.error || t('profile.form.errors.checkFieldsAndRetry') });
     }
 
     return validation.isValid;
@@ -632,14 +635,14 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
       if (response.success && response.data) {
         onSuccess?.(response.data);
       } else {
-        const errorMessage = response.error?.message || 'Failed to save profile';
+        const errorMessage = response.error?.message || t('profile.form.errors.failedToSave');
         console.error('❌ Profile save failed:', errorMessage);
         console.error('❌ Full error object:', response.error);
         setErrors({ general: errorMessage });
         onError?.(errorMessage);
       }
     } catch (error: any) {
-      const errorMessage = 'An unexpected error occurred. Please try again.';
+      const errorMessage = t('profile.form.errors.unexpectedError');
       setErrors({ general: errorMessage });
       onError?.(errorMessage);
     } finally {
@@ -705,18 +708,18 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
       exiting={FadeOutLeft.duration(200)}
       style={styles.stepContent}
     >
-      <Text style={styles.stepTitle}>Personal Information</Text>
+      <Text style={styles.stepTitle}>{t('profile.personalInfo')}</Text>
       <Text style={styles.stepDescription}>
-        Enter your basic personal information for emergency identification
+        {t('profile.form.descriptions.personalInfo')}
       </Text>
       
       <View style={styles.inputGroup}>
-        <Text style={styles.label}>First Name *</Text>
+        <Text style={styles.label}>{t('profile.form.labels.firstName')} *</Text>
         <TextInput
           style={[styles.input, errors.firstName ? styles.inputError : undefined]}
           value={formState.personalInfo.firstName || ''}
           onChangeText={(value) => updatePersonalInfo('firstName', value)}
-          placeholder="Enter your first name"
+          placeholder={t('profile.form.placeholders.firstName')}
           placeholderTextColor={colors.text.tertiary}
           autoCapitalize="words"
         />
@@ -724,12 +727,12 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
       </View>
 
       <View style={styles.inputGroup}>
-        <Text style={styles.label}>Last Name *</Text>
+        <Text style={styles.label}>{t('profile.form.labels.lastName')} *</Text>
         <TextInput
           style={[styles.input, errors.lastName ? styles.inputError : undefined]}
           value={formState.personalInfo.lastName || ''}
           onChangeText={(value) => updatePersonalInfo('lastName', value)}
-          placeholder="Enter your last name"
+          placeholder={t('profile.form.placeholders.lastName')}
           placeholderTextColor={colors.text.tertiary}
           autoCapitalize="words"
         />
@@ -738,35 +741,35 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
 
       <View style={styles.inputGroup}>
         <DatePicker
-          label="Date of Birth"
+          label={t('profile.dateOfBirth')}
           value={formState.personalInfo.dateOfBirth}
           onDateChange={(date) => updatePersonalInfo('dateOfBirth', date)}
-          placeholder="Select your date of birth"
+          placeholder={t('profile.form.placeholders.dateOfBirth')}
           required={true}
           error={errors.dateOfBirth}
         />
       </View>
 
       <View style={styles.inputGroup}>
-        <Text style={styles.label}>Phone Number</Text>
+        <Text style={styles.label}>{t('profile.phoneNumber')}</Text>
         <TextInput
           style={styles.input}
           value={formState.personalInfo.phoneNumber || ''}
           onChangeText={(value) => updatePersonalInfo('phoneNumber', value)}
-          placeholder="Enter your phone number"
+          placeholder={t('profile.form.placeholders.phoneNumber')}
           placeholderTextColor={colors.text.tertiary}
           keyboardType="phone-pad"
         />
       </View>
 
       <View style={styles.inputGroup}>
-        <Text style={styles.label}>Gender</Text>
+        <Text style={styles.label}>{t('profile.gender')}</Text>
         <View style={styles.genderContainer}>
           {[
-            { value: 'male', label: 'Male' },
-            { value: 'female', label: 'Female' },
-            { value: 'non-binary', label: 'Non-binary' },
-            { value: 'prefer-not-to-say', label: 'Prefer not to say' }
+            { value: 'male', label: t('profile.form.genderOptions.male') },
+            { value: 'female', label: t('profile.form.genderOptions.female') },
+            { value: 'non-binary', label: t('profile.form.genderOptions.nonBinary') },
+            { value: 'prefer-not-to-say', label: t('profile.form.genderOptions.preferNotToSay') }
           ].map((option) => (
             <TouchableOpacity
               key={option.value}
@@ -795,13 +798,13 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
       exiting={FadeOutLeft.duration(200)}
       style={styles.stepContent}
     >
-      <Text style={styles.stepTitle}>Medical Information</Text>
+      <Text style={styles.stepTitle}>{t('profile.medicalInfo')}</Text>
       <Text style={styles.stepDescription}>
-        Provide critical medical information for emergency responders
+        {t('profile.form.descriptions.medicalInfo')}
       </Text>
       
       <View style={styles.inputGroup}>
-        <Text style={styles.label}>Blood Type *</Text>
+        <Text style={styles.label}>{t('profile.bloodType')} *</Text>
         <View style={styles.bloodTypeContainer}>
           {BLOOD_TYPES.map((bloodType) => (
             <TouchableOpacity
@@ -825,31 +828,31 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
       </View>
 
       <View style={styles.inputGroup}>
-        <Text style={styles.label}>Height</Text>
+        <Text style={styles.label}>{t('profile.height')}</Text>
         <TextInput
           style={styles.input}
           value={formState.medicalInfo.height || ''}
           onChangeText={(value) => updateMedicalInfo('height', value)}
-          placeholder="e.g., 5'10&quot; or 178 cm"
+          placeholder={t('profile.form.placeholders.height')}
           placeholderTextColor={colors.text.tertiary}
         />
       </View>
 
       <View style={styles.inputGroup}>
-        <Text style={styles.label}>Weight</Text>
+        <Text style={styles.label}>{t('profile.weight')}</Text>
         <TextInput
           style={styles.input}
           value={formState.medicalInfo.weight || ''}
           onChangeText={(value) => updateMedicalInfo('weight', value)}
-          placeholder="e.g., 150 lbs or 68 kg"
+          placeholder={t('profile.form.placeholders.weight')}
           placeholderTextColor={colors.text.tertiary}
         />
       </View>
 
       {/* Allergies Section */}
       <View style={styles.inputGroup}>
-        <Text style={styles.label}>Allergies</Text>
-        <Text style={styles.helperText}>Add any allergies or adverse reactions</Text>
+        <Text style={styles.label}>{t('profile.allergies')}</Text>
+        <Text style={styles.helperText}>{t('profile.form.helpers.allergies')}</Text>
         
         {formState.medicalInfo.allergies?.map((allergy, index) => (
           <View key={index} style={styles.listItem}>
@@ -862,7 +865,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
                 newAllergies[index] = value;
                 updateMedicalInfo('allergies', newAllergies);
               }}
-              placeholder="e.g., Penicillin, Peanuts, Shellfish"
+              placeholder={t('profile.form.placeholders.allergies')}
               placeholderTextColor={colors.text.tertiary}
             />
             <TouchableOpacity
@@ -884,14 +887,14 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
             updateMedicalInfo('allergies', newAllergies);
           }}
         >
-          <Text style={styles.addItemButtonText}>+ Add Allergy</Text>
+          <Text style={styles.addItemButtonText}>{t('profile.addAllergy')}</Text>
         </TouchableOpacity>
       </View>
 
       {/* Current Medications Section */}
       <View style={styles.inputGroup}>
-        <Text style={styles.label}>Current Medications</Text>
-        <Text style={styles.helperText}>List all medications you're currently taking</Text>
+        <Text style={styles.label}>{t('profile.medications')}</Text>
+        <Text style={styles.helperText}>{t('profile.form.helpers.medications')}</Text>
         
         {formState.medicalInfo.medications?.map((medication, index) => (
           <View key={index} style={styles.listItem}>
@@ -904,7 +907,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
                 newMedications[index] = value;
                 updateMedicalInfo('medications', newMedications);
               }}
-              placeholder="e.g., Lisinopril 10mg daily, Aspirin 81mg"
+              placeholder={t('profile.form.placeholders.medications')}
               placeholderTextColor={colors.text.tertiary}
             />
             <TouchableOpacity
@@ -926,14 +929,14 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
             updateMedicalInfo('medications', newMedications);
           }}
         >
-          <Text style={styles.addItemButtonText}>+ Add Medication</Text>
+          <Text style={styles.addItemButtonText}>{t('profile.addMedication')}</Text>
         </TouchableOpacity>
       </View>
 
       {/* Medical Conditions Section */}
       <View style={styles.inputGroup}>
-        <Text style={styles.label}>Medical Conditions</Text>
-        <Text style={styles.helperText}>List any ongoing medical conditions or diagnoses</Text>
+        <Text style={styles.label}>{t('profile.conditions')}</Text>
+        <Text style={styles.helperText}>{t('profile.form.helpers.conditions')}</Text>
         
         {formState.medicalInfo.medicalConditions?.map((condition, index) => (
           <View key={index} style={styles.listItem}>
@@ -946,7 +949,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
                 newConditions[index] = value;
                 updateMedicalInfo('medicalConditions', newConditions);
               }}
-              placeholder="e.g., Diabetes Type 2, Hypertension, Asthma"
+              placeholder={t('profile.form.placeholders.conditions')}
               placeholderTextColor={colors.text.tertiary}
             />
             <TouchableOpacity
@@ -968,29 +971,29 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
             updateMedicalInfo('medicalConditions', newConditions);
           }}
         >
-          <Text style={styles.addItemButtonText}>+ Add Medical Condition</Text>
+          <Text style={styles.addItemButtonText}>{t('profile.addCondition')}</Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.inputGroup}>
-        <Text style={styles.label}>Emergency Medical Information</Text>
+        <Text style={styles.label}>{t('profile.form.labels.emergencyMedicalInfo')}</Text>
         <TextInput
           style={[styles.input, styles.textArea]}
           value={formState.medicalInfo.emergencyMedicalInfo || ''}
           onChangeText={(value) => updateMedicalInfo('emergencyMedicalInfo', value)}
-          placeholder="Critical medical information for first responders (allergies, conditions, medications, etc.)"
+          placeholder={t('profile.form.placeholders.emergencyMedicalInfo')}
           placeholderTextColor={colors.text.tertiary}
           multiline
           numberOfLines={4}
         />
         <Text style={styles.helperText}>
-          Include critical allergies, medical conditions, current medications, and any other information emergency responders should know immediately.
+          {t('profile.form.helpers.emergencyMedicalInfo')}
         </Text>
       </View>
 
       <View style={styles.switchGroup}>
         <View style={styles.switchItem}>
-          <Text style={styles.switchLabel}>Blood Donor</Text>
+          <Text style={styles.switchLabel}>{t('profile.bloodDonor')}</Text>
           <Switch
             value={formState.medicalInfo.bloodDonorStatus || false}
             onValueChange={(value) => updateMedicalInfo('bloodDonorStatus', value)}
@@ -1000,7 +1003,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
         </View>
         
         <View style={styles.switchItem}>
-          <Text style={styles.switchLabel}>Organ Donor</Text>
+          <Text style={styles.switchLabel}>{t('profile.organDonor')}</Text>
           <Switch
             value={formState.medicalInfo.organDonorStatus || false}
             onValueChange={(value) => updateMedicalInfo('organDonorStatus', value)}
@@ -1018,42 +1021,42 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
       exiting={FadeOutLeft.duration(200)}
       style={styles.stepContent}
     >
-      <Text style={styles.stepTitle}>Emergency Contacts</Text>
+      <Text style={styles.stepTitle}>{t('profile.form.emergencyContacts.title')}</Text>
       <Text style={styles.stepDescription}>
-        Add people to contact in case of emergency. At least one contact is required.
+        {t('profile.form.emergencyContacts.description')}
       </Text>
       
       <TouchableOpacity 
         style={styles.addButton}
         onPress={addEmergencyContact}
       >
-        <Text style={styles.addButtonText}>+ Add Emergency Contact</Text>
+        <Text style={styles.addButtonText}>{t('profile.form.emergencyContacts.addContact')}</Text>
       </TouchableOpacity>
 
       {formState.emergencyContacts.map((contact, index) => (
         <View key={contact.id} style={styles.contactItem}>
           <View style={styles.contactHeader}>
-            <Text style={styles.contactTitle}>Contact {index + 1}</Text>
+            <Text style={styles.contactTitle}>{t('profile.form.emergencyContacts.contact', { number: index + 1 })}</Text>
             {contact.isPrimary && (
               <View style={styles.primaryBadge}>
-                <Text style={styles.primaryBadgeText}>Primary</Text>
+                <Text style={styles.primaryBadgeText}>{t('profile.form.emergencyContacts.primary')}</Text>
               </View>
             )}
             <TouchableOpacity 
               style={styles.removeButton}
               onPress={() => removeEmergencyContact(index)}
             >
-              <Text style={styles.removeButtonText}>Remove</Text>
+              <Text style={styles.removeButtonText}>{t('profile.form.emergencyContacts.remove')}</Text>
             </TouchableOpacity>
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Name *</Text>
+            <Text style={styles.label}>{t('profile.form.emergencyContacts.name')}</Text>
             <TextInput
               style={[styles.input, errors[`contact_${index}_name`] ? styles.inputError : undefined]}
               value={contact.name}
               onChangeText={(value) => updateEmergencyContact(index, 'name', value)}
-              placeholder="Contact name"
+              placeholder={t('profile.form.emergencyContacts.namePlaceholder')}
               placeholderTextColor={colors.text.tertiary}
               autoCapitalize="words"
             />
@@ -1063,12 +1066,12 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Phone Number *</Text>
+            <Text style={styles.label}>{t('profile.form.emergencyContacts.phoneNumber')}</Text>
             <TextInput
               style={[styles.input, errors[`contact_${index}_phone`] ? styles.inputError : undefined]}
               value={contact.phoneNumber}
               onChangeText={(value) => updateEmergencyContact(index, 'phoneNumber', value)}
-              placeholder="Phone number"
+              placeholder={t('profile.form.emergencyContacts.phonePlaceholder')}
               placeholderTextColor={colors.text.tertiary}
               keyboardType="phone-pad"
             />
@@ -1078,12 +1081,12 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Email</Text>
+            <Text style={styles.label}>{t('profile.form.emergencyContacts.email')}</Text>
             <TextInput
               style={styles.input}
               value={contact.email || ''}
               onChangeText={(value) => updateEmergencyContact(index, 'email', value)}
-              placeholder="Email address (optional)"
+              placeholder={t('profile.form.emergencyContacts.emailPlaceholder')}
               placeholderTextColor={colors.text.tertiary}
               keyboardType="email-address"
               autoCapitalize="none"
@@ -1091,7 +1094,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Relationship</Text>
+            <Text style={styles.label}>{t('profile.form.emergencyContacts.relationship')}</Text>
             <View style={styles.relationshipContainer}>
               {RELATIONSHIP_TYPES.slice(0, 6).map((relationship) => (
                 <TouchableOpacity
@@ -1106,7 +1109,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
                     styles.relationshipText,
                     contact.relationship === relationship && styles.relationshipTextActive
                   ]}>
-                    {relationship.charAt(0).toUpperCase() + relationship.slice(1)}
+                    {t(`profile.form.relationships.${relationship}`)}
                   </Text>
                 </TouchableOpacity>
               ))}
@@ -1115,7 +1118,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
 
           {formState.emergencyContacts.length > 1 && (
             <View style={styles.switchContainer}>
-              <Text style={styles.switchLabel}>Set as Primary Contact</Text>
+              <Text style={styles.switchLabel}>{t('profile.form.emergencyContacts.setAsPrimary')}</Text>
               <Switch
                 value={contact.isPrimary}
                 onValueChange={(value) => updateEmergencyContact(index, 'isPrimary', value)}
@@ -1129,9 +1132,9 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
 
       {formState.emergencyContacts.length === 0 && (
         <View style={styles.emptyState}>
-          <Text style={styles.emptyStateText}>No emergency contacts added yet</Text>
+          <Text style={styles.emptyStateText}>{t('profile.form.emergencyContacts.noContactsYet')}</Text>
           <Text style={styles.emptyStateSubtext}>
-            Add at least one emergency contact for emergency responders to reach
+            {t('profile.form.emergencyContacts.addAtLeastOne')}
           </Text>
         </View>
       )}
@@ -1148,16 +1151,16 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
       exiting={FadeOutLeft.duration(200)}
       style={styles.stepContent}
     >
-      <Text style={styles.stepTitle}>Privacy Settings</Text>
+      <Text style={styles.stepTitle}>{t('profile.form.privacy.title')}</Text>
       <Text style={styles.stepDescription}>
-        Configure how your profile information can be accessed in emergency situations.
+        {t('profile.form.privacy.description')}
       </Text>
       
       <View style={styles.settingItem}>
         <View style={styles.settingInfo}>
-          <Text style={styles.settingTitle}>Allow Emergency Access</Text>
+          <Text style={styles.settingTitle}>{t('profile.form.privacy.allowEmergencyAccess')}</Text>
           <Text style={styles.settingDescription}>
-            Allow emergency responders to access your basic information via QR code
+            {t('profile.form.privacy.allowEmergencyAccessDesc')}
           </Text>
         </View>
         <Switch
@@ -1176,9 +1179,9 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
 
       <View style={styles.settingItem}>
         <View style={styles.settingInfo}>
-          <Text style={styles.settingTitle}>Allow Medical Professional Access</Text>
+          <Text style={styles.settingTitle}>{t('profile.form.privacy.allowMedicalProfessionalAccess')}</Text>
           <Text style={styles.settingDescription}>
-            Allow verified medical professionals to access additional information
+            {t('profile.form.privacy.allowMedicalProfessionalAccessDesc')}
           </Text>
         </View>
         <Switch
@@ -1197,9 +1200,9 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
 
       <View style={styles.settingItem}>
         <View style={styles.settingInfo}>
-          <Text style={styles.settingTitle}>Require Password for Full Access</Text>
+          <Text style={styles.settingTitle}>{t('profile.form.privacy.requirePassword')}</Text>
           <Text style={styles.settingDescription}>
-            Require additional authentication for complete profile access via app
+            {t('profile.form.privacy.requirePasswordDesc')}
           </Text>
         </View>
         <Switch
@@ -1231,13 +1234,13 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
           {hasExistingPassword ? (
             // User has existing password - show change password option
             <View>
-              <Text style={styles.passwordSectionTitle}>Password Protection</Text>
+              <Text style={styles.passwordSectionTitle}>{t('profile.form.privacy.passwordProtection')}</Text>
               <Text style={styles.passwordSectionDescription}>
-                You already have a password set up for profile protection.
+                {t('profile.form.privacy.existingPasswordMessage')}
               </Text>
               
               <View style={styles.existingPasswordInfo}>
-                <Text style={styles.existingPasswordText}>✓ Password protection is currently enabled</Text>
+                <Text style={styles.existingPasswordText}>✓ {t('profile.form.privacy.passwordEnabled')}</Text>
                 <TouchableOpacity
                   style={styles.changePasswordButton}
                   onPress={() => {
@@ -1251,21 +1254,21 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
                   }}
                 >
                   <Text style={styles.changePasswordButtonText}>
-                    {wantToChangePassword ? 'Keep Current Password' : 'Change Password'}
+                    {wantToChangePassword ? t('profile.form.privacy.keepCurrentPassword') : t('profile.form.privacy.changePassword')}
                   </Text>
                 </TouchableOpacity>
               </View>
 
               {wantToChangePassword && (
                 <View style={styles.changePasswordForm}>
-                  <Text style={styles.changePasswordTitle}>Set New Password</Text>
+                  <Text style={styles.changePasswordTitle}>{t('profile.form.privacy.setNewPassword')}</Text>
                   
                   <View style={styles.passwordInputContainer}>
-                    <Text style={styles.label}>New Profile Password</Text>
+                    <Text style={styles.label}>{t('profile.form.privacy.newProfilePassword')}</Text>
                     <View style={styles.passwordFieldContainer}>
                       <TextInput
                         style={[styles.passwordInput, passwordError ? styles.inputError : null]}
-                        placeholder="Enter new profile password"
+                        placeholder={t('profile.form.privacy.enterNewPassword')}
                         placeholderTextColor={colors.text.tertiary}
                         value={profilePassword}
                         onChangeText={setProfilePassword}
@@ -1278,17 +1281,17 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
                         onPress={() => setShowPassword(!showPassword)}
                       >
                         <Text style={styles.passwordToggleText}>
-                          {showPassword ? 'Hide' : 'Show'}
+                          {showPassword ? t('profile.form.privacy.hide') : t('profile.form.privacy.show')}
                         </Text>
                       </TouchableOpacity>
                     </View>
                   </View>
 
                   <View style={styles.passwordInputContainer}>
-                    <Text style={styles.label}>Confirm New Password</Text>
+                    <Text style={styles.label}>{t('profile.form.privacy.confirmNewPassword')}</Text>
                     <TextInput
                       style={[styles.passwordInput, passwordError ? styles.inputError : null]}
-                      placeholder="Confirm new profile password"
+                      placeholder={t('profile.form.privacy.confirmNewPasswordPlaceholder')}
                       placeholderTextColor={colors.text.tertiary}
                       value={confirmPassword}
                       onChangeText={setConfirmPassword}
@@ -1304,7 +1307,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
 
                   {profilePassword && (
                     <View style={styles.passwordStrengthContainer}>
-                      <Text style={styles.passwordStrengthLabel}>Password Strength:</Text>
+                      <Text style={styles.passwordStrengthLabel}>{t('profile.form.privacy.passwordStrength')}</Text>
                       <Text style={[
                         styles.passwordStrengthText,
                         { color: getPasswordStrengthColor(passwordService.validateProfilePassword(profilePassword).strength) }
@@ -1319,17 +1322,17 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
           ) : (
             // No existing password - show create password form
             <View>
-              <Text style={styles.passwordSectionTitle}>Set Profile Password</Text>
+              <Text style={styles.passwordSectionTitle}>{t('profile.form.privacy.setProfilePassword')}</Text>
               <Text style={styles.passwordSectionDescription}>
-                This password will be required to access your full profile information through the app.
+                {t('profile.form.privacy.setProfilePasswordDesc')}
               </Text>
 
               <View style={styles.passwordInputContainer}>
-                <Text style={styles.label}>Profile Password</Text>
+                <Text style={styles.label}>{t('profile.form.privacy.profilePassword')}</Text>
                 <View style={styles.passwordFieldContainer}>
                   <TextInput
                     style={[styles.passwordInput, passwordError ? styles.inputError : null]}
-                    placeholder="Enter profile password"
+                    placeholder={t('profile.form.privacy.enterProfilePassword')}
                     placeholderTextColor={colors.text.tertiary}
                     value={profilePassword}
                     onChangeText={setProfilePassword}
@@ -1342,17 +1345,17 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
                     onPress={() => setShowPassword(!showPassword)}
                   >
                     <Text style={styles.passwordToggleText}>
-                      {showPassword ? 'Hide' : 'Show'}
+                      {showPassword ? t('profile.form.privacy.hide') : t('profile.form.privacy.show')}
                     </Text>
                   </TouchableOpacity>
                 </View>
               </View>
 
               <View style={styles.passwordInputContainer}>
-                <Text style={styles.label}>Confirm Password</Text>
+                <Text style={styles.label}>{t('profile.form.privacy.confirmPassword')}</Text>
                 <TextInput
                   style={[styles.passwordInput, passwordError ? styles.inputError : null]}
-                  placeholder="Confirm profile password"
+                  placeholder={t('profile.form.privacy.confirmPasswordPlaceholder')}
                   placeholderTextColor={colors.text.tertiary}
                   value={confirmPassword}
                   onChangeText={setConfirmPassword}
@@ -1368,7 +1371,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
 
               {profilePassword && (
                 <View style={styles.passwordStrengthContainer}>
-                  <Text style={styles.passwordStrengthLabel}>Password Strength:</Text>
+                  <Text style={styles.passwordStrengthLabel}>{t('profile.form.privacy.passwordStrength')}</Text>
                   <Text style={[
                     styles.passwordStrengthText,
                     { color: getPasswordStrengthColor(passwordService.validateProfilePassword(profilePassword).strength) }
@@ -1384,9 +1387,9 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
 
       <View style={styles.settingItem}>
         <View style={styles.settingInfo}>
-          <Text style={styles.settingTitle}>Enable Audit Logging</Text>
+          <Text style={styles.settingTitle}>{t('profile.form.privacy.enableAuditLogging')}</Text>
           <Text style={styles.settingDescription}>
-            Keep track of who accesses your profile and when
+            {t('profile.form.privacy.enableAuditLoggingDesc')}
           </Text>
         </View>
         <Switch
@@ -1404,9 +1407,9 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
       </View>
 
       <View style={styles.completionSection}>
-        <Text style={styles.completionTitle}>Ready to Save</Text>
+        <Text style={styles.completionTitle}>{t('profile.form.privacy.readyToSave')}</Text>
         <Text style={styles.completionText}>
-          Your profile is ready to be saved. You can always edit this information later.
+          {t('profile.form.privacy.readyToSaveDesc')}
         </Text>
       </View>
     </Animated.View>
@@ -1417,7 +1420,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
   // =============================================
 
   if (isLoadingProfile) {
-    return <LoadingOverlay visible={true} message="Loading profile..." />;
+    return <LoadingOverlay visible={true} message={t('profile.loadingProfile')} />;
   }
 
   return (
@@ -1443,7 +1446,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
           onPress={handleBack}
         >
           <Text style={styles.backButtonText}>
-            {currentStep === 0 ? 'Cancel' : 'Back'}
+            {currentStep === 0 ? t('profile.form.buttons.cancel') : t('profile.form.buttons.back')}
           </Text>
         </TouchableOpacity>
 
@@ -1456,7 +1459,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
             <ActivityIndicator color={colors.text.inverse} />
           ) : (
             <Text style={styles.nextButtonText}>
-              {currentStep === steps.length - 1 ? 'Save Profile' : 'Next'}
+              {currentStep === steps.length - 1 ? t('profile.form.buttons.saveProfile') : t('profile.form.buttons.next')}
             </Text>
           )}
         </TouchableOpacity>

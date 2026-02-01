@@ -11,6 +11,7 @@ import {
   Modal,
   ScrollView
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { colors, spacing } from '../../theme';
 import { AuditLog } from '../../types';
 import { profileService } from '../../services';
@@ -33,6 +34,7 @@ export const AuditLogViewer: React.FC<AuditLogViewerProps> = ({
   showFilters = true,
   maxItems = 100
 }) => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [filteredLogs, setFilteredLogs] = useState<AuditLog[]>([]);
@@ -60,7 +62,7 @@ export const AuditLogViewer: React.FC<AuditLogViewerProps> = ({
 
   const loadAuditLogs = async () => {
     if (!targetProfileId) {
-      setError('No profile ID available');
+      setError(t('profile.noProfileIdAvailable'));
       setLoading(false);
       return;
     }
@@ -74,11 +76,11 @@ export const AuditLogViewer: React.FC<AuditLogViewerProps> = ({
       if (response.success && response.data) {
         setAuditLogs(response.data);
       } else {
-        setError(response.error?.message || 'Failed to load audit logs');
+        setError(response.error?.message || t('admin.failedLoadAuditLogs'));
       }
     } catch (err: any) {
       console.error('Error loading audit logs:', err);
-      setError('Failed to load audit logs');
+      setError(t('admin.failedLoadAuditLogs'));
     } finally {
       setLoading(false);
     }
@@ -198,11 +200,11 @@ export const AuditLogViewer: React.FC<AuditLogViewerProps> = ({
       
       <View style={styles.logMeta}>
         <Text style={styles.metaText}>
-          Method: {item.accessMethod.replace('_', ' ')}
+          {t('admin.accessMethod')}: {item.accessMethod.replace('_', ' ')}
         </Text>
         {item.fieldsAccessed && item.fieldsAccessed.length > 0 && (
           <Text style={styles.metaText}>
-            Fields: {item.fieldsAccessed.slice(0, 3).join(', ')}
+            {t('admin.fieldsAccessed')}: {item.fieldsAccessed.slice(0, 3).join(', ')}
             {item.fieldsAccessed.length > 3 && '...'}
           </Text>
         )}
@@ -217,52 +219,52 @@ export const AuditLogViewer: React.FC<AuditLogViewerProps> = ({
       <View style={styles.filtersContainer}>
         <TextInput
           style={styles.searchInput}
-          placeholder="Search logs..."
+          placeholder={t('admin.searchLogs')}
           value={searchText}
           onChangeText={setSearchText}
         />
         
         <View style={styles.filterRow}>
-          <Text style={styles.filterLabel}>Access Type:</Text>
+          <Text style={styles.filterLabel}>{t('profile.accessType')}:</Text>
           <TouchableOpacity
             style={[styles.filterButton, filters.accessType === 'all' && styles.filterButtonActive]}
             onPress={() => setFilters(prev => ({ ...prev, accessType: 'all' }))}
           >
-            <Text style={styles.filterButtonText}>All</Text>
+            <Text style={styles.filterButtonText}>{t('admin.filterAll')}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.filterButton, filters.accessType === 'emergency_access' && styles.filterButtonActive]}
             onPress={() => setFilters(prev => ({ ...prev, accessType: 'emergency_access' }))}
           >
-            <Text style={styles.filterButtonText}>Emergency</Text>
+            <Text style={styles.filterButtonText}>{t('admin.filterEmergency')}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.filterButton, filters.accessType === 'qr_scan' && styles.filterButtonActive]}
             onPress={() => setFilters(prev => ({ ...prev, accessType: 'qr_scan' }))}
           >
-            <Text style={styles.filterButtonText}>QR Scan</Text>
+            <Text style={styles.filterButtonText}>{t('admin.filterQRScan')}</Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.filterRow}>
-          <Text style={styles.filterLabel}>Time Range:</Text>
+          <Text style={styles.filterLabel}>{t('admin.timeRange')}:</Text>
           <TouchableOpacity
             style={[styles.filterButton, filters.dateRange === 'all' && styles.filterButtonActive]}
             onPress={() => setFilters(prev => ({ ...prev, dateRange: 'all' }))}
           >
-            <Text style={styles.filterButtonText}>All</Text>
+            <Text style={styles.filterButtonText}>{t('admin.filterAll')}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.filterButton, filters.dateRange === 'today' && styles.filterButtonActive]}
             onPress={() => setFilters(prev => ({ ...prev, dateRange: 'today' }))}
           >
-            <Text style={styles.filterButtonText}>Today</Text>
+            <Text style={styles.filterButtonText}>{t('admin.filterToday')}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.filterButton, filters.dateRange === 'week' && styles.filterButtonActive]}
             onPress={() => setFilters(prev => ({ ...prev, dateRange: 'week' }))}
           >
-            <Text style={styles.filterButtonText}>Week</Text>
+            <Text style={styles.filterButtonText}>{t('admin.filterWeek')}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -281,7 +283,7 @@ export const AuditLogViewer: React.FC<AuditLogViewerProps> = ({
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Access Log Details</Text>
+            <Text style={styles.modalTitle}>{t('admin.auditLogDetails')}</Text>
             <TouchableOpacity
               style={styles.closeButton}
               onPress={() => setModalVisible(false)}
@@ -292,28 +294,28 @@ export const AuditLogViewer: React.FC<AuditLogViewerProps> = ({
           
           <ScrollView style={styles.modalContent}>
             <View style={styles.detailSection}>
-              <Text style={styles.detailLabel}>Access Type</Text>
+              <Text style={styles.detailLabel}>{t('profile.accessType')}</Text>
               <Text style={styles.detailValue}>
                 {getAccessTypeIcon(selectedLog.accessType)} {selectedLog.accessType.replace('_', ' ').toUpperCase()}
               </Text>
             </View>
 
             <View style={styles.detailSection}>
-              <Text style={styles.detailLabel}>Accessed By</Text>
+              <Text style={styles.detailLabel}>{t('admin.accessedBy')}</Text>
               <Text style={[styles.detailValue, { color: getAccessorTypeColor(selectedLog.accessorType) }]}>
                 {selectedLog.accessorType.replace('_', ' ')}
               </Text>
             </View>
 
             <View style={styles.detailSection}>
-              <Text style={styles.detailLabel}>Method</Text>
+              <Text style={styles.detailLabel}>{t('admin.method')}</Text>
               <Text style={styles.detailValue}>
                 {selectedLog.accessMethod.replace('_', ' ')}
               </Text>
             </View>
 
             <View style={styles.detailSection}>
-              <Text style={styles.detailLabel}>Timestamp</Text>
+              <Text style={styles.detailLabel}>{t('admin.timestamp')}</Text>
               <Text style={styles.detailValue}>
                 {formatTimestamp(selectedLog.timestamp)}
               </Text>
@@ -321,7 +323,7 @@ export const AuditLogViewer: React.FC<AuditLogViewerProps> = ({
 
             {selectedLog.fieldsAccessed && selectedLog.fieldsAccessed.length > 0 && (
               <View style={styles.detailSection}>
-                <Text style={styles.detailLabel}>Fields Accessed</Text>
+                <Text style={styles.detailLabel}>{t('admin.fieldsAccessed')}</Text>
                 {selectedLog.fieldsAccessed.map((field, index) => (
                   <Text key={index} style={styles.fieldItem}>
                     • {field}
@@ -332,14 +334,14 @@ export const AuditLogViewer: React.FC<AuditLogViewerProps> = ({
 
             {selectedLog.notes && (
               <View style={styles.detailSection}>
-                <Text style={styles.detailLabel}>Notes</Text>
+                <Text style={styles.detailLabel}>{t('admin.notes')}</Text>
                 <Text style={styles.detailValue}>{selectedLog.notes}</Text>
               </View>
             )}
 
             {selectedLog.location && (
               <View style={styles.detailSection}>
-                <Text style={styles.detailLabel}>Location</Text>
+                <Text style={styles.detailLabel}>{t('admin.location')}</Text>
                 <Text style={styles.detailValue}>
                   {selectedLog.location.latitude.toFixed(4)}, {selectedLog.location.longitude.toFixed(4)}
                 </Text>
@@ -348,14 +350,14 @@ export const AuditLogViewer: React.FC<AuditLogViewerProps> = ({
 
             {selectedLog.deviceInfo && (
               <View style={styles.detailSection}>
-                <Text style={styles.detailLabel}>Device</Text>
+                <Text style={styles.detailLabel}>{t('admin.device')}</Text>
                 <Text style={styles.detailValue}>{selectedLog.deviceInfo}</Text>
               </View>
             )}
 
             {selectedLog.dataModified && (
               <View style={styles.warningSection}>
-                <Text style={styles.warningText}>⚠️ Data was modified during this access</Text>
+                <Text style={styles.warningText}>⚠️ {t('admin.dataModifiedWarning')}</Text>
               </View>
             )}
           </ScrollView>
@@ -368,7 +370,7 @@ export const AuditLogViewer: React.FC<AuditLogViewerProps> = ({
     return (
       <View style={styles.centerContainer}>
         <ActivityIndicator size="large" color={colors.primary.main} />
-        <Text style={styles.loadingText}>Loading audit logs...</Text>
+        <Text style={styles.loadingText}>{t('admin.loadingAuditLogs')}</Text>
       </View>
     );
   }
@@ -378,7 +380,7 @@ export const AuditLogViewer: React.FC<AuditLogViewerProps> = ({
       <View style={styles.centerContainer}>
         <Text style={styles.errorText}>❌ {error}</Text>
         <TouchableOpacity style={styles.retryButton} onPress={loadAuditLogs}>
-          <Text style={styles.retryButtonText}>Retry</Text>
+          <Text style={styles.retryButtonText}>{t('common.retry')}</Text>
         </TouchableOpacity>
       </View>
     );
@@ -390,10 +392,10 @@ export const AuditLogViewer: React.FC<AuditLogViewerProps> = ({
       
       <View style={styles.summaryContainer}>
         <Text style={styles.summaryText}>
-          Showing {filteredLogs.length} of {auditLogs.length} access logs
+          {t('admin.showingLogsCount', { filtered: filteredLogs.length, total: auditLogs.length })}
         </Text>
         <TouchableOpacity onPress={loadAuditLogs}>
-          <Text style={styles.refreshText}>🔄 Refresh</Text>
+          <Text style={styles.refreshText}>🔄 {t('admin.refresh')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -401,8 +403,8 @@ export const AuditLogViewer: React.FC<AuditLogViewerProps> = ({
         <View style={styles.centerContainer}>
           <Text style={styles.emptyText}>
             {auditLogs.length === 0 
-              ? "No access logs found" 
-              : "No logs match your filters"
+              ? t('admin.noAccessLogsFound') 
+              : t('admin.noLogsMatchFilters')
             }
           </Text>
         </View>

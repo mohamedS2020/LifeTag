@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { UserAuditLogViewer } from '../components/Profile';
 import { useAuth } from '../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
@@ -24,22 +25,18 @@ export const ProfileAccessHistoryScreen: React.FC<ProfileAccessHistoryScreenProp
   profileId,
   title
 }) => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const finalProfileId = profileId || user?.profile?.id || user?.id;
-  const screenTitle = title || 'Profile Access History';
+  const screenTitle = title || t('profile.accessHistory');
 
   const showInfoAlert = () => {
     Alert.alert(
-      'About Access Logs',
-      'This shows everyone who has accessed your medical profile information, including:\n\n' +
-      '• QR code scans by medical professionals 👨‍⚕️\n' +
-      '• Emergency access situations 🚨\n' +
-      '• Full profile views 👁️\n' +
-      '• Profile modifications ✏️\n\n' +
-      'Medical professionals are marked with a green badge. All access is logged for your security and privacy.',
-      [{ text: 'OK' }]
+      t('profile.aboutAccessLogs'),
+      t('profile.accessLogsDescription'),
+      [{ text: t('common.ok') }]
     );
   };
 
@@ -71,9 +68,9 @@ export const ProfileAccessHistoryScreen: React.FC<ProfileAccessHistoryScreenProp
             <View style={styles.errorIconContainer}>
               <Ionicons name="warning-outline" size={48} color={colors.status.error.main} />
             </View>
-            <Text style={styles.errorTitle}>Profile Not Found</Text>
+            <Text style={styles.errorTitle}>{t('profile.noProfileFound')}</Text>
             <Text style={styles.errorText}>
-              Unable to load profile access history.
+              {t('profile.noAccessHistory')}
             </Text>
           </View>
         )}
