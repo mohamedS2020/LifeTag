@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
   Vibration,
   TextInput,
-  ScrollView
+  ScrollView,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { CameraView, CameraType, useCameraPermissions, BarcodeScanningResult } from 'expo-camera';
@@ -19,6 +19,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { QRService, EmergencyQRData } from '../../services/qrService';
 import { profileService } from '../../services';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { AuditLog } from '../../types';
 import { useTheme } from '../../theme';
 
@@ -57,6 +58,9 @@ const QRScanner: React.FC<QRScannerProps> = ({
   
   // Auth context for user identification
   const { user } = useAuth();
+  
+  // Language context for RTL detection
+  const { isRTL } = useLanguage();
   
   // State management
   const [scanned, setScanned] = useState(false);
@@ -343,36 +347,18 @@ const QRScanner: React.FC<QRScannerProps> = ({
       borderWidth: 2,
       borderColor: 'transparent',
     },
-    corner: {
+    // Corner lines - simple rectangles with background color (no borders = no RTL flip)
+    cornerLineHorizontal: {
       position: 'absolute',
       width: 30,
+      height: 3,
+      backgroundColor: colors.primary.main,
+    },
+    cornerLineVertical: {
+      position: 'absolute',
+      width: 3,
       height: 30,
-      borderColor: colors.primary.main,
-      borderWidth: 3,
-    },
-    topLeft: {
-      top: -2,
-      left: -2,
-      borderRightWidth: 0,
-      borderBottomWidth: 0,
-    },
-    topRight: {
-      top: -2,
-      right: -2,
-      borderLeftWidth: 0,
-      borderBottomWidth: 0,
-    },
-    bottomLeft: {
-      bottom: -2,
-      left: -2,
-      borderRightWidth: 0,
-      borderTopWidth: 0,
-    },
-    bottomRight: {
-      bottom: -2,
-      right: -2,
-      borderLeftWidth: 0,
-      borderTopWidth: 0,
+      backgroundColor: colors.primary.main,
     },
     loadingOverlay: {
       position: 'absolute',
@@ -497,7 +483,7 @@ const QRScanner: React.FC<QRScannerProps> = ({
       minHeight: 120,
       marginVertical: spacing.md,
     },
-  }), [colors, spacing, borderRadius, typography, shadows]);
+  }), [colors, spacing, borderRadius, typography, shadows, isRTL]);
 
   if (!permission) {
     return (
@@ -636,11 +622,19 @@ const QRScanner: React.FC<QRScannerProps> = ({
         <View style={styles.scanOverlay}>
           <View style={styles.scanArea}>
             <View style={[styles.scanFrame, { width: scanAreaSize, height: scanAreaSize }]}>
-              {/* Corner indicators */}
-              <View style={[styles.corner, styles.topLeft]} />
-              <View style={[styles.corner, styles.topRight]} />
-              <View style={[styles.corner, styles.bottomLeft]} />
-              <View style={[styles.corner, styles.bottomRight]} />
+              {/* Corner lines - 8 simple rectangles (2 per corner), no borders = no RTL issues */}
+              {/* Top-left corner */}
+              <View style={[styles.cornerLineHorizontal, { top: 0, left: 0 }]} />
+              <View style={[styles.cornerLineVertical, { top: 0, left: 0 }]} />
+              {/* Top-right corner */}
+              <View style={[styles.cornerLineHorizontal, { top: 0, right: 0 }]} />
+              <View style={[styles.cornerLineVertical, { top: 0, right: 0 }]} />
+              {/* Bottom-left corner */}
+              <View style={[styles.cornerLineHorizontal, { bottom: 0, left: 0 }]} />
+              <View style={[styles.cornerLineVertical, { bottom: 0, left: 0 }]} />
+              {/* Bottom-right corner */}
+              <View style={[styles.cornerLineHorizontal, { bottom: 0, right: 0 }]} />
+              <View style={[styles.cornerLineVertical, { bottom: 0, right: 0 }]} />
               
               {/* Loading indicator */}
               {isLoading && (

@@ -212,6 +212,7 @@
     "profileProtected": "Dieses Profil ist passwortgeschützt",
     "enterPassword": "Passwort eingeben zum Anzeigen",
     "accessHistory": "Profilzugriffsverlauf",
+    "yourAccessHistory": "Patienten, auf die Sie zugegriffen haben",
     "noAccessHistory": "Kein Zugriffsverlauf verfügbar",
     "accessDetails": "Zugriffsdetails",
     "accessedBy": "Zugegriffen von",

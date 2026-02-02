@@ -40,15 +40,15 @@ export const SettingsScreen: React.FC = () => {
       backgroundColor: colors.background.primary,
     },
     headerIconContainer: {
-      width: 72,
-      height: 72,
-      borderRadius: 36,
+      width: 80,
+      height: 80,
+      borderRadius: 40,
       backgroundColor: colors.background.elevated,
       alignItems: 'center',
       justifyContent: 'center',
-      marginBottom: spacing.lg,
+      marginBottom: spacing.md,
       borderWidth: 1,
-      borderColor: colors.border.default,
+      borderColor: colors.border.light,
     },
     settingIconBg: {
       width: 40,
@@ -134,7 +134,7 @@ export const SettingsScreen: React.FC = () => {
         {/* Header */}
         <Animated.View entering={FadeInDown.delay(100).duration(400)} style={styles.header}>
           <View style={dynamicStyles.headerIconContainer}>
-            <Ionicons name="settings-outline" size={36} color={colors.primary.main} />
+            <Ionicons name="settings-outline" size={48} color={colors.primary.main} />
           </View>
           <H2 style={styles.headerTitle}>{t('settings.title')}</H2>
           <Body color="secondary" align="center">{t('settings.subtitle')}</Body>
@@ -279,12 +279,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contentContainer: {
-    padding: spacing.xl,
+    padding: spacing.lg,
   },
   header: {
     alignItems: 'center',
-    marginBottom: spacing['3xl'],
-    paddingVertical: spacing.xl,
+    marginBottom: spacing.xl,
   },
   headerTitle: {
     marginBottom: spacing.xs,

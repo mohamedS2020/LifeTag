@@ -212,6 +212,7 @@
     "profileProtected": "هذا الملف الشخصي محمي بكلمة مرور",
     "enterPassword": "أدخل كلمة المرور للعرض",
     "accessHistory": "سجل الوصول للملف الشخصي",
+    "yourAccessHistory": "المرضى الذين قمت بالوصول إليهم",
     "noAccessHistory": "لا يوجد سجل وصول متاح",
     "accessDetails": "تفاصيل الوصول",
     "accessedBy": "تم الوصول بواسطة",

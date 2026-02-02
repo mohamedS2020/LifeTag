@@ -46,6 +46,22 @@ const sharedColors = {
     },
   },
 
+  // Accent colors
+  accent: {
+    purple: {
+      main: '#8B5CF6',
+      light: '#A78BFA',
+      dark: '#7C3AED',
+      background: 'rgba(139, 92, 246, 0.12)',
+    },
+    teal: {
+      main: '#14B8A6',
+      light: '#2DD4BF',
+      dark: '#0D9488',
+      background: 'rgba(20, 184, 166, 0.12)',
+    },
+  },
+
   // Medical/Emergency specific colors
   medical: {
     emergency: '#BF1A1A',

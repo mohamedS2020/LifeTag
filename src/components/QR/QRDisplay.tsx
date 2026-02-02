@@ -575,6 +575,7 @@ export const QRDisplay: React.FC<QRDisplayProps> = ({
       shadowOpacity: 0.3,
       shadowRadius: 8,
       elevation: 8,
+      direction: 'ltr', // Prevent RTL flip for corner markers
     },
     qrBorder: {
       position: 'absolute',

@@ -63,6 +63,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       paddingTop: spacing.xl,
       paddingBottom: spacing.lg,
       paddingHorizontal: spacing.lg,
+      alignItems: 'center',
     },
     brandTitle: {
       fontSize: 24,
@@ -176,7 +177,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     actionCard: {
       flexDirection: 'row',
       alignItems: 'center',
-      borderLeftWidth: 3,
+      borderStartWidth: 3,
+      borderWidth: 0,
       paddingVertical: spacing.md,
     },
     actionIconContainer: {
@@ -331,7 +333,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         title: t('home.viewFullProfile'),
         subtitle: t('home.seeCompleteInfo'),
         icon: 'document-text',
-        color: colors.status.info.main,
+        color: colors.accent.purple.main,
         onPress: () => navigation.navigate('ProfileDisplay'),
       },
       {
@@ -470,7 +472,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
               <Card
                 variant="default"
                 onPress={action.onPress}
-                style={{ ...styles.actionCard, borderLeftColor: action.color }}
+                style={{ ...styles.actionCard, borderStartColor: action.color }}
               >
                 <View style={styles.actionIconContainer}>
                   <View style={[styles.actionIconBg, { backgroundColor: `${action.color}20` }]}>
