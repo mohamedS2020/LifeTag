@@ -14,6 +14,7 @@ import {
   RefreshControl,
   StatusBar,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
@@ -55,6 +56,19 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     container: {
       flex: 1,
       backgroundColor: colors.background.primary,
+    },
+    // Branded Header
+    brandHeader: {
+      backgroundColor: colors.primary.main,
+      paddingTop: spacing.xl,
+      paddingBottom: spacing.lg,
+      paddingHorizontal: spacing.lg,
+    },
+    brandTitle: {
+      fontSize: 24,
+      fontWeight: '800',
+      color: '#FFFFFF',
+      letterSpacing: -0.5,
     },
     scrollView: {
       flex: 1,
@@ -209,8 +223,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     emergencyCard: {
       marginHorizontal: spacing.lg,
       marginBottom: spacing.lg,
-      borderLeftWidth: 3,
-      borderLeftColor: colors.medical.emergency,
+      borderStartWidth: 3,
+      borderStartColor: colors.medical.emergency,
     },
     emergencyHeader: {
       flexDirection: 'row',
@@ -228,16 +242,18 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     emergencyItem: {
       flexDirection: 'row',
       marginBottom: spacing.sm,
+      flexWrap: 'wrap',
     },
     emergencyLabel: {
       ...typography.label,
       color: colors.text.secondary,
-      width: 120,
+      marginEnd: spacing.sm,
     },
     emergencyValue: {
       ...typography.body,
       color: colors.text.primary,
       flex: 1,
+      flexShrink: 1,
     },
     
     bottomSpacing: {
@@ -534,7 +550,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={colors.background.primary} />
+      <StatusBar barStyle="light-content" backgroundColor={colors.primary.main} />
+      
+      {/* Branded Header with SafeArea */}
+      <SafeAreaView style={styles.brandHeader} edges={['top']}>
+        <Text style={styles.brandTitle}>LifeTag</Text>
+      </SafeAreaView>
       
       <ScrollView
         style={styles.scrollView}

@@ -9,16 +9,12 @@ import './src/i18n'; // Initialize i18n
  * Separated to use theme context inside provider
  */
 function AppContent() {
-  const { isDark, colors } = useTheme();
+  const { isDark } = useTheme();
   
   return (
     <>
       <AppNavigator />
-      <StatusBar 
-        style="light" 
-        translucent 
-        backgroundColor={isDark ? colors.background.primary : colors.primary.main} 
-      />
+      <StatusBar style={isDark ? 'light' : 'dark'} />
     </>
   );
 }

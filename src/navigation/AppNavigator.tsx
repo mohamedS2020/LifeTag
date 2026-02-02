@@ -175,32 +175,8 @@ const AuthenticatedTabs: React.FC = () => {
       ...typography.caption,
       marginTop: 2,
     },
-    headerShown: true,
-    headerStyle: {
-      backgroundColor: isDark ? colors.background.primary : colors.primary.main,
-      shadowColor: colors.primary.dark,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: isDark ? 0 : 0.15,
-      shadowRadius: 8,
-      elevation: isDark ? 0 : 4,
-      borderBottomWidth: 0,
-      height: 100,
-    },
-    headerTintColor: isDark ? colors.text.primary : '#FFFFFF',
-    headerTitleStyle: {
-      fontSize: 28,
-      fontWeight: '800' as const,
-      color: isDark ? colors.text.primary : '#FFFFFF',
-      letterSpacing: -0.5,
-    },
-    headerTitleAlign: 'left' as const,
-    headerLeftContainerStyle: {
-      paddingLeft: spacing.md,
-    },
-    headerRightContainerStyle: {
-      paddingRight: spacing.md,
-    },
-    headerShadowVisible: !isDark,
+    // Hide headers on tab screens - cleaner, more modern look
+    headerShown: false,
   }), [colors, spacing, typography, isDark]);
 
   return (
@@ -452,7 +428,7 @@ const AppNavigator: React.FC = () => {
         ) : (
           <AuthStack />
         )}
-        <StatusBar style="light" translucent backgroundColor={isDark ? colors.background.primary : colors.primary.main} />
+        <StatusBar style={isDark ? 'light' : 'dark'} />
       </NavigationContainer>
     </SafeAreaProvider>
   );

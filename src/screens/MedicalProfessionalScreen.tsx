@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
-import { View, StyleSheet, SafeAreaView } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { MedicalProfessionalDashboard } from '../components/common';
 import { RootStackParamList } from '../navigation/AppNavigator';
@@ -49,7 +50,7 @@ const MedicalProfessionalScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.content}>
         <MedicalProfessionalDashboard
           onNavigateToProfile={handleNavigateToProfile}
