@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -17,7 +17,7 @@ import profileService from '../services/profileService';
 import authService from '../services/authService';
 import { MedicalProfessionalApprovalService } from '../services/medicalProfessionalApprovalService';
 import { RootStackParamList } from '../navigation/AppNavigator';
-import { colors, spacing } from '../theme';
+import { useTheme } from '../theme';
 
 interface RouteParams {
   logId: string;
@@ -31,6 +31,7 @@ type AdminAuditLogDetailNavigationProp = StackNavigationProp<RootStackParamList>
  * Shows comprehensive details of a specific audit log
  */
 const AdminAuditLogDetailScreen: React.FC = () => {
+  const { colors, spacing, borderRadius, typography, shadows } = useTheme();
   const { t } = useTranslation();
   const navigation = useNavigation<AdminAuditLogDetailNavigationProp>();
   const route = useRoute();
@@ -54,6 +55,170 @@ const AdminAuditLogDetailScreen: React.FC = () => {
     name: string;
     details: string;
   } | null>(null);
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background.primary,
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.md,
+      backgroundColor: colors.background.secondary,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border.default,
+    },
+    backButton: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: colors.background.elevated,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    headerTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: colors.text.primary,
+      flex: 1,
+      textAlign: 'center',
+    },
+    headerRight: {
+      width: 40,
+    },
+    content: {
+      flex: 1,
+    },
+    scrollContent: {
+      padding: spacing.md,
+    },
+    accessTypeHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.background.secondary,
+      padding: spacing.lg,
+      borderRadius: borderRadius.lg,
+      marginBottom: spacing.md,
+      borderWidth: 1,
+      borderColor: colors.border.light,
+    },
+    accessTypeIcon: {
+      width: 60,
+      height: 60,
+      borderRadius: 30,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: spacing.md,
+    },
+    accessTypeInfo: {
+      flex: 1,
+    },
+    accessTypeTitle: {
+      fontSize: 20,
+      fontWeight: '700',
+      color: colors.text.primary,
+      marginBottom: spacing.xxs,
+    },
+    accessTypeDescription: {
+      fontSize: 14,
+      color: colors.text.secondary,
+      lineHeight: 20,
+    },
+    section: {
+      marginBottom: spacing.md,
+    },
+    sectionTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text.primary,
+      marginBottom: spacing.sm,
+    },
+    infoCard: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      backgroundColor: colors.background.secondary,
+      padding: spacing.md,
+      borderRadius: borderRadius.md,
+      borderWidth: 1,
+      borderColor: colors.border.light,
+    },
+    infoContent: {
+      flex: 1,
+      marginLeft: spacing.sm,
+    },
+    infoText: {
+      fontSize: 14,
+      color: colors.text.primary,
+      marginLeft: spacing.sm,
+      flex: 1,
+    },
+    infoMainText: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text.primary,
+      marginBottom: spacing.xxs,
+    },
+    infoSubText: {
+      fontSize: 14,
+      color: colors.primary.main,
+      marginBottom: 2,
+    },
+    infoDetailsText: {
+      fontSize: 12,
+      color: colors.text.tertiary,
+      fontFamily: 'monospace',
+    },
+    fieldItem: {
+      fontSize: 14,
+      color: colors.text.primary,
+      marginBottom: 2,
+    },
+    notesCard: {
+      backgroundColor: colors.background.secondary,
+      padding: spacing.md,
+      borderRadius: borderRadius.md,
+      borderLeftWidth: 4,
+      borderLeftColor: colors.primary.main,
+      borderWidth: 1,
+      borderColor: colors.border.light,
+    },
+    notesText: {
+      fontSize: 14,
+      color: colors.text.primary,
+      lineHeight: 20,
+      fontStyle: 'italic',
+    },
+    technicalCard: {
+      backgroundColor: colors.background.secondary,
+      padding: spacing.md,
+      borderRadius: borderRadius.md,
+      borderWidth: 1,
+      borderColor: colors.border.light,
+    },
+    technicalRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingVertical: spacing.xxs,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border.light,
+    },
+    technicalLabel: {
+      fontSize: 12,
+      color: colors.text.tertiary,
+      fontWeight: '500',
+    },
+    technicalValue: {
+      fontSize: 12,
+      color: colors.text.primary,
+      fontFamily: 'monospace',
+      flex: 1,
+      textAlign: 'right',
+    },
+  }), [colors, spacing, borderRadius, typography, shadows]);
 
   /**
    * Fetch detailed information about the accessor and profile
@@ -331,169 +496,5 @@ const AdminAuditLogDetailScreen: React.FC = () => {
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.primary,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    backgroundColor: colors.background.secondary,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.default,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.background.elevated,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: colors.text.primary,
-    flex: 1,
-    textAlign: 'center',
-  },
-  headerRight: {
-    width: 40,
-  },
-  content: {
-    flex: 1,
-  },
-  scrollContent: {
-    padding: spacing.md,
-  },
-  accessTypeHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.background.secondary,
-    padding: spacing.lg,
-    borderRadius: spacing.borderRadius.lg,
-    marginBottom: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.border.light,
-  },
-  accessTypeIcon: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: spacing.md,
-  },
-  accessTypeInfo: {
-    flex: 1,
-  },
-  accessTypeTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: colors.text.primary,
-    marginBottom: spacing.xxs,
-  },
-  accessTypeDescription: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    lineHeight: 20,
-  },
-  section: {
-    marginBottom: spacing.md,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text.primary,
-    marginBottom: spacing.sm,
-  },
-  infoCard: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    backgroundColor: colors.background.secondary,
-    padding: spacing.md,
-    borderRadius: spacing.borderRadius.md,
-    borderWidth: 1,
-    borderColor: colors.border.light,
-  },
-  infoContent: {
-    flex: 1,
-    marginLeft: spacing.sm,
-  },
-  infoText: {
-    fontSize: 14,
-    color: colors.text.primary,
-    marginLeft: spacing.sm,
-    flex: 1,
-  },
-  infoMainText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text.primary,
-    marginBottom: spacing.xxs,
-  },
-  infoSubText: {
-    fontSize: 14,
-    color: colors.primary.main,
-    marginBottom: 2,
-  },
-  infoDetailsText: {
-    fontSize: 12,
-    color: colors.text.tertiary,
-    fontFamily: 'monospace',
-  },
-  fieldItem: {
-    fontSize: 14,
-    color: colors.text.primary,
-    marginBottom: 2,
-  },
-  notesCard: {
-    backgroundColor: colors.background.secondary,
-    padding: spacing.md,
-    borderRadius: spacing.borderRadius.md,
-    borderLeftWidth: 4,
-    borderLeftColor: colors.primary.main,
-    borderWidth: 1,
-    borderColor: colors.border.light,
-  },
-  notesText: {
-    fontSize: 14,
-    color: colors.text.primary,
-    lineHeight: 20,
-    fontStyle: 'italic',
-  },
-  technicalCard: {
-    backgroundColor: colors.background.secondary,
-    padding: spacing.md,
-    borderRadius: spacing.borderRadius.md,
-    borderWidth: 1,
-    borderColor: colors.border.light,
-  },
-  technicalRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: spacing.xxs,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.light,
-  },
-  technicalLabel: {
-    fontSize: 12,
-    color: colors.text.tertiary,
-    fontWeight: '500',
-  },
-  technicalValue: {
-    fontSize: 12,
-    color: colors.text.primary,
-    fontFamily: 'monospace',
-    flex: 1,
-    textAlign: 'right',
-  },
-});
 
 export default AdminAuditLogDetailScreen;

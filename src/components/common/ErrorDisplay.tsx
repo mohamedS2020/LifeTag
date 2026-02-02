@@ -3,7 +3,7 @@
  * Shows error messages with appropriate styling based on severity
  */
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { 
   View, 
   Text, 
@@ -15,7 +15,7 @@ import Animated, { FadeInDown, FadeOutUp } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthError } from '../../utils/errorHandling';
 import { useTranslation } from 'react-i18next';
-import { colors, spacing, borderRadius, typography } from '../../theme';
+import { useTheme } from '../../theme';
 
 interface ErrorDisplayProps {
   error: AuthError | null;
@@ -31,6 +31,84 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
   style 
 }) => {
   const { t } = useTranslation();
+  const { colors, spacing, borderRadius, typography } = useTheme();
+
+  const styles = useMemo(() => StyleSheet.create({
+    errorContainer: {
+      backgroundColor: colors.status.error.background,
+      borderColor: colors.status.error.border,
+      borderWidth: 1,
+      borderRadius: borderRadius.md,
+      padding: spacing.md,
+      marginVertical: spacing.sm,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    warningContainer: {
+      backgroundColor: colors.status.warning.background,
+      borderColor: colors.status.warning.border,
+      borderWidth: 1,
+      borderRadius: borderRadius.md,
+      padding: spacing.md,
+      marginVertical: spacing.sm,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    infoContainer: {
+      backgroundColor: colors.status.info.background,
+      borderColor: colors.status.info.border,
+      borderWidth: 1,
+      borderRadius: borderRadius.md,
+      padding: spacing.md,
+      marginVertical: spacing.sm,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    contentRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      flex: 1,
+    },
+    icon: {
+      marginRight: spacing.sm,
+    },
+    errorText: {
+      ...typography.bodySmall,
+      color: colors.status.error.main,
+      flex: 1,
+    },
+    warningText: {
+      ...typography.bodySmall,
+      color: colors.status.warning.main,
+      flex: 1,
+    },
+    infoText: {
+      ...typography.bodySmall,
+      color: colors.status.info.main,
+      flex: 1,
+    },
+    buttonContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    detailsButton: {
+      paddingHorizontal: spacing.sm,
+      paddingVertical: spacing.xs,
+      marginRight: spacing.sm,
+    },
+    detailsButtonText: {
+      ...typography.caption,
+      color: colors.text.tertiary,
+      textDecorationLine: 'underline',
+    },
+    dismissButton: {
+      padding: spacing.xs,
+    },
+  }), [colors, spacing, borderRadius, typography]);
+
   if (!error) return null;
 
   const getErrorStyle = () => {
@@ -122,6 +200,22 @@ interface FieldErrorProps {
 }
 
 export const FieldError: React.FC<FieldErrorProps> = ({ error, visible = true }) => {
+  const { colors, spacing, typography } = useTheme();
+
+  const styles = useMemo(() => StyleSheet.create({
+    fieldErrorContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginTop: spacing.xs,
+      marginBottom: spacing.sm,
+      gap: spacing.xs,
+    },
+    fieldErrorText: {
+      ...typography.caption,
+      color: colors.status.error.main,
+    },
+  }), [colors, spacing, typography]);
+
   if (!error || !visible) return null;
 
   return (
@@ -149,6 +243,38 @@ export const SuccessDisplay: React.FC<SuccessDisplayProps> = ({
   autoHide = true,
   hideDelay = 3000
 }) => {
+  const { colors, spacing, borderRadius, typography } = useTheme();
+
+  const styles = useMemo(() => StyleSheet.create({
+    successContainer: {
+      backgroundColor: colors.status.success.background,
+      borderColor: colors.status.success.border,
+      borderWidth: 1,
+      borderRadius: borderRadius.md,
+      padding: spacing.md,
+      marginVertical: spacing.sm,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    contentRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      flex: 1,
+    },
+    icon: {
+      marginRight: spacing.sm,
+    },
+    successText: {
+      ...typography.bodySmall,
+      color: colors.status.success.main,
+      flex: 1,
+    },
+    dismissButton: {
+      padding: spacing.xs,
+    },
+  }), [colors, spacing, borderRadius, typography]);
+
   React.useEffect(() => {
     if (message && autoHide && onDismiss) {
       const timer = setTimeout(onDismiss, hideDelay);
@@ -177,106 +303,3 @@ export const SuccessDisplay: React.FC<SuccessDisplayProps> = ({
     </Animated.View>
   );
 };
-
-const styles = StyleSheet.create({
-  errorContainer: {
-    backgroundColor: colors.status.error.background,
-    borderColor: colors.status.error.border,
-    borderWidth: 1,
-    borderRadius: borderRadius.md,
-    padding: spacing.md,
-    marginVertical: spacing.sm,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  warningContainer: {
-    backgroundColor: colors.status.warning.background,
-    borderColor: colors.status.warning.border,
-    borderWidth: 1,
-    borderRadius: borderRadius.md,
-    padding: spacing.md,
-    marginVertical: spacing.sm,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  infoContainer: {
-    backgroundColor: colors.status.info.background,
-    borderColor: colors.status.info.border,
-    borderWidth: 1,
-    borderRadius: borderRadius.md,
-    padding: spacing.md,
-    marginVertical: spacing.sm,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  successContainer: {
-    backgroundColor: colors.status.success.background,
-    borderColor: colors.status.success.border,
-    borderWidth: 1,
-    borderRadius: borderRadius.md,
-    padding: spacing.md,
-    marginVertical: spacing.sm,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  contentRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  icon: {
-    marginRight: spacing.sm,
-  },
-  errorText: {
-    ...typography.bodySmall,
-    color: colors.status.error.main,
-    flex: 1,
-  },
-  warningText: {
-    ...typography.bodySmall,
-    color: colors.status.warning.main,
-    flex: 1,
-  },
-  infoText: {
-    ...typography.bodySmall,
-    color: colors.status.info.main,
-    flex: 1,
-  },
-  successText: {
-    ...typography.bodySmall,
-    color: colors.status.success.main,
-    flex: 1,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  detailsButton: {
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    marginRight: spacing.sm,
-  },
-  detailsButtonText: {
-    ...typography.caption,
-    color: colors.text.tertiary,
-    textDecorationLine: 'underline',
-  },
-  dismissButton: {
-    padding: spacing.xs,
-  },
-  fieldErrorContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: spacing.xs,
-    marginBottom: spacing.sm,
-    gap: spacing.xs,
-  },
-  fieldErrorText: {
-    ...typography.caption,
-    color: colors.status.error.main,
-  },
-});

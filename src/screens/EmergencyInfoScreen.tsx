@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -18,7 +18,7 @@ import { EmergencyQRData } from '../services/qrService';
 import { profileService } from '../services';
 import { useAuth } from '../context/AuthContext';
 import { AuditLog } from '../types';
-import { colors, spacing } from '../theme';
+import { useTheme } from '../theme';
 
 // Navigation type definitions
 type RootStackParamList = {
@@ -54,6 +54,9 @@ interface EmergencyInfoScreenProps {
  * - Optimized for high-stress emergency scenarios
  */
 const EmergencyInfoScreen: React.FC = () => {
+  // Theme hook for dynamic theming
+  const { colors, spacing, borderRadius, typography, shadows } = useTheme();
+  
   // Navigation hooks
   const { t } = useTranslation();
   const navigation = useNavigation<any>();
@@ -65,6 +68,246 @@ const EmergencyInfoScreen: React.FC = () => {
   
   // Auth context for audit logging
   const { user } = useAuth();
+
+  // Memoized styles for dynamic theming
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background.primary,
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.md,
+      backgroundColor: colors.medical.emergency,
+      borderBottomWidth: 2,
+      borderBottomColor: colors.status.error.main,
+    },
+    headerButton: {
+      padding: spacing.xs,
+      borderRadius: borderRadius.full,
+      backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    },
+    headerTitle: {
+      flex: 1,
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: colors.text.inverse,
+      textAlign: 'center',
+      marginHorizontal: spacing.sm,
+    },
+    scrollContainer: {
+      flex: 1,
+    },
+    scrollContent: {
+      padding: spacing.lg,
+    },
+    patientNameSection: {
+      backgroundColor: colors.background.elevated,
+      padding: spacing.lg,
+      borderRadius: borderRadius.lg,
+      marginBottom: spacing.lg,
+      borderLeftWidth: 4,
+      borderLeftColor: colors.medical.emergency,
+    },
+    patientNameLabel: {
+      fontSize: 12,
+      fontWeight: 'bold',
+      color: colors.text.tertiary,
+      letterSpacing: 1,
+      marginBottom: spacing.xs,
+    },
+    patientName: {
+      fontSize: 28,
+      fontWeight: 'bold',
+      color: colors.text.primary,
+      marginBottom: spacing.xs,
+    },
+    lastUpdated: {
+      fontSize: 12,
+      color: colors.text.tertiary,
+    },
+    criticalInfoGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      marginBottom: spacing.lg,
+      gap: spacing.sm,
+    },
+    criticalCard: {
+      flex: 1,
+      minWidth: 150,
+      backgroundColor: colors.background.elevated,
+      padding: spacing.md,
+      borderRadius: borderRadius.lg,
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: colors.border.light,
+    },
+    bloodTypeCard: {
+      borderTopWidth: 3,
+      borderTopColor: colors.medical.emergency,
+    },
+    emergencyContactCard: {
+      borderTopWidth: 3,
+      borderTopColor: colors.medical.verified,
+    },
+    criticalLabel: {
+      fontSize: 10,
+      fontWeight: 'bold',
+      color: colors.text.tertiary,
+      letterSpacing: 1,
+      marginTop: spacing.sm,
+      marginBottom: spacing.xxs,
+      textAlign: 'center',
+    },
+    criticalValue: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: colors.text.primary,
+      textAlign: 'center',
+    },
+    contactPhone: {
+      fontSize: 14,
+      color: colors.status.warning.main,
+      fontWeight: '600',
+      marginTop: spacing.xxs,
+    },
+    contactRelation: {
+      fontSize: 12,
+      color: colors.text.tertiary,
+      marginTop: 2,
+    },
+    section: {
+      marginBottom: spacing.lg,
+    },
+    sectionHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: spacing.sm,
+    },
+    sectionTitle: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: colors.text.primary,
+      marginLeft: spacing.sm,
+      letterSpacing: 0.5,
+    },
+    allergiesList: {
+      gap: spacing.sm,
+    },
+    allergyItem: {
+      backgroundColor: `${colors.status.warning.main}20`,
+      padding: spacing.sm,
+      borderRadius: borderRadius.md,
+      borderLeftWidth: 4,
+    },
+    allergyText: {
+      fontSize: 16,
+      color: colors.text.primary,
+      fontWeight: '500',
+    },
+    notesContainer: {
+      backgroundColor: `${colors.primary.main}15`,
+      padding: spacing.md,
+      borderRadius: borderRadius.md,
+      borderLeftWidth: 4,
+      borderLeftColor: colors.primary.main,
+    },
+    notesText: {
+      fontSize: 16,
+      color: colors.text.primary,
+      lineHeight: 22,
+    },
+    additionalInfoContainer: {
+      backgroundColor: colors.background.elevated,
+      padding: spacing.md,
+      borderRadius: borderRadius.md,
+      borderWidth: 1,
+      borderColor: colors.border.light,
+    },
+    infoRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: spacing.sm,
+    },
+    infoLabel: {
+      fontSize: 14,
+      color: colors.text.tertiary,
+      fontWeight: '500',
+      marginRight: spacing.sm,
+    },
+    infoValue: {
+      fontSize: 14,
+      color: colors.text.primary,
+      fontWeight: '600',
+    },
+    fullProfileText: {
+      fontSize: 14,
+      color: colors.text.primary,
+      fontWeight: '500',
+      marginLeft: spacing.xs,
+    },
+    actionButtons: {
+      backgroundColor: colors.background.secondary,
+      padding: spacing.lg,
+      paddingBottom: spacing.xl,
+      borderTopWidth: 1,
+      borderTopColor: colors.border.default,
+    },
+    fullProfileButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: colors.primary.main,
+      paddingVertical: spacing.md,
+      borderRadius: borderRadius.md,
+      marginBottom: spacing.sm,
+    },
+    fullProfileButtonText: {
+      color: colors.text.inverse,
+      fontSize: 16,
+      fontWeight: 'bold',
+      marginLeft: spacing.sm,
+    },
+    emergencyCallButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: colors.status.warning.main,
+      paddingVertical: spacing.md,
+      borderRadius: borderRadius.md,
+      marginBottom: spacing.sm,
+    },
+    emergencyCallText: {
+      color: colors.text.primary,
+      fontSize: 16,
+      fontWeight: 'bold',
+      marginLeft: spacing.sm,
+    },
+    secondaryButtons: {
+      flexDirection: 'row',
+      gap: spacing.sm,
+    },
+    secondaryButton: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: colors.background.elevated,
+      paddingVertical: spacing.sm,
+      borderRadius: borderRadius.md,
+      borderWidth: 1,
+      borderColor: colors.border.default,
+    },
+    secondaryButtonText: {
+      color: colors.text.secondary,
+      fontSize: 14,
+      fontWeight: '500',
+      marginLeft: spacing.xs,
+    },
+  }), [colors, spacing, borderRadius, typography, shadows]);
 
   /**
    * Log emergency-only access when component mounts
@@ -164,9 +407,13 @@ const EmergencyInfoScreen: React.FC = () => {
   const formatTimestamp = (timestamp: string): string => {
     try {
       const date = new Date(timestamp);
+      // Check if date is valid
+      if (isNaN(date.getTime())) {
+        return t('common.unknown');
+      }
       return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
     } catch {
-      return timestamp;
+      return t('common.unknown');
     }
   };
 
@@ -191,7 +438,7 @@ const EmergencyInfoScreen: React.FC = () => {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
           <Ionicons name="close" size={24} color="white" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{t('emergency.medicalInfo')}</Text>
+        <Text style={styles.headerTitle} numberOfLines={1}>{t('emergency.medicalInfo')}</Text>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
           <Ionicons name="qr-code" size={24} color="white" />
         </TouchableOpacity>
@@ -346,244 +593,5 @@ const EmergencyInfoScreen: React.FC = () => {
     </SafeAreaView>
   );
 };
-
-/**
- * Styles for EmergencyInfoScreen component
- */
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.primary,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    backgroundColor: colors.medical.emergency,
-    borderBottomWidth: 2,
-    borderBottomColor: colors.status.error.main,
-  },
-  headerButton: {
-    padding: spacing.xs,
-    borderRadius: spacing.borderRadius.full,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: colors.text.inverse,
-  },
-  scrollContainer: {
-    flex: 1,
-  },
-  scrollContent: {
-    padding: spacing.lg,
-  },
-  patientNameSection: {
-    backgroundColor: colors.background.elevated,
-    padding: spacing.lg,
-    borderRadius: spacing.borderRadius.lg,
-    marginBottom: spacing.lg,
-    borderLeftWidth: 4,
-    borderLeftColor: colors.medical.emergency,
-  },
-  patientNameLabel: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: colors.text.tertiary,
-    letterSpacing: 1,
-    marginBottom: spacing.xs,
-  },
-  patientName: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: colors.text.primary,
-    marginBottom: spacing.xs,
-  },
-  lastUpdated: {
-    fontSize: 12,
-    color: colors.text.tertiary,
-  },
-  criticalInfoGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginBottom: spacing.lg,
-    gap: spacing.sm,
-  },
-  criticalCard: {
-    flex: 1,
-    minWidth: 150,
-    backgroundColor: colors.background.elevated,
-    padding: spacing.md,
-    borderRadius: spacing.borderRadius.lg,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: colors.border.light,
-  },
-  bloodTypeCard: {
-    borderTopWidth: 3,
-    borderTopColor: colors.medical.emergency,
-  },
-  emergencyContactCard: {
-    borderTopWidth: 3,
-    borderTopColor: colors.medical.verified,
-  },
-  criticalLabel: {
-    fontSize: 10,
-    fontWeight: 'bold',
-    color: colors.text.tertiary,
-    letterSpacing: 1,
-    marginTop: spacing.sm,
-    marginBottom: spacing.xxs,
-    textAlign: 'center',
-  },
-  criticalValue: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: colors.text.primary,
-    textAlign: 'center',
-  },
-  contactPhone: {
-    fontSize: 14,
-    color: colors.status.warning.main,
-    fontWeight: '600',
-    marginTop: spacing.xxs,
-  },
-  contactRelation: {
-    fontSize: 12,
-    color: colors.text.tertiary,
-    marginTop: 2,
-  },
-  section: {
-    marginBottom: spacing.lg,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.sm,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: colors.text.primary,
-    marginLeft: spacing.sm,
-    letterSpacing: 0.5,
-  },
-  allergiesList: {
-    gap: spacing.sm,
-  },
-  allergyItem: {
-    backgroundColor: `${colors.status.warning.main}20`,
-    padding: spacing.sm,
-    borderRadius: spacing.borderRadius.md,
-    borderLeftWidth: 4,
-  },
-  allergyText: {
-    fontSize: 16,
-    color: colors.text.primary,
-    fontWeight: '500',
-  },
-  notesContainer: {
-    backgroundColor: `${colors.primary.main}15`,
-    padding: spacing.md,
-    borderRadius: spacing.borderRadius.md,
-    borderLeftWidth: 4,
-    borderLeftColor: colors.primary.main,
-  },
-  notesText: {
-    fontSize: 16,
-    color: colors.text.primary,
-    lineHeight: 22,
-  },
-  additionalInfoContainer: {
-    backgroundColor: colors.background.elevated,
-    padding: spacing.md,
-    borderRadius: spacing.borderRadius.md,
-    borderWidth: 1,
-    borderColor: colors.border.light,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.sm,
-  },
-  infoLabel: {
-    fontSize: 14,
-    color: colors.text.tertiary,
-    fontWeight: '500',
-    marginRight: spacing.sm,
-  },
-  infoValue: {
-    fontSize: 14,
-    color: colors.text.primary,
-    fontWeight: '600',
-  },
-  fullProfileText: {
-    fontSize: 14,
-    color: colors.text.primary,
-    fontWeight: '500',
-    marginLeft: spacing.xs,
-  },
-  actionButtons: {
-    backgroundColor: colors.background.secondary,
-    padding: spacing.lg,
-    paddingBottom: spacing.xl,
-    borderTopWidth: 1,
-    borderTopColor: colors.border.default,
-  },
-  fullProfileButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.primary.main,
-    paddingVertical: spacing.md,
-    borderRadius: spacing.borderRadius.md,
-    marginBottom: spacing.sm,
-  },
-  fullProfileButtonText: {
-    color: colors.text.inverse,
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginLeft: spacing.sm,
-  },
-  emergencyCallButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.status.warning.main,
-    paddingVertical: spacing.md,
-    borderRadius: spacing.borderRadius.md,
-    marginBottom: spacing.sm,
-  },
-  emergencyCallText: {
-    color: colors.text.primary,
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginLeft: spacing.sm,
-  },
-  secondaryButtons: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
-  secondaryButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.background.elevated,
-    paddingVertical: spacing.sm,
-    borderRadius: spacing.borderRadius.md,
-    borderWidth: 1,
-    borderColor: colors.border.default,
-  },
-  secondaryButtonText: {
-    color: colors.text.secondary,
-    fontSize: 14,
-    fontWeight: '500',
-    marginLeft: spacing.xs,
-  },
-});
 
 export default EmergencyInfoScreen;

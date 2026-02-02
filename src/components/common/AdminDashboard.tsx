@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { AdminManagementService } from '../../services/adminManagementService';
 import {
   View,
@@ -19,7 +19,7 @@ import { db } from '../../config/firebase.config';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
-import { colors, spacing } from '../../theme';
+import { useTheme } from '../../theme';
 
 /**
  * Admin Dashboard Props
@@ -46,6 +46,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
   onNavigateToProfile,
   onError,
 }) => {
+  const { colors, spacing, borderRadius, typography } = useTheme();
   const { user, logout } = useAuth();
   const navigation = useNavigation<AdminNavigationProp>();
   const { t } = useTranslation();
@@ -194,6 +195,212 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
       ]
     );
   };
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background.primary,
+    },
+    scrollContainer: {
+      flex: 1,
+    },
+    scrollContent: {
+      padding: spacing.md,
+    },
+    header: {
+      backgroundColor: colors.background.secondary,
+      padding: spacing.lg,
+      borderRadius: borderRadius.lg,
+      marginBottom: spacing.md,
+      borderWidth: 1,
+      borderColor: colors.border.light,
+    },
+    headerInfo: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: spacing.xs,
+    },
+    headerTitle: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: colors.text.primary,
+    },
+    adminBadge: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.status.success.main + '30',
+      paddingHorizontal: spacing.xs,
+      paddingVertical: spacing.xxs,
+      borderRadius: borderRadius.lg,
+    },
+    adminBadgeText: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: colors.status.success.main,
+      marginLeft: spacing.xxs,
+    },
+    welcomeText: {
+      fontSize: 16,
+      color: colors.text.secondary,
+    },
+    statsContainer: {
+      marginBottom: spacing.lg,
+    },
+    sectionTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: colors.text.primary,
+      marginBottom: spacing.sm,
+    },
+    statsGrid: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+    },
+    statCard: {
+      flex: 1,
+      backgroundColor: colors.background.secondary,
+      padding: spacing.md,
+      borderRadius: borderRadius.lg,
+      alignItems: 'center',
+      marginHorizontal: spacing.xxs,
+      borderWidth: 1,
+      borderColor: colors.border.light,
+    },
+    statLabel: {
+      fontSize: 12,
+      color: colors.text.secondary,
+      marginTop: spacing.xs,
+      textAlign: 'center',
+    },
+    statValue: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: colors.text.primary,
+      marginTop: spacing.xxs,
+    },
+    actionsContainer: {
+      marginBottom: spacing.lg,
+    },
+    actionCard: {
+      backgroundColor: colors.background.secondary,
+      padding: spacing.md,
+      borderRadius: borderRadius.lg,
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: spacing.sm,
+      borderWidth: 1,
+      borderColor: colors.border.light,
+    },
+    disabledCard: {
+      opacity: 0.6,
+    },
+    actionIcon: {
+      width: 50,
+      height: 50,
+      borderRadius: 25,
+      backgroundColor: colors.background.elevated,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: spacing.md,
+    },
+    actionContent: {
+      flex: 1,
+    },
+    actionTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text.primary,
+      marginBottom: spacing.xxs,
+    },
+    actionDescription: {
+      fontSize: 14,
+      color: colors.text.secondary,
+      lineHeight: 20,
+    },
+    disabledText: {
+      color: colors.text.tertiary,
+    },
+    modalContainer: {
+      flex: 1,
+      backgroundColor: colors.background.primary,
+    },
+    modalHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: spacing.md,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border.default,
+      backgroundColor: colors.background.secondary,
+    },
+    modalTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: colors.text.primary,
+    },
+    modalContent: {
+      flex: 1,
+      padding: spacing.md,
+    },
+    formGroup: {
+      marginBottom: spacing.md,
+    },
+    formLabel: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: colors.text.primary,
+      marginBottom: spacing.xs,
+    },
+    formInput: {
+      backgroundColor: colors.background.secondary,
+      borderWidth: 1,
+      borderColor: colors.border.default,
+      borderRadius: borderRadius.md,
+      padding: spacing.sm,
+      fontSize: 16,
+      color: colors.text.primary,
+    },
+    createButton: {
+      backgroundColor: colors.primary.main,
+      padding: spacing.md,
+      borderRadius: borderRadius.md,
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginTop: spacing.lg,
+    },
+    disabledButton: {
+      opacity: 0.6,
+    },
+    createButtonText: {
+      color: colors.text.inverse,
+      fontSize: 16,
+      fontWeight: '600',
+      marginLeft: spacing.xs,
+    },
+    signOutSection: {
+      marginHorizontal: spacing.md,
+      marginTop: spacing.xs,
+      marginBottom: spacing.xxl,
+    },
+    signOutButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: colors.background.secondary,
+      borderRadius: borderRadius.lg,
+      padding: spacing.md,
+      borderWidth: 2,
+      borderColor: colors.status.error.main,
+    },
+    signOutText: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.status.error.main,
+      marginLeft: spacing.xs,
+    },
+  }), [colors, spacing, borderRadius]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -481,213 +688,5 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.primary,
-  },
-  scrollContainer: {
-    flex: 1,
-  },
-  scrollContent: {
-    padding: spacing.md,
-  },
-  header: {
-    backgroundColor: colors.background.secondary,
-    padding: spacing.lg,
-    borderRadius: spacing.borderRadius.lg,
-    marginBottom: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.border.light,
-  },
-  headerInfo: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.xs,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.text.primary,
-  },
-  adminBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.status.success.main + '30',
-    paddingHorizontal: spacing.xs,
-    paddingVertical: spacing.xxs,
-    borderRadius: spacing.borderRadius.lg,
-  },
-  adminBadgeText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: colors.status.success.main,
-    marginLeft: spacing.xxs,
-  },
-  welcomeText: {
-    fontSize: 16,
-    color: colors.text.secondary,
-  },
-  statsContainer: {
-    marginBottom: spacing.lg,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: colors.text.primary,
-    marginBottom: spacing.sm,
-  },
-  statsGrid: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  statCard: {
-    flex: 1,
-    backgroundColor: colors.background.secondary,
-    padding: spacing.md,
-    borderRadius: spacing.borderRadius.lg,
-    alignItems: 'center',
-    marginHorizontal: spacing.xxs,
-    borderWidth: 1,
-    borderColor: colors.border.light,
-  },
-  statLabel: {
-    fontSize: 12,
-    color: colors.text.secondary,
-    marginTop: spacing.xs,
-    textAlign: 'center',
-  },
-  statValue: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: colors.text.primary,
-    marginTop: spacing.xxs,
-  },
-  actionsContainer: {
-    marginBottom: spacing.lg,
-  },
-  actionCard: {
-    backgroundColor: colors.background.secondary,
-    padding: spacing.md,
-    borderRadius: spacing.borderRadius.lg,
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.sm,
-    borderWidth: 1,
-    borderColor: colors.border.light,
-  },
-  disabledCard: {
-    opacity: 0.6,
-  },
-  actionIcon: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: colors.background.elevated,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: spacing.md,
-  },
-  actionContent: {
-    flex: 1,
-  },
-  actionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text.primary,
-    marginBottom: spacing.xxs,
-  },
-  actionDescription: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    lineHeight: 20,
-  },
-  disabledText: {
-    color: colors.text.tertiary,
-  },
-  
-  // Modal styles
-  modalContainer: {
-    flex: 1,
-    backgroundColor: colors.background.primary,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.default,
-    backgroundColor: colors.background.secondary,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: colors.text.primary,
-  },
-  modalContent: {
-    flex: 1,
-    padding: spacing.md,
-  },
-  formGroup: {
-    marginBottom: spacing.md,
-  },
-  formLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.text.primary,
-    marginBottom: spacing.xs,
-  },
-  formInput: {
-    backgroundColor: colors.background.secondary,
-    borderWidth: 1,
-    borderColor: colors.border.default,
-    borderRadius: spacing.borderRadius.md,
-    padding: spacing.sm,
-    fontSize: 16,
-    color: colors.text.primary,
-  },
-  createButton: {
-    backgroundColor: colors.primary.main,
-    padding: spacing.md,
-    borderRadius: spacing.borderRadius.md,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: spacing.lg,
-  },
-  disabledButton: {
-    opacity: 0.6,
-  },
-  createButtonText: {
-    color: colors.text.inverse,
-    fontSize: 16,
-    fontWeight: '600',
-    marginLeft: spacing.xs,
-  },
-  signOutSection: {
-    marginHorizontal: spacing.md,
-    marginTop: spacing.xs,
-    marginBottom: spacing.xxl,
-  },
-  signOutButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.background.secondary,
-    borderRadius: spacing.borderRadius.lg,
-    padding: spacing.md,
-    borderWidth: 2,
-    borderColor: colors.status.error.main,
-  },
-  signOutText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.status.error.main,
-    marginLeft: spacing.xs,
-  },
-});
 
 export default AdminDashboard;

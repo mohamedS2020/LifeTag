@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -14,7 +14,7 @@ import { MedicalProfessional } from '../../types';
 import { MedicalProfessionalApprovalService } from '../../services/medicalProfessionalApprovalService';
 import VerifiedBadge, { VerifiedProfessionalIndicator } from './VerifiedBadge';
 import { useTranslation } from 'react-i18next';
-import { colors, spacing } from '../../theme';
+import { useTheme } from '../../theme';
 
 /**
  * Props for MedicalProfessionalList component
@@ -43,7 +43,166 @@ const MedicalProfessionalList: React.FC<MedicalProfessionalListProps> = ({
   compactView = false,
   showVerificationDetails = true,
 }) => {
+  const { colors, spacing, borderRadius, typography } = useTheme();
   const { t } = useTranslation();
+
+  // Memoized styles for dynamic theming
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background.primary,
+    },
+    listContainer: {
+      padding: spacing.md,
+    },
+    emptyContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: spacing['2xl'],
+    },
+    loadingContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    loadingText: {
+      fontSize: 16,
+      color: colors.text.secondary,
+      marginTop: spacing.sm,
+    },
+    errorContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: spacing['2xl'],
+    },
+    errorTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: colors.status.error.main,
+      marginTop: spacing.md,
+      marginBottom: spacing.sm,
+    },
+    errorText: {
+      fontSize: 14,
+      color: colors.text.secondary,
+      textAlign: 'center',
+      marginBottom: spacing.lg,
+    },
+    retryButton: {
+      backgroundColor: colors.primary.main,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.sm,
+      borderRadius: spacing.sm,
+    },
+    retryButtonText: {
+      color: colors.text.inverse,
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    compactItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.background.card,
+      borderRadius: spacing.sm,
+      padding: spacing.md,
+      marginBottom: spacing.sm,
+      borderWidth: 1,
+      borderColor: colors.border.default,
+    },
+    compactContent: {
+      flex: 1,
+    },
+    compactHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: spacing.xs,
+    },
+    compactName: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text.primary,
+      flex: 1,
+      marginRight: spacing.sm,
+    },
+    compactSpecialty: {
+      fontSize: 14,
+      color: colors.text.secondary,
+      marginBottom: 2,
+    },
+    compactHospital: {
+      fontSize: 12,
+      color: colors.text.tertiary,
+    },
+    detailedItem: {
+      backgroundColor: colors.background.card,
+      borderRadius: spacing.md,
+      padding: spacing.md,
+      marginBottom: spacing.md,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+      borderWidth: 1,
+      borderColor: colors.border.default,
+    },
+    detailedHeader: {
+      marginBottom: spacing.md,
+    },
+    professionalNameSection: {
+      marginBottom: spacing.sm,
+    },
+    detailedName: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: colors.text.primary,
+      marginBottom: spacing.sm,
+    },
+    detailedContent: {
+      gap: spacing.sm,
+    },
+    detailRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    detailText: {
+      fontSize: 14,
+      color: colors.text.secondary,
+      marginLeft: spacing.sm,
+      flex: 1,
+    },
+    verificationInfo: {
+      marginTop: spacing.sm,
+      paddingTop: spacing.sm,
+      borderTopWidth: 1,
+      borderTopColor: colors.border.default,
+    },
+    verificationText: {
+      fontSize: 12,
+      color: colors.status.success.main,
+      fontStyle: 'italic',
+    },
+    emptyState: {
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    emptyTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: colors.text.primary,
+      marginTop: spacing.md,
+      marginBottom: spacing.sm,
+    },
+    emptyText: {
+      fontSize: 14,
+      color: colors.text.secondary,
+      textAlign: 'center',
+      lineHeight: 20,
+    },
+  }), [colors, spacing, borderRadius, typography]);
+
   // State management
   const [professionals, setProfessionals] = useState<MedicalProfessional[]>([]);
   const [loading, setLoading] = useState(true);
@@ -324,164 +483,5 @@ const MedicalProfessionalList: React.FC<MedicalProfessionalListProps> = ({
     </View>
   );
 };
-
-/**
- * Styles for MedicalProfessionalList component
- */
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.primary,
-  },
-  listContainer: {
-    padding: spacing.md,
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: spacing['2xl'],
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    fontSize: 16,
-    color: colors.text.secondary,
-    marginTop: spacing.sm,
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: spacing['2xl'],
-  },
-  errorTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.status.error.main,
-    marginTop: spacing.md,
-    marginBottom: spacing.sm,
-  },
-  errorText: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    textAlign: 'center',
-    marginBottom: spacing.lg,
-  },
-  retryButton: {
-    backgroundColor: colors.primary.main,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-    borderRadius: spacing.sm,
-  },
-  retryButtonText: {
-    color: colors.text.inverse,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  compactItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.background.card,
-    borderRadius: spacing.sm,
-    padding: spacing.md,
-    marginBottom: spacing.sm,
-    borderWidth: 1,
-    borderColor: colors.border.default,
-  },
-  compactContent: {
-    flex: 1,
-  },
-  compactHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.xs,
-  },
-  compactName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text.primary,
-    flex: 1,
-    marginRight: spacing.sm,
-  },
-  compactSpecialty: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    marginBottom: 2,
-  },
-  compactHospital: {
-    fontSize: 12,
-    color: colors.text.tertiary,
-  },
-  detailedItem: {
-    backgroundColor: colors.background.card,
-    borderRadius: spacing.md,
-    padding: spacing.md,
-    marginBottom: spacing.md,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-    borderWidth: 1,
-    borderColor: colors.border.default,
-  },
-  detailedHeader: {
-    marginBottom: spacing.md,
-  },
-  professionalNameSection: {
-    marginBottom: spacing.sm,
-  },
-  detailedName: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.text.primary,
-    marginBottom: spacing.sm,
-  },
-  detailedContent: {
-    gap: spacing.sm,
-  },
-  detailRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  detailText: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    marginLeft: spacing.sm,
-    flex: 1,
-  },
-  verificationInfo: {
-    marginTop: spacing.sm,
-    paddingTop: spacing.sm,
-    borderTopWidth: 1,
-    borderTopColor: colors.border.default,
-  },
-  verificationText: {
-    fontSize: 12,
-    color: colors.status.success.main,
-    fontStyle: 'italic',
-  },
-  emptyState: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.text.primary,
-    marginTop: spacing.md,
-    marginBottom: spacing.sm,
-  },
-  emptyText: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-});
 
 export default MedicalProfessionalList;

@@ -384,9 +384,11 @@
       },
       "relationships": {
         "spouse": "Spouse",
+        "partner": "Partner",
         "parent": "Parent",
         "child": "Child",
         "sibling": "Sibling",
+        "grandparent": "Grandparent",
         "friend": "Friend",
         "other": "Other"
       },
@@ -403,6 +405,9 @@
     "subtitle": "Manage your account and preferences",
     "comingSoonDescription": "More settings and customization options will be available in upcoming updates.",
     "appPreferences": "App Preferences",
+    "theme": "Theme",
+    "darkMode": "Dark",
+    "lightMode": "Light",
     "language": "Language",
     "accountPrivacy": "Account & Privacy",
     "profileSettings": "Profile Settings",
@@ -410,7 +415,9 @@
     "emergencySettings": "Emergency Settings",
     "emergencyContacts": "Emergency Contacts",
     "alertPreferences": "Alert Preferences",
-    "signOut": "Sign Out"
+    "signOut": "Sign Out",
+    "accountActions": "Account",
+    "deleteAccount": "Delete Account"
   },
   "language": {
     "title": "Language",
@@ -889,6 +896,8 @@
     "cleanupInfoText": "• Audit logs are automatically cleaned up based on retention policies\n• Logs older than {{days}} days are deleted\n• Only the most recent {{maxLogs}} logs are kept per profile\n• Cleanup operations are logged for audit purposes\n• This process is irreversible - deleted logs cannot be recovered"
   },
   "verification": {
+    "verified": "Verified",
+    "verifiedOnDate": "Verified on {{date}}",
     "allUpdatesMarkedRead": "All recent updates have been marked as read.",
     "reapplyTitle": "Reapply for Verification",
     "reapplyMessage": "You can submit a new medical professional verification application. Would you like to proceed?",

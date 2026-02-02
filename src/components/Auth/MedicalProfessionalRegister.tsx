@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   StyleSheet,
@@ -14,7 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../context';
 import { Button, TextInput, Card, H1, Body, Caption } from '../../components/ui';
 import { LoadingOverlay } from '../../components/common';
-import { colors, spacing } from '../../theme';
+import { useTheme } from '../../theme';
 import { useTranslation } from 'react-i18next';
 
 interface MedicalProfessionalRegisterProps {
@@ -30,6 +30,8 @@ const MedicalProfessionalRegister: React.FC<MedicalProfessionalRegisterProps> = 
   onNavigateToRegularRegister,
   onRegisterSuccess 
 }) => {
+  const { colors, spacing, borderRadius, typography, shadows } = useTheme();
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -52,6 +54,81 @@ const MedicalProfessionalRegister: React.FC<MedicalProfessionalRegisterProps> = 
 
   const { register, loading } = useAuth();
   const { t } = useTranslation();
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background.primary,
+    },
+    scrollContainer: {
+      flexGrow: 1,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.xl,
+    },
+    content: {
+      maxWidth: 400,
+      alignSelf: 'center',
+      width: '100%',
+    },
+    header: {
+      alignItems: 'center',
+      marginBottom: spacing.xl,
+    },
+    logoContainer: {
+      width: 80,
+      height: 80,
+      borderRadius: 40,
+      backgroundColor: colors.background.elevated,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: spacing.md,
+      borderWidth: 1,
+      borderColor: colors.border.light,
+    },
+    title: {
+      color: colors.text.primary,
+      marginBottom: spacing.xs,
+    },
+    subtitle: {
+      color: colors.text.secondary,
+      textAlign: 'center',
+    },
+    verificationNotice: {
+      marginBottom: spacing.lg,
+      backgroundColor: colors.background.elevated,
+      borderLeftWidth: 3,
+      borderLeftColor: colors.primary.main,
+    },
+    noticeHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: spacing.sm,
+    },
+    noticeTitle: {
+      color: colors.primary.main,
+      fontWeight: '600',
+      marginLeft: spacing.sm,
+    },
+    noticeText: {
+      color: colors.text.secondary,
+      lineHeight: 20,
+    },
+    registerButton: {
+      marginTop: spacing.md,
+    },
+    navigationContainer: {
+      marginTop: spacing.xl,
+      alignItems: 'center',
+    },
+    loginContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginTop: spacing.md,
+    },
+    loginText: {
+      color: colors.text.secondary,
+    },
+  }), [colors, spacing, borderRadius, typography, shadows]);
 
   // Update form data
   const updateFormData = (field: string, value: string) => {
@@ -437,80 +514,5 @@ const MedicalProfessionalRegister: React.FC<MedicalProfessionalRegisterProps> = 
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.primary,
-  },
-  scrollContainer: {
-    flexGrow: 1,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.xl,
-  },
-  content: {
-    maxWidth: 400,
-    alignSelf: 'center',
-    width: '100%',
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: spacing.xl,
-  },
-  logoContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: colors.background.elevated,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.border.light,
-  },
-  title: {
-    color: colors.text.primary,
-    marginBottom: spacing.xs,
-  },
-  subtitle: {
-    color: colors.text.secondary,
-    textAlign: 'center',
-  },
-  verificationNotice: {
-    marginBottom: spacing.lg,
-    backgroundColor: colors.background.elevated,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.primary.main,
-  },
-  noticeHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.sm,
-  },
-  noticeTitle: {
-    color: colors.primary.main,
-    fontWeight: '600',
-    marginLeft: spacing.sm,
-  },
-  noticeText: {
-    color: colors.text.secondary,
-    lineHeight: 20,
-  },
-  registerButton: {
-    marginTop: spacing.md,
-  },
-  navigationContainer: {
-    marginTop: spacing.xl,
-    alignItems: 'center',
-  },
-  loginContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: spacing.md,
-  },
-  loginText: {
-    color: colors.text.secondary,
-  },
-});
 
 export default MedicalProfessionalRegister;

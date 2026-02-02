@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -17,7 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { AuditLog } from '../types';
 import profileService from '../services/profileService';
 import { RootStackParamList } from '../navigation/AppNavigator';
-import { colors, spacing } from '../theme';
+import { useTheme } from '../theme';
 
 type AdminAuditLogsNavigationProp = StackNavigationProp<RootStackParamList>;
 
@@ -26,12 +26,153 @@ type AdminAuditLogsNavigationProp = StackNavigationProp<RootStackParamList>;
  * Shows all system audit logs for admin oversight
  */
 const AdminAuditLogsScreen: React.FC = () => {
+  const { colors, spacing, borderRadius, typography, shadows } = useTheme();
   const { t } = useTranslation();
   const navigation = useNavigation<AdminAuditLogsNavigationProp>();
   const insets = useSafeAreaInsets();
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background.primary,
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.md,
+      backgroundColor: colors.background.secondary,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border.default,
+    },
+    backButton: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: colors.background.elevated,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    headerTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: colors.text.primary,
+      flex: 1,
+      textAlign: 'center',
+    },
+    headerRight: {
+      width: 40,
+      height: 40,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    refreshButton: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      backgroundColor: colors.background.elevated,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    content: {
+      flex: 1,
+    },
+    statsHeader: {
+      backgroundColor: colors.background.secondary,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.md,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border.default,
+    },
+    statsText: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text.primary,
+      marginBottom: spacing.xxs,
+    },
+    statsSubtext: {
+      fontSize: 14,
+      color: colors.text.secondary,
+    },
+    logsList: {
+      flex: 1,
+    },
+    listContent: {
+      paddingVertical: spacing.sm,
+      paddingBottom: spacing.lg,
+    },
+    logItem: {
+      backgroundColor: colors.background.secondary,
+      marginHorizontal: spacing.md,
+      marginVertical: spacing.xxs,
+      borderRadius: borderRadius.md,
+      borderWidth: 1,
+      borderColor: colors.border.light,
+    },
+    logHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: spacing.sm,
+    },
+    logIcon: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: spacing.sm,
+    },
+    logInfo: {
+      flex: 1,
+    },
+    logTitleRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: spacing.xxs,
+    },
+    logAction: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: colors.text.primary,
+      marginRight: spacing.sm,
+    },
+    userTypeBadge: {
+      paddingHorizontal: spacing.xs,
+      paddingVertical: 2,
+      borderRadius: borderRadius.sm,
+    },
+    userTypeText: {
+      fontSize: 10,
+      fontWeight: '600',
+      color: colors.text.inverse,
+    },
+    logProfileId: {
+      fontSize: 12,
+      color: colors.text.tertiary,
+      fontFamily: 'monospace',
+      marginBottom: 2,
+    },
+    logTimestamp: {
+      fontSize: 11,
+      color: colors.text.tertiary,
+    },
+    loadingContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: spacing.xxl,
+    },
+    loadingText: {
+      fontSize: 16,
+      color: colors.text.secondary,
+      marginTop: spacing.md,
+      fontWeight: '500',
+    },
+  }), [colors, spacing, borderRadius, typography, shadows]);
 
   /**
    * Fetch all audit logs for admin view
@@ -258,145 +399,5 @@ const AdminAuditLogsScreen: React.FC = () => {
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.primary,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    backgroundColor: colors.background.secondary,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.default,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.background.elevated,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: colors.text.primary,
-    flex: 1,
-    textAlign: 'center',
-  },
-  headerRight: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  refreshButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: colors.background.elevated,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  content: {
-    flex: 1,
-  },
-  statsHeader: {
-    backgroundColor: colors.background.secondary,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.default,
-  },
-  statsText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text.primary,
-    marginBottom: spacing.xxs,
-  },
-  statsSubtext: {
-    fontSize: 14,
-    color: colors.text.secondary,
-  },
-  logsList: {
-    flex: 1,
-  },
-  listContent: {
-    paddingVertical: spacing.sm,
-    paddingBottom: spacing.lg,
-  },
-  logItem: {
-    backgroundColor: colors.background.secondary,
-    marginHorizontal: spacing.md,
-    marginVertical: spacing.xxs,
-    borderRadius: spacing.borderRadius.md,
-    borderWidth: 1,
-    borderColor: colors.border.light,
-  },
-  logHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: spacing.sm,
-  },
-  logIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: spacing.sm,
-  },
-  logInfo: {
-    flex: 1,
-  },
-  logTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.xxs,
-  },
-  logAction: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.text.primary,
-    marginRight: spacing.sm,
-  },
-  userTypeBadge: {
-    paddingHorizontal: spacing.xs,
-    paddingVertical: 2,
-    borderRadius: spacing.borderRadius.sm,
-  },
-  userTypeText: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: colors.text.inverse,
-  },
-  logProfileId: {
-    fontSize: 12,
-    color: colors.text.tertiary,
-    fontFamily: 'monospace',
-    marginBottom: 2,
-  },
-  logTimestamp: {
-    fontSize: 11,
-    color: colors.text.tertiary,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: spacing.xxl,
-  },
-  loadingText: {
-    fontSize: 16,
-    color: colors.text.secondary,
-    marginTop: spacing.md,
-    fontWeight: '500',
-  },
-});
 
 export default AdminAuditLogsScreen;

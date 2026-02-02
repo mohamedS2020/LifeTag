@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -15,6 +15,7 @@ import { MedicalProfessional } from '../../types';
 import { MedicalProfessionalApprovalService } from '../../services/medicalProfessionalApprovalService';
 import { LoadingOverlay } from '../common/LoadingOverlay';
 import VerifiedBadge, { ProfileHeaderBadge } from '../common/VerifiedBadge';
+import { useTheme } from '../../theme';
 
 interface MedicalProfessionalProfileProps {
   professionalId?: string;
@@ -38,6 +39,7 @@ export const MedicalProfessionalProfile: React.FC<MedicalProfessionalProfileProp
   onError,
 }) => {
   const { t } = useTranslation();
+  const { colors } = useTheme();
   const [professional, setProfessional] = useState<MedicalProfessional | null>(initialProfessional || null);
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -157,9 +159,9 @@ export const MedicalProfessionalProfile: React.FC<MedicalProfessionalProfileProp
     if (!professional) return null;
 
     return (
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: colors.background.card, borderBottomColor: colors.border.default }]}>
         <View style={styles.headerContent}>
-          <Text style={styles.name}>
+          <Text style={[styles.name, { color: colors.text.primary }]}>
             {professional.personalInfo.firstName} {professional.personalInfo.lastName}
           </Text>
           
@@ -173,21 +175,21 @@ export const MedicalProfessionalProfile: React.FC<MedicalProfessionalProfileProp
           />
           
           {professional.professionalInfo.specialty && (
-            <Text style={styles.specialty}>
+            <Text style={[styles.specialty, { color: colors.text.secondary }]}>
               {professional.professionalInfo.specialty}
             </Text>
           )}
           
           {professional.professionalInfo.hospitalAffiliation && (
-            <Text style={styles.hospital}>
+            <Text style={[styles.hospital, { color: colors.text.tertiary }]}>
               {professional.professionalInfo.hospitalAffiliation}
             </Text>
           )}
         </View>
 
         {showEditButton && (
-          <TouchableOpacity style={styles.editButton} onPress={onEdit}>
-            <Ionicons name="create-outline" size={20} color="#FF6B6B" />
+          <TouchableOpacity style={[styles.editButton, { backgroundColor: colors.status.error.background }]} onPress={onEdit}>
+            <Ionicons name="create-outline" size={20} color={colors.primary.main} />
           </TouchableOpacity>
         )}
       </View>
@@ -203,38 +205,38 @@ export const MedicalProfessionalProfile: React.FC<MedicalProfessionalProfileProp
     const { email, phoneNumber } = professional.personalInfo;
 
     return (
-      <View style={styles.section}>
-        <View style={styles.sectionHeader}>
-          <Ionicons name="call" size={20} color="#FF6B6B" />
-          <Text style={styles.sectionTitle}>{t('medicalProfessional.contactInformation')}</Text>
+      <View style={[styles.section, { backgroundColor: colors.background.card }]}>
+        <View style={[styles.sectionHeader, { borderBottomColor: colors.border.default }]}>
+          <Ionicons name="call" size={20} color={colors.primary.main} />
+          <Text style={[styles.sectionTitle, { color: colors.text.primary }]}>{t('medicalProfessional.contactInformation')}</Text>
         </View>
 
         <View style={styles.sectionContent}>
           <View style={styles.contactRow}>
-            <Ionicons name="mail" size={16} color="#666666" />
-            <Text style={styles.label}>{t('medicalProfessional.emailLabel')}</Text>
-            <Text style={styles.value}>{email}</Text>
+            <Ionicons name="mail" size={16} color={colors.text.secondary} />
+            <Text style={[styles.label, { color: colors.text.secondary }]}>{t('medicalProfessional.emailLabel')}</Text>
+            <Text style={[styles.value, { color: colors.text.primary }]}>{email}</Text>
             {showContactButtons && (
               <TouchableOpacity
-                style={styles.contactButton}
+                style={[styles.contactButton, { backgroundColor: colors.status.error.background }]}
                 onPress={() => handleEmail(email)}
               >
-                <Ionicons name="send" size={16} color="#FF6B6B" />
+                <Ionicons name="send" size={16} color={colors.primary.main} />
               </TouchableOpacity>
             )}
           </View>
 
           {phoneNumber && (
             <View style={styles.contactRow}>
-              <Ionicons name="call" size={16} color="#666666" />
-              <Text style={styles.label}>{t('medicalProfessional.phoneLabel')}</Text>
-              <Text style={styles.value}>{phoneNumber}</Text>
+              <Ionicons name="call" size={16} color={colors.text.secondary} />
+              <Text style={[styles.label, { color: colors.text.secondary }]}>{t('medicalProfessional.phoneLabel')}</Text>
+              <Text style={[styles.value, { color: colors.text.primary }]}>{phoneNumber}</Text>
               {showContactButtons && (
                 <TouchableOpacity
-                  style={styles.contactButton}
+                  style={[styles.contactButton, { backgroundColor: colors.status.error.background }]}
                   onPress={() => handleCall(phoneNumber)}
                 >
-                  <Ionicons name="call" size={16} color="#FF6B6B" />
+                  <Ionicons name="call" size={16} color={colors.primary.main} />
                 </TouchableOpacity>
               )}
             </View>
@@ -254,32 +256,33 @@ export const MedicalProfessionalProfile: React.FC<MedicalProfessionalProfileProp
     const licenseExpiry = formatLicenseExpiry(professionalInfo.licenseExpiryDate);
 
     return (
-      <View style={styles.section}>
-        <View style={styles.sectionHeader}>
-          <Ionicons name="document-text" size={20} color="#FF6B6B" />
-          <Text style={styles.sectionTitle}>{t('medicalProfessional.professionalCredentials')}</Text>
+      <View style={[styles.section, { backgroundColor: colors.background.card }]}>
+        <View style={[styles.sectionHeader, { borderBottomColor: colors.border.default }]}>
+          <Ionicons name="document-text" size={20} color={colors.primary.main} />
+          <Text style={[styles.sectionTitle, { color: colors.text.primary }]}>{t('medicalProfessional.professionalCredentials')}</Text>
         </View>
 
         <View style={styles.sectionContent}>
           <View style={styles.infoRow}>
-            <Text style={styles.label}>{t('medicalProfessional.licenseNumberLabel')}</Text>
-            <Text style={styles.value}>{professionalInfo.licenseNumber}</Text>
+            <Text style={[styles.label, { color: colors.text.secondary }]}>{t('medicalProfessional.licenseNumberLabel')}</Text>
+            <Text style={[styles.value, { color: colors.text.primary }]}>{professionalInfo.licenseNumber}</Text>
           </View>
 
           {professionalInfo.licenseState && (
             <View style={styles.infoRow}>
-              <Text style={styles.label}>{t('medicalProfessional.licenseStateLabel')}</Text>
-              <Text style={styles.value}>{professionalInfo.licenseState}</Text>
+              <Text style={[styles.label, { color: colors.text.secondary }]}>{t('medicalProfessional.licenseStateLabel')}</Text>
+              <Text style={[styles.value, { color: colors.text.primary }]}>{professionalInfo.licenseState}</Text>
             </View>
           )}
 
           {professionalInfo.licenseExpiryDate && (
             <View style={styles.infoRow}>
-              <Text style={styles.label}>{t('medicalProfessional.licenseExpiryLabel')}</Text>
+              <Text style={[styles.label, { color: colors.text.secondary }]}>{t('medicalProfessional.licenseExpiryLabel')}</Text>
               <Text style={[
                 styles.value,
-                licenseExpiry.isExpired && styles.expiredText,
-                licenseExpiry.isExpiring && styles.expiringText
+                { color: colors.text.primary },
+                licenseExpiry.isExpired && { color: colors.status.error.main },
+                licenseExpiry.isExpiring && { color: colors.status.warning.main }
               ]}>
                 {licenseExpiry.text}
               </Text>
@@ -287,7 +290,7 @@ export const MedicalProfessionalProfile: React.FC<MedicalProfessionalProfileProp
                 <Ionicons 
                   name="warning" 
                   size={16} 
-                  color={licenseExpiry.isExpired ? "#DC3545" : "#FFC107"} 
+                  color={licenseExpiry.isExpired ? colors.status.error.main : colors.status.warning.main} 
                 />
               )}
             </View>
@@ -295,8 +298,8 @@ export const MedicalProfessionalProfile: React.FC<MedicalProfessionalProfileProp
 
           {professionalInfo.yearsOfExperience && (
             <View style={styles.infoRow}>
-              <Text style={styles.label}>{t('medicalProfessional.experienceLabel')}</Text>
-              <Text style={styles.value}>{formatExperience(professionalInfo.yearsOfExperience)}</Text>
+              <Text style={[styles.label, { color: colors.text.secondary }]}>{t('medicalProfessional.experienceLabel')}</Text>
+              <Text style={[styles.value, { color: colors.text.primary }]}>{formatExperience(professionalInfo.yearsOfExperience)}</Text>
             </View>
           )}
         </View>
@@ -313,10 +316,10 @@ export const MedicalProfessionalProfile: React.FC<MedicalProfessionalProfileProp
     const { verificationStatus } = professional;
 
     return (
-      <View style={styles.section}>
-        <View style={styles.sectionHeader}>
-          <Ionicons name="shield-checkmark" size={20} color="#FF6B6B" />
-          <Text style={styles.sectionTitle}>{t('medicalProfessional.verificationStatus')}</Text>
+      <View style={[styles.section, { backgroundColor: colors.background.card }]}>
+        <View style={[styles.sectionHeader, { borderBottomColor: colors.border.default }]}>
+          <Ionicons name="shield-checkmark" size={20} color={colors.primary.main} />
+          <Text style={[styles.sectionTitle, { color: colors.text.primary }]}>{t('medicalProfessional.verificationStatus')}</Text>
         </View>
 
         <View style={styles.sectionContent}>
@@ -330,8 +333,8 @@ export const MedicalProfessionalProfile: React.FC<MedicalProfessionalProfileProp
 
           {verificationStatus.isVerified && verificationStatus.verifiedAt && (
             <View style={styles.infoRow}>
-              <Text style={styles.label}>{t('medicalProfessional.verifiedDateLabel')}</Text>
-              <Text style={styles.value}>
+              <Text style={[styles.label, { color: colors.text.secondary }]}>{t('medicalProfessional.verifiedDateLabel')}</Text>
+              <Text style={[styles.value, { color: colors.text.primary }]}>
                 {verificationStatus.verifiedAt.toLocaleDateString()}
               </Text>
             </View>
@@ -339,15 +342,15 @@ export const MedicalProfessionalProfile: React.FC<MedicalProfessionalProfileProp
 
           {verificationStatus.verifiedBy && (
             <View style={styles.infoRow}>
-              <Text style={styles.label}>{t('medicalProfessional.verifiedByLabel')}</Text>
-              <Text style={styles.value}>{verificationStatus.verifiedBy}</Text>
+              <Text style={[styles.label, { color: colors.text.secondary }]}>{t('medicalProfessional.verifiedByLabel')}</Text>
+              <Text style={[styles.value, { color: colors.text.primary }]}>{verificationStatus.verifiedBy}</Text>
             </View>
           )}
 
           {verificationStatus.verificationNotes && (
             <View style={styles.infoRow}>
-              <Text style={styles.label}>{t('medicalProfessional.notesLabel')}</Text>
-              <Text style={styles.value}>{verificationStatus.verificationNotes}</Text>
+              <Text style={[styles.label, { color: colors.text.secondary }]}>{t('medicalProfessional.notesLabel')}</Text>
+              <Text style={[styles.value, { color: colors.text.primary }]}>{verificationStatus.verificationNotes}</Text>
             </View>
           )}
         </View>
@@ -365,10 +368,10 @@ export const MedicalProfessionalProfile: React.FC<MedicalProfessionalProfileProp
 
   if (!professional) {
     return (
-      <View style={styles.errorContainer}>
-        <Ionicons name="person-outline" size={64} color="#CCCCCC" />
-        <Text style={styles.errorTitle}>{t('medicalProfessional.professionalNotFound')}</Text>
-        <Text style={styles.errorText}>
+      <View style={[styles.errorContainer, { backgroundColor: colors.background.primary }]}>
+        <Ionicons name="person-outline" size={64} color={colors.text.tertiary} />
+        <Text style={[styles.errorTitle, { color: colors.text.primary }]}>{t('medicalProfessional.professionalNotFound')}</Text>
+        <Text style={[styles.errorText, { color: colors.text.secondary }]}>
           {t('medicalProfessional.professionalNotFoundMessage')}
         </Text>
       </View>
@@ -377,14 +380,14 @@ export const MedicalProfessionalProfile: React.FC<MedicalProfessionalProfileProp
 
   return (
     <ScrollView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: colors.background.primary }]}
       contentContainerStyle={styles.content}
       refreshControl={
         <RefreshControl
           refreshing={isRefreshing}
           onRefresh={handleRefresh}
-          colors={['#FF6B6B']}
-          tintColor="#FF6B6B"
+          colors={[colors.primary.main]}
+          tintColor={colors.primary.main}
         />
       }
     >
@@ -403,16 +406,13 @@ export const MedicalProfessionalProfile: React.FC<MedicalProfessionalProfileProp
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
   },
   content: {
     paddingBottom: 20,
   },
   header: {
-    backgroundColor: '#FFFFFF',
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
@@ -423,27 +423,22 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#333333',
     marginBottom: 8,
   },
   specialty: {
     fontSize: 16,
-    color: '#666666',
     marginTop: 8,
     marginBottom: 4,
   },
   hospital: {
     fontSize: 14,
-    color: '#999999',
     fontStyle: 'italic',
   },
   editButton: {
     padding: 8,
     borderRadius: 8,
-    backgroundColor: '#FFF5F5',
   },
   section: {
-    backgroundColor: '#FFFFFF',
     marginTop: 12,
     marginHorizontal: 16,
     borderRadius: 12,
@@ -458,12 +453,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333333',
     marginLeft: 8,
   },
   sectionContent: {
@@ -488,28 +481,23 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#666666',
     marginLeft: 8,
     minWidth: 100,
   },
   value: {
     fontSize: 14,
-    color: '#333333',
     flex: 1,
     marginLeft: 8,
   },
   expiredText: {
-    color: '#DC3545',
     fontWeight: '600',
   },
   expiringText: {
-    color: '#FFC107',
     fontWeight: '600',
   },
   contactButton: {
     padding: 8,
     borderRadius: 6,
-    backgroundColor: '#FFF5F5',
     marginLeft: 8,
   },
   errorContainer: {
@@ -517,18 +505,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 40,
-    backgroundColor: '#F8F9FA',
   },
   errorTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333333',
     marginTop: 16,
     marginBottom: 8,
   },
   errorText: {
     fontSize: 14,
-    color: '#666666',
     textAlign: 'center',
     lineHeight: 20,
   },

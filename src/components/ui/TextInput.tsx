@@ -3,7 +3,7 @@
  * Styled input with label, icons, and animations
  */
 
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useMemo } from 'react';
 import {
   View,
   TextInput as RNTextInput,
@@ -22,7 +22,8 @@ import Animated, {
   interpolateColor,
 } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, borderRadius, layout, typography, duration } from '../../theme';
+import { useTheme } from '../../context/ThemeContext';
+import { duration } from '../../theme';
 
 interface TextInputProps extends Omit<RNTextInputProps, 'style'> {
   label?: string;
@@ -53,6 +54,7 @@ const TextInput: React.FC<TextInputProps> = ({
   secureTextEntry,
   ...textInputProps
 }) => {
+  const { colors, spacing, borderRadius, layout, typography } = useTheme();
   const [isFocused, setIsFocused] = useState(false);
   const [isSecure, setIsSecure] = useState(secureTextEntry);
   const inputRef = useRef<RNTextInput>(null);
@@ -86,6 +88,74 @@ const TextInput: React.FC<TextInputProps> = ({
       borderWidth: isFocused || error ? 1.5 : 1,
     };
   });
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      marginBottom: spacing.lg,
+    },
+    labelContainer: {
+      flexDirection: 'row',
+      marginBottom: spacing.sm,
+    },
+    label: {
+      ...typography.label,
+      color: colors.text.secondary,
+    },
+    labelError: {
+      color: colors.status.error.main,
+    },
+    required: {
+      color: colors.status.error.main,
+    },
+    inputContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.background.input,
+      borderRadius: borderRadius.md,
+      borderWidth: 1,
+      borderColor: colors.border.default,
+      minHeight: layout.inputHeight,
+    },
+    inputDisabled: {
+      backgroundColor: colors.background.tertiary,
+      opacity: 0.6,
+    },
+    input: {
+      flex: 1,
+      ...typography.body,
+      color: colors.text.primary,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: Platform.OS === 'ios' ? spacing.md : spacing.sm,
+      minHeight: layout.inputHeight,
+    },
+    inputWithLeftIcon: {
+      paddingLeft: spacing.xs,
+    },
+    inputWithRightIcon: {
+      paddingRight: spacing.xs,
+    },
+    inputTextDisabled: {
+      color: colors.text.disabled,
+    },
+    leftIconContainer: {
+      paddingLeft: spacing.lg,
+    },
+    rightIconContainer: {
+      paddingRight: spacing.lg,
+      paddingVertical: spacing.md,
+    },
+    helperText: {
+      ...typography.caption,
+      marginTop: spacing.xs,
+      marginLeft: spacing.xs,
+    },
+    errorText: {
+      color: colors.status.error.main,
+    },
+    hintText: {
+      color: colors.text.tertiary,
+    },
+  }), [colors, spacing, borderRadius, layout, typography]);
 
   const hasValue = textInputProps.value && textInputProps.value.length > 0;
 
@@ -173,73 +243,5 @@ const TextInput: React.FC<TextInputProps> = ({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    marginBottom: spacing.lg,
-  },
-  labelContainer: {
-    flexDirection: 'row',
-    marginBottom: spacing.sm,
-  },
-  label: {
-    ...typography.label,
-    color: colors.text.secondary,
-  },
-  labelError: {
-    color: colors.status.error.main,
-  },
-  required: {
-    color: colors.status.error.main,
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.background.input,
-    borderRadius: borderRadius.md,
-    borderWidth: 1,
-    borderColor: colors.border.default,
-    minHeight: layout.inputHeight,
-  },
-  inputDisabled: {
-    backgroundColor: colors.background.tertiary,
-    opacity: 0.6,
-  },
-  input: {
-    flex: 1,
-    ...typography.body,
-    color: colors.text.primary,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: Platform.OS === 'ios' ? spacing.md : spacing.sm,
-    minHeight: layout.inputHeight,
-  },
-  inputWithLeftIcon: {
-    paddingLeft: spacing.xs,
-  },
-  inputWithRightIcon: {
-    paddingRight: spacing.xs,
-  },
-  inputTextDisabled: {
-    color: colors.text.disabled,
-  },
-  leftIconContainer: {
-    paddingLeft: spacing.lg,
-  },
-  rightIconContainer: {
-    paddingRight: spacing.lg,
-    paddingVertical: spacing.md,
-  },
-  helperText: {
-    ...typography.caption,
-    marginTop: spacing.xs,
-    marginLeft: spacing.xs,
-  },
-  errorText: {
-    color: colors.status.error.main,
-  },
-  hintText: {
-    color: colors.text.tertiary,
-  },
-});
 
 export default TextInput;

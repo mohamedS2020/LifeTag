@@ -4,7 +4,7 @@
  * Handles personal info, medical info, emergency contacts, and privacy settings
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -42,7 +42,7 @@ import {
 import { profileService, passwordService } from '../../services';
 import { LoadingOverlay } from '../common/LoadingOverlay';
 import { DatePicker } from '../common/DatePicker';
-import { colors, spacing } from '../../theme';
+import { useTheme } from '../../theme';
 
 // =============================================
 // INTERFACES
@@ -72,22 +72,6 @@ interface FormErrors {
 // HELPER FUNCTIONS
 // =============================================
 
-/**
- * Get color for password strength indicator
- */
-const getPasswordStrengthColor = (strength: 'weak' | 'medium' | 'strong'): string => {
-  switch (strength) {
-    case 'weak':
-      return colors.status.error.main;
-    case 'medium':
-      return colors.status.warning.main;
-    case 'strong':
-      return colors.status.success.main;
-    default:
-      return colors.text.tertiary;
-  }
-};
-
 // =============================================
 // MAIN COMPONENT
 // =============================================
@@ -104,7 +88,511 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
   // STATE MANAGEMENT
   // =============================================
   
+  const { colors, spacing, borderRadius, typography, shadows } = useTheme();
   const { t } = useTranslation();
+
+  /**
+   * Get color for password strength indicator
+   */
+  const getPasswordStrengthColor = (strength: 'weak' | 'medium' | 'strong'): string => {
+    switch (strength) {
+      case 'weak':
+        return colors.status.error.main;
+      case 'medium':
+        return colors.status.warning.main;
+      case 'strong':
+        return colors.status.success.main;
+      default:
+        return colors.text.tertiary;
+    }
+  };
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background.primary,
+    },
+    stepIndicator: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.md,
+      backgroundColor: colors.background.secondary,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border.default,
+    },
+    stepItem: {
+      alignItems: 'center',
+      flex: 1,
+    },
+    stepCircle: {
+      width: 30,
+      height: 30,
+      borderRadius: 15,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: spacing.xxs,
+    },
+    stepActiveCircle: {
+      backgroundColor: colors.primary.main,
+    },
+    stepInactiveCircle: {
+      backgroundColor: colors.background.elevated,
+    },
+    stepNumber: {
+      fontSize: 14,
+      fontWeight: 'bold',
+    },
+    stepActiveText: {
+      color: colors.text.inverse,
+    },
+    stepInactiveText: {
+      color: colors.text.tertiary,
+    },
+    stepLabel: {
+      fontSize: 12,
+      textAlign: 'center',
+    },
+    stepActiveLabel: {
+      color: colors.primary.main,
+      fontWeight: '600',
+    },
+    stepInactiveLabel: {
+      color: colors.text.tertiary,
+    },
+    scrollView: {
+      flex: 1,
+    },
+    stepContent: {
+      padding: spacing.lg,
+    },
+    stepTitle: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      marginBottom: spacing.xs,
+      color: colors.text.primary,
+    },
+    stepDescription: {
+      fontSize: 16,
+      color: colors.text.secondary,
+      marginBottom: spacing.lg,
+      lineHeight: 22,
+    },
+    inputGroup: {
+      marginBottom: spacing.lg,
+    },
+    label: {
+      fontSize: 16,
+      fontWeight: '600',
+      marginBottom: spacing.xs,
+      color: colors.text.primary,
+    },
+    input: {
+      borderWidth: 1,
+      borderColor: colors.border.default,
+      borderRadius: borderRadius.md,
+      padding: spacing.sm,
+      fontSize: 16,
+      backgroundColor: colors.background.secondary,
+      color: colors.text.primary,
+    },
+    inputError: {
+      borderColor: colors.status.error.main,
+    },
+    textArea: {
+      height: 100,
+      textAlignVertical: 'top',
+    },
+    helperText: {
+      fontSize: 14,
+      color: colors.text.secondary,
+      marginTop: spacing.xxs,
+      fontStyle: 'italic',
+    },
+    errorText: {
+      color: colors.status.error.main,
+      fontSize: 14,
+      marginTop: spacing.xxs,
+    },
+    errorContainer: {
+      backgroundColor: colors.background.secondary,
+      padding: spacing.md,
+      margin: spacing.lg,
+      borderRadius: borderRadius.md,
+      borderWidth: 1,
+      borderColor: colors.status.error.main,
+    },
+    genderContainer: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: spacing.sm,
+    },
+    genderButton: {
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.xs,
+      borderRadius: 20,
+      borderWidth: 1,
+      borderColor: colors.border.default,
+      backgroundColor: colors.background.secondary,
+    },
+    genderButtonActive: {
+      backgroundColor: colors.primary.main,
+      borderColor: colors.primary.main,
+    },
+    genderText: {
+      fontSize: 14,
+      color: colors.text.primary,
+    },
+    genderTextActive: {
+      color: colors.text.inverse,
+    },
+    bloodTypeContainer: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: spacing.sm,
+    },
+    bloodTypeButton: {
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      borderRadius: 20,
+      borderWidth: 1,
+      borderColor: colors.border.default,
+      backgroundColor: colors.background.secondary,
+      minWidth: 50,
+      alignItems: 'center',
+    },
+    bloodTypeButtonActive: {
+      backgroundColor: colors.primary.main,
+      borderColor: colors.primary.main,
+    },
+    bloodTypeText: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text.primary,
+    },
+    bloodTypeTextActive: {
+      color: colors.text.inverse,
+    },
+    switchGroup: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+    },
+    switchItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      flex: 1,
+      marginHorizontal: spacing.xxs,
+    },
+    switchLabel: {
+      fontSize: 14,
+      color: colors.text.primary,
+      marginRight: spacing.sm,
+    },
+    addButton: {
+      backgroundColor: colors.status.error.main,
+      padding: spacing.md,
+      borderRadius: borderRadius.md,
+      alignItems: 'center',
+      marginBottom: spacing.lg,
+    },
+    addButtonText: {
+      color: colors.text.inverse,
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    contactItem: {
+      backgroundColor: colors.background.secondary,
+      padding: spacing.md,
+      borderRadius: borderRadius.md,
+      marginBottom: spacing.md,
+      borderWidth: 1,
+      borderColor: colors.border.default,
+    },
+    contactHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: spacing.md,
+    },
+    contactTitle: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: colors.text.primary,
+    },
+    primaryBadge: {
+      backgroundColor: colors.primary.main,
+      paddingHorizontal: spacing.xs,
+      paddingVertical: spacing.xxs,
+      borderRadius: borderRadius.sm,
+    },
+    primaryBadgeText: {
+      color: colors.text.inverse,
+      fontSize: 12,
+      fontWeight: '600',
+    },
+    removeButton: {
+      backgroundColor: colors.status.error.main,
+      paddingHorizontal: spacing.xs,
+      paddingVertical: spacing.xxs,
+      borderRadius: borderRadius.sm,
+    },
+    removeButtonText: {
+      color: colors.text.inverse,
+      fontSize: 12,
+      fontWeight: '600',
+    },
+    relationshipContainer: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: spacing.xs,
+    },
+    relationshipButton: {
+      paddingHorizontal: spacing.sm,
+      paddingVertical: spacing.xxs,
+      borderRadius: 15,
+      borderWidth: 1,
+      borderColor: colors.border.default,
+      backgroundColor: colors.background.secondary,
+    },
+    relationshipButtonActive: {
+      backgroundColor: colors.primary.main,
+      borderColor: colors.primary.main,
+    },
+    relationshipText: {
+      fontSize: 12,
+      color: colors.text.primary,
+    },
+    relationshipTextActive: {
+      color: colors.text.inverse,
+    },
+    switchContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginTop: spacing.md,
+      paddingTop: spacing.md,
+      borderTopWidth: 1,
+      borderTopColor: colors.border.default,
+    },
+    emptyState: {
+      alignItems: 'center',
+      padding: spacing.xxl,
+      backgroundColor: colors.background.secondary,
+      borderRadius: borderRadius.md,
+      borderStyle: 'dashed',
+      borderWidth: 2,
+      borderColor: colors.border.default,
+    },
+    emptyStateText: {
+      fontSize: 16,
+      color: colors.text.secondary,
+      marginBottom: spacing.xxs,
+      fontWeight: '500',
+    },
+    emptyStateSubtext: {
+      fontSize: 14,
+      color: colors.text.tertiary,
+      textAlign: 'center',
+      lineHeight: 20,
+    },
+    settingItem: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingVertical: spacing.md,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border.default,
+    },
+    settingInfo: {
+      flex: 1,
+      marginRight: spacing.md,
+    },
+    settingTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text.primary,
+      marginBottom: 2,
+    },
+    settingDescription: {
+      fontSize: 14,
+      color: colors.text.secondary,
+      lineHeight: 20,
+    },
+    completionSection: {
+      backgroundColor: colors.background.elevated,
+      padding: spacing.lg,
+      borderRadius: borderRadius.md,
+      marginTop: spacing.lg,
+      borderWidth: 1,
+      borderColor: colors.primary.main,
+    },
+    completionTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: colors.primary.main,
+      marginBottom: spacing.xs,
+    },
+    completionText: {
+      fontSize: 14,
+      color: colors.text.secondary,
+      lineHeight: 20,
+    },
+    buttonContainer: {
+      flexDirection: 'row',
+      padding: spacing.lg,
+      backgroundColor: colors.background.secondary,
+      borderTopWidth: 1,
+      borderTopColor: colors.border.default,
+    },
+    button: {
+      flex: 1,
+      padding: spacing.md,
+      borderRadius: borderRadius.md,
+      alignItems: 'center',
+      marginHorizontal: spacing.xxs,
+    },
+    backButton: {
+      backgroundColor: colors.background.elevated,
+    },
+    nextButton: {
+      backgroundColor: colors.primary.main,
+    },
+    backButtonText: {
+      color: colors.text.primary,
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    nextButtonText: {
+      color: colors.text.inverse,
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    passwordSection: {
+      backgroundColor: colors.background.secondary,
+      borderRadius: borderRadius.md,
+      padding: spacing.md,
+      marginTop: spacing.md,
+      borderWidth: 1,
+      borderColor: colors.border.default,
+    },
+    passwordSectionTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text.primary,
+      marginBottom: spacing.xxs,
+    },
+    passwordSectionDescription: {
+      fontSize: 14,
+      color: colors.text.secondary,
+      marginBottom: spacing.md,
+      lineHeight: 20,
+    },
+    passwordInputContainer: {
+      marginBottom: spacing.sm,
+    },
+    passwordFieldContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: colors.border.default,
+      borderRadius: borderRadius.md,
+      backgroundColor: colors.background.secondary,
+    },
+    passwordInput: {
+      flex: 1,
+      height: 48,
+      paddingHorizontal: spacing.sm,
+      fontSize: 16,
+      color: colors.text.primary,
+    },
+    passwordToggle: {
+      paddingHorizontal: spacing.sm,
+      paddingVertical: spacing.xs,
+    },
+    passwordToggleText: {
+      color: colors.primary.main,
+      fontSize: 14,
+      fontWeight: '500',
+    },
+    passwordError: {
+      color: colors.status.error.main,
+      fontSize: 12,
+      marginTop: spacing.xxs,
+      fontWeight: '500',
+    },
+    passwordStrengthContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginTop: spacing.xs,
+    },
+    passwordStrengthLabel: {
+      fontSize: 12,
+      color: colors.text.secondary,
+      marginRight: spacing.xxs,
+    },
+    passwordStrengthText: {
+      fontSize: 12,
+      fontWeight: '600',
+    },
+    listItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: spacing.xs,
+    },
+    listItemInput: {
+      flex: 1,
+      marginRight: spacing.sm,
+    },
+    addItemButton: {
+      backgroundColor: colors.background.secondary,
+      padding: spacing.sm,
+      borderRadius: borderRadius.md,
+      alignItems: 'center',
+      marginTop: spacing.xs,
+      borderWidth: 1,
+      borderColor: colors.primary.main,
+      borderStyle: 'dashed',
+    },
+    addItemButtonText: {
+      color: colors.primary.main,
+      fontSize: 14,
+      fontWeight: '600',
+    },
+    existingPasswordInfo: {
+      backgroundColor: colors.background.elevated,
+      padding: spacing.sm,
+      borderRadius: borderRadius.md,
+      marginBottom: spacing.sm,
+      borderWidth: 1,
+      borderColor: colors.primary.main,
+    },
+    existingPasswordText: {
+      fontSize: 14,
+      color: colors.text.secondary,
+      marginBottom: spacing.xs,
+    },
+    changePasswordButton: {
+      backgroundColor: colors.primary.main,
+      paddingHorizontal: spacing.sm,
+      paddingVertical: spacing.xxs,
+      borderRadius: borderRadius.sm,
+      alignSelf: 'flex-start',
+    },
+    changePasswordButtonText: {
+      color: colors.text.inverse,
+      fontSize: 12,
+      fontWeight: '600',
+    },
+    changePasswordForm: {
+      marginTop: spacing.sm,
+    },
+    changePasswordTitle: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: colors.text.primary,
+      marginBottom: spacing.sm,
+    },
+  }), [colors, spacing, borderRadius, typography, shadows]);
 
   const [formState, setFormState] = useState<FormState>({
     personalInfo: {},
@@ -1467,498 +1955,5 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
     </View>
   );
 };
-
-// =============================================
-// STYLES
-// =============================================
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.primary,
-  },
-  stepIndicator: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    backgroundColor: colors.background.secondary,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.default,
-  },
-  stepItem: {
-    alignItems: 'center',
-    flex: 1,
-  },
-  stepCircle: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: spacing.xxs,
-  },
-  stepActiveCircle: {
-    backgroundColor: colors.primary.main,
-  },
-  stepInactiveCircle: {
-    backgroundColor: colors.background.elevated,
-  },
-  stepNumber: {
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  stepActiveText: {
-    color: colors.text.inverse,
-  },
-  stepInactiveText: {
-    color: colors.text.tertiary,
-  },
-  stepLabel: {
-    fontSize: 12,
-    textAlign: 'center',
-  },
-  stepActiveLabel: {
-    color: colors.primary.main,
-    fontWeight: '600',
-  },
-  stepInactiveLabel: {
-    color: colors.text.tertiary,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  stepContent: {
-    padding: spacing.lg,
-  },
-  stepTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: spacing.xs,
-    color: colors.text.primary,
-  },
-  stepDescription: {
-    fontSize: 16,
-    color: colors.text.secondary,
-    marginBottom: spacing.lg,
-    lineHeight: 22,
-  },
-  inputGroup: {
-    marginBottom: spacing.lg,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: spacing.xs,
-    color: colors.text.primary,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: colors.border.default,
-    borderRadius: spacing.borderRadius.md,
-    padding: spacing.sm,
-    fontSize: 16,
-    backgroundColor: colors.background.secondary,
-    color: colors.text.primary,
-  },
-  inputError: {
-    borderColor: colors.status.error.main,
-  },
-  textArea: {
-    height: 100,
-    textAlignVertical: 'top',
-  },
-  helperText: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    marginTop: spacing.xxs,
-    fontStyle: 'italic',
-  },
-  errorText: {
-    color: colors.status.error.main,
-    fontSize: 14,
-    marginTop: spacing.xxs,
-  },
-  errorContainer: {
-    backgroundColor: colors.background.secondary,
-    padding: spacing.md,
-    margin: spacing.lg,
-    borderRadius: spacing.borderRadius.md,
-    borderWidth: 1,
-    borderColor: colors.status.error.main,
-  },
-  genderContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.sm,
-  },
-  genderButton: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: colors.border.default,
-    backgroundColor: colors.background.secondary,
-  },
-  genderButtonActive: {
-    backgroundColor: colors.primary.main,
-    borderColor: colors.primary.main,
-  },
-  genderText: {
-    fontSize: 14,
-    color: colors.text.primary,
-  },
-  genderTextActive: {
-    color: colors.text.inverse,
-  },
-  bloodTypeContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.sm,
-  },
-  bloodTypeButton: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: colors.border.default,
-    backgroundColor: colors.background.secondary,
-    minWidth: 50,
-    alignItems: 'center',
-  },
-  bloodTypeButtonActive: {
-    backgroundColor: colors.primary.main,
-    borderColor: colors.primary.main,
-  },
-  bloodTypeText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text.primary,
-  },
-  bloodTypeTextActive: {
-    color: colors.text.inverse,
-  },
-  switchGroup: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  switchItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-    marginHorizontal: spacing.xxs,
-  },
-  switchLabel: {
-    fontSize: 14,
-    color: colors.text.primary,
-    marginRight: spacing.sm,
-  },
-  addButton: {
-    backgroundColor: colors.status.error.main,
-    padding: spacing.md,
-    borderRadius: spacing.borderRadius.md,
-    alignItems: 'center',
-    marginBottom: spacing.lg,
-  },
-  addButtonText: {
-    color: colors.text.inverse,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  contactItem: {
-    backgroundColor: colors.background.secondary,
-    padding: spacing.md,
-    borderRadius: spacing.borderRadius.md,
-    marginBottom: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.border.default,
-  },
-  contactHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.md,
-  },
-  contactTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: colors.text.primary,
-  },
-  primaryBadge: {
-    backgroundColor: colors.primary.main,
-    paddingHorizontal: spacing.xs,
-    paddingVertical: spacing.xxs,
-    borderRadius: spacing.borderRadius.sm,
-  },
-  primaryBadgeText: {
-    color: colors.text.inverse,
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  removeButton: {
-    backgroundColor: colors.status.error.main,
-    paddingHorizontal: spacing.xs,
-    paddingVertical: spacing.xxs,
-    borderRadius: spacing.borderRadius.sm,
-  },
-  removeButtonText: {
-    color: colors.text.inverse,
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  relationshipContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.xs,
-  },
-  relationshipButton: {
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xxs,
-    borderRadius: 15,
-    borderWidth: 1,
-    borderColor: colors.border.default,
-    backgroundColor: colors.background.secondary,
-  },
-  relationshipButtonActive: {
-    backgroundColor: colors.primary.main,
-    borderColor: colors.primary.main,
-  },
-  relationshipText: {
-    fontSize: 12,
-    color: colors.text.primary,
-  },
-  relationshipTextActive: {
-    color: colors.text.inverse,
-  },
-  switchContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: spacing.md,
-    paddingTop: spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: colors.border.default,
-  },
-  emptyState: {
-    alignItems: 'center',
-    padding: spacing.xxl,
-    backgroundColor: colors.background.secondary,
-    borderRadius: spacing.borderRadius.md,
-    borderStyle: 'dashed',
-    borderWidth: 2,
-    borderColor: colors.border.default,
-  },
-  emptyStateText: {
-    fontSize: 16,
-    color: colors.text.secondary,
-    marginBottom: spacing.xxs,
-    fontWeight: '500',
-  },
-  emptyStateSubtext: {
-    fontSize: 14,
-    color: colors.text.tertiary,
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-  settingItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.default,
-  },
-  settingInfo: {
-    flex: 1,
-    marginRight: spacing.md,
-  },
-  settingTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text.primary,
-    marginBottom: 2,
-  },
-  settingDescription: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    lineHeight: 20,
-  },
-  completionSection: {
-    backgroundColor: colors.background.elevated,
-    padding: spacing.lg,
-    borderRadius: spacing.borderRadius.md,
-    marginTop: spacing.lg,
-    borderWidth: 1,
-    borderColor: colors.primary.main,
-  },
-  completionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: colors.primary.main,
-    marginBottom: spacing.xs,
-  },
-  completionText: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    lineHeight: 20,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    padding: spacing.lg,
-    backgroundColor: colors.background.secondary,
-    borderTopWidth: 1,
-    borderTopColor: colors.border.default,
-  },
-  button: {
-    flex: 1,
-    padding: spacing.md,
-    borderRadius: spacing.borderRadius.md,
-    alignItems: 'center',
-    marginHorizontal: spacing.xxs,
-  },
-  backButton: {
-    backgroundColor: colors.background.elevated,
-  },
-  nextButton: {
-    backgroundColor: colors.primary.main,
-  },
-  backButtonText: {
-    color: colors.text.primary,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  nextButtonText: {
-    color: colors.text.inverse,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  
-  // Password-related styles
-  passwordSection: {
-    backgroundColor: colors.background.secondary,
-    borderRadius: spacing.borderRadius.md,
-    padding: spacing.md,
-    marginTop: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.border.default,
-  },
-  passwordSectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text.primary,
-    marginBottom: spacing.xxs,
-  },
-  passwordSectionDescription: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    marginBottom: spacing.md,
-    lineHeight: 20,
-  },
-  passwordInputContainer: {
-    marginBottom: spacing.sm,
-  },
-  passwordFieldContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: colors.border.default,
-    borderRadius: spacing.borderRadius.md,
-    backgroundColor: colors.background.secondary,
-  },
-  passwordInput: {
-    flex: 1,
-    height: 48,
-    paddingHorizontal: spacing.sm,
-    fontSize: 16,
-    color: colors.text.primary,
-  },
-  passwordToggle: {
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-  },
-  passwordToggleText: {
-    color: colors.primary.main,
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  passwordError: {
-    color: colors.status.error.main,
-    fontSize: 12,
-    marginTop: spacing.xxs,
-    fontWeight: '500',
-  },
-  passwordStrengthContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: spacing.xs,
-  },
-  passwordStrengthLabel: {
-    fontSize: 12,
-    color: colors.text.secondary,
-    marginRight: spacing.xxs,
-  },
-  passwordStrengthText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  listItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.xs,
-  },
-  listItemInput: {
-    flex: 1,
-    marginRight: spacing.sm,
-  },
-  addItemButton: {
-    backgroundColor: colors.background.secondary,
-    padding: spacing.sm,
-    borderRadius: spacing.borderRadius.md,
-    alignItems: 'center',
-    marginTop: spacing.xs,
-    borderWidth: 1,
-    borderColor: colors.primary.main,
-    borderStyle: 'dashed',
-  },
-  addItemButtonText: {
-    color: colors.primary.main,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  existingPasswordInfo: {
-    backgroundColor: colors.background.elevated,
-    padding: spacing.sm,
-    borderRadius: spacing.borderRadius.md,
-    marginBottom: spacing.sm,
-    borderWidth: 1,
-    borderColor: colors.primary.main,
-  },
-  existingPasswordText: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    marginBottom: spacing.xs,
-  },
-  changePasswordButton: {
-    backgroundColor: colors.primary.main,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xxs,
-    borderRadius: spacing.borderRadius.sm,
-    alignSelf: 'flex-start',
-  },
-  changePasswordButtonText: {
-    color: colors.text.inverse,
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  changePasswordForm: {
-    marginTop: spacing.sm,
-  },
-  changePasswordTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.text.primary,
-    marginBottom: spacing.sm,
-  },
-});
 
 export default ProfileForm;

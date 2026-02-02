@@ -3,11 +3,12 @@
  * Status badges for verification, roles, and indicators
  */
 
-import React from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { View, Text, StyleSheet, ViewStyle, TextStyle } from 'react-native';
 import Animated, { FadeIn, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, borderRadius, typography, duration } from '../../theme';
+import { useTheme } from '../../context/ThemeContext';
+import { duration } from '../../theme';
 
 export type BadgeVariant = 'success' | 'warning' | 'error' | 'info' | 'neutral' | 'primary';
 export type BadgeSize = 'sm' | 'md' | 'lg';
@@ -29,6 +30,7 @@ const Badge: React.FC<BadgeProps> = ({
   pulse = false,
   style,
 }) => {
+  const { colors, spacing, borderRadius, typography } = useTheme();
   const pulseAnim = useSharedValue(1);
 
   React.useEffect(() => {
@@ -45,7 +47,7 @@ const Badge: React.FC<BadgeProps> = ({
     opacity: pulse ? pulseAnim.value : 1,
   }));
 
-  const getVariantStyles = (): { container: ViewStyle; text: TextStyle; iconColor: string } => {
+  const getVariantStyles = useCallback((): { container: ViewStyle; text: TextStyle; iconColor: string } => {
     switch (variant) {
       case 'success':
         return {
@@ -103,9 +105,9 @@ const Badge: React.FC<BadgeProps> = ({
           iconColor: colors.text.secondary,
         };
     }
-  };
+  }, [colors, variant]);
 
-  const getSizeStyles = (): { container: ViewStyle; text: TextStyle; iconSize: number } => {
+  const getSizeStyles = useCallback((): { container: ViewStyle; text: TextStyle; iconSize: number } => {
     switch (size) {
       case 'sm':
         return {
@@ -139,10 +141,22 @@ const Badge: React.FC<BadgeProps> = ({
           iconSize: 14,
         };
     }
-  };
+  }, [spacing, borderRadius, typography, size]);
 
   const variantStyles = getVariantStyles();
   const sizeStyles = getSizeStyles();
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      alignSelf: 'flex-start',
+      borderWidth: 1,
+    },
+    icon: {
+      marginRight: spacing.xs,
+    },
+  }), [spacing]);
 
   return (
     <Animated.View
@@ -168,17 +182,5 @@ const Badge: React.FC<BadgeProps> = ({
     </Animated.View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    borderWidth: 1,
-  },
-  icon: {
-    marginRight: spacing.xs,
-  },
-});
 
 export default Badge;

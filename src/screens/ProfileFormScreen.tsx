@@ -4,7 +4,7 @@
  * Task 7.4: Implement navigation between profile creation, QR display, scanning, and history
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -20,7 +20,7 @@ import { UserProfile } from '../types';
 import { ProfileForm } from '../components/Profile';
 import { LoadingOverlay } from '../components/common';
 import { profileService } from '../services';
-import { colors, spacing } from '../theme';
+import { useTheme } from '../theme';
 import { Button } from '../components/ui';
 
 interface ProfileFormScreenProps {
@@ -35,6 +35,7 @@ interface ProfileFormScreenProps {
 }
 
 const ProfileFormScreen: React.FC<ProfileFormScreenProps> = ({ navigation, route }) => {
+  const { colors, spacing, borderRadius, typography, shadows } = useTheme();
   const { t } = useTranslation();
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
@@ -42,6 +43,83 @@ const ProfileFormScreen: React.FC<ProfileFormScreenProps> = ({ navigation, route
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background.primary,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      backgroundColor: colors.background.secondary,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border.default,
+    },
+    closeButton: {
+      padding: spacing.xs,
+      borderRadius: borderRadius.full,
+      backgroundColor: colors.background.elevated,
+    },
+    headerContent: {
+      flex: 1,
+      alignItems: 'center',
+    },
+    headerTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: colors.text.primary,
+    },
+    headerSubtitle: {
+      fontSize: 12,
+      color: colors.text.tertiary,
+      marginTop: 2,
+    },
+    placeholder: {
+      width: 40,
+    },
+    
+    // Error State Styles
+    errorContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: spacing.xl,
+    },
+    errorIconContainer: {
+      width: 80,
+      height: 80,
+      borderRadius: 40,
+      backgroundColor: `${colors.status.error.main}20`,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: spacing.md,
+    },
+    errorTitle: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: colors.text.primary,
+      marginBottom: spacing.sm,
+      textAlign: 'center',
+    },
+    errorMessage: {
+      fontSize: 16,
+      color: colors.text.secondary,
+      textAlign: 'center',
+      marginBottom: spacing.xl,
+      lineHeight: 24,
+    },
+    errorActions: {
+      width: '100%',
+      gap: spacing.sm,
+    },
+    retryButton: {
+      marginBottom: spacing.sm,
+    },
+  }), [colors, spacing, borderRadius, typography, shadows]);
 
   // Route parameters
   const mode = route?.params?.mode || 'edit';
@@ -261,82 +339,5 @@ const ProfileFormScreen: React.FC<ProfileFormScreenProps> = ({ navigation, route
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.primary,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: colors.background.secondary,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.default,
-  },
-  closeButton: {
-    padding: spacing.xs,
-    borderRadius: spacing.borderRadius.full,
-    backgroundColor: colors.background.elevated,
-  },
-  headerContent: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: colors.text.primary,
-  },
-  headerSubtitle: {
-    fontSize: 12,
-    color: colors.text.tertiary,
-    marginTop: 2,
-  },
-  placeholder: {
-    width: 40,
-  },
-  
-  // Error State Styles
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: spacing.xl,
-  },
-  errorIconContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: `${colors.status.error.main}20`,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: spacing.md,
-  },
-  errorTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: colors.text.primary,
-    marginBottom: spacing.sm,
-    textAlign: 'center',
-  },
-  errorMessage: {
-    fontSize: 16,
-    color: colors.text.secondary,
-    textAlign: 'center',
-    marginBottom: spacing.xl,
-    lineHeight: 24,
-  },
-  errorActions: {
-    width: '100%',
-    gap: spacing.sm,
-  },
-  retryButton: {
-    marginBottom: spacing.sm,
-  },
-});
 
 export default ProfileFormScreen;

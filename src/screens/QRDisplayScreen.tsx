@@ -4,7 +4,7 @@
  * Task 7.4: Implement navigation between profile creation, QR display, scanning, and history
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -21,7 +21,7 @@ import { QRDisplay } from '../components/QR';
 import { LoadingOverlay } from '../components/common';
 import { profileService } from '../services';
 import { Button, Card, H3, Body, BodySmall } from '../components/ui';
-import { colors, spacing, borderRadius, typography, shadows } from '../theme';
+import { useTheme } from '../theme';
 import { useTranslation } from 'react-i18next';
 
 interface QRDisplayScreenProps {
@@ -35,6 +35,7 @@ interface QRDisplayScreenProps {
 }
 
 const QRDisplayScreen: React.FC<QRDisplayScreenProps> = ({ navigation, route }) => {
+  const { colors, spacing, borderRadius, typography, shadows } = useTheme();
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
@@ -44,6 +45,68 @@ const QRDisplayScreen: React.FC<QRDisplayScreenProps> = ({ navigation, route }) 
 
   const emergencyMode = route?.params?.emergencyMode || false;
   const profileId = route?.params?.profileId;
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background.primary,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      backgroundColor: colors.background.secondary,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.md,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border.default,
+    },
+    closeButton: {
+      padding: spacing.sm,
+    },
+    headerTitle: {
+      ...typography.h4,
+      color: colors.text.primary,
+      flex: 1,
+      textAlign: 'center',
+    },
+    headerEditButton: {
+      padding: spacing.sm,
+    },
+    placeholder: {
+      width: 40,
+    },
+    
+    // Error State Styles
+    errorContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: spacing['3xl'],
+    },
+    errorIconContainer: {
+      width: 80,
+      height: 80,
+      borderRadius: 40,
+      backgroundColor: colors.medical.emergencyBackground,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: spacing.xl,
+    },
+    errorTitle: {
+      marginBottom: spacing.sm,
+      textAlign: 'center',
+    },
+    errorMessage: {
+      marginBottom: spacing['3xl'],
+      lineHeight: 24,
+    },
+    errorActions: {
+      flexDirection: 'column',
+      width: '100%',
+      gap: spacing.md,
+    },
+  }), [colors, spacing, borderRadius, typography, shadows]);
 
   // Load profile data
   useEffect(() => {
@@ -173,67 +236,5 @@ const QRDisplayScreen: React.FC<QRDisplayScreenProps> = ({ navigation, route }) 
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.primary,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: colors.background.secondary,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.default,
-  },
-  closeButton: {
-    padding: spacing.sm,
-  },
-  headerTitle: {
-    ...typography.h4,
-    color: colors.text.primary,
-    flex: 1,
-    textAlign: 'center',
-  },
-  headerEditButton: {
-    padding: spacing.sm,
-  },
-  placeholder: {
-    width: 40,
-  },
-  
-  // Error State Styles
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: spacing['3xl'],
-  },
-  errorIconContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: colors.medical.emergencyBackground,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.xl,
-  },
-  errorTitle: {
-    marginBottom: spacing.sm,
-    textAlign: 'center',
-  },
-  errorMessage: {
-    marginBottom: spacing['3xl'],
-    lineHeight: 24,
-  },
-  errorActions: {
-    flexDirection: 'column',
-    width: '100%',
-    gap: spacing.md,
-  },
-});
 
 export default QRDisplayScreen;

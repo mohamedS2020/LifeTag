@@ -4,7 +4,7 @@
  * Task 7.4: Implement navigation between profile creation, QR display, scanning, and history
  */
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -17,7 +17,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 import { QRScanner } from '../components/QR';
 import { EmergencyQRData } from '../services/qrService';
-import { colors, spacing } from '../theme';
+import { useTheme } from '../theme';
 import { useTranslation } from 'react-i18next';
 
 interface QRScannerScreenProps {
@@ -31,9 +31,118 @@ interface QRScannerScreenProps {
 }
 
 const QRScannerScreen: React.FC<QRScannerScreenProps> = ({ navigation, route }) => {
+  const { colors, spacing, borderRadius, typography, shadows } = useTheme();
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background.primary,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      backgroundColor: colors.background.secondary,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border.default,
+    },
+    closeButton: {
+      padding: spacing.xs,
+      borderRadius: borderRadius.full,
+      backgroundColor: colors.background.elevated,
+    },
+    headerTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: colors.text.primary,
+      flex: 1,
+      textAlign: 'center',
+    },
+    placeholder: {
+      width: 40,
+    },
+    
+    professionalBanner: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: `${colors.medical.verified}15`,
+      paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.md,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border.light,
+    },
+    professionalText: {
+      marginLeft: spacing.sm,
+      fontSize: 14,
+      color: colors.medical.verified,
+      fontWeight: '600',
+    },
+    
+    instructionsContainer: {
+      backgroundColor: colors.background.secondary,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.md,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border.default,
+    },
+    instructionsTitle: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: colors.text.primary,
+      marginBottom: spacing.sm,
+      textAlign: 'center',
+    },
+    instructionsText: {
+      fontSize: 14,
+      color: colors.text.secondary,
+      textAlign: 'center',
+      lineHeight: 20,
+    },
+    
+    footer: {
+      backgroundColor: colors.background.secondary,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.md,
+      borderTopWidth: 1,
+      borderTopColor: colors.border.default,
+    },
+    footerContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: spacing.sm,
+    },
+    footerText: {
+      marginLeft: spacing.sm,
+      fontSize: 12,
+      color: colors.text.tertiary,
+      textAlign: 'center',
+    },
+    historyButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: 'transparent',
+      borderWidth: 1,
+      borderColor: colors.primary.main,
+      paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.md,
+      borderRadius: borderRadius.md,
+    },
+    historyButtonText: {
+      marginLeft: spacing.xs,
+      fontSize: 14,
+      color: colors.primary.main,
+      fontWeight: '600',
+    },
+  }), [colors, spacing, borderRadius, typography, shadows]);
+
   const [scanResult, setScanResult] = useState<{
     qrData: string;
     emergencyData: EmergencyQRData | null;
@@ -182,112 +291,5 @@ const QRScannerScreen: React.FC<QRScannerScreenProps> = ({ navigation, route }) 
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.primary,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: colors.background.secondary,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.default,
-  },
-  closeButton: {
-    padding: spacing.xs,
-    borderRadius: spacing.borderRadius.full,
-    backgroundColor: colors.background.elevated,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: colors.text.primary,
-    flex: 1,
-    textAlign: 'center',
-  },
-  placeholder: {
-    width: 40,
-  },
-  
-  professionalBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: `${colors.medical.verified}15`,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.light,
-  },
-  professionalText: {
-    marginLeft: spacing.sm,
-    fontSize: 14,
-    color: colors.medical.verified,
-    fontWeight: '600',
-  },
-  
-  instructionsContainer: {
-    backgroundColor: colors.background.secondary,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.default,
-  },
-  instructionsTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: colors.text.primary,
-    marginBottom: spacing.sm,
-    textAlign: 'center',
-  },
-  instructionsText: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-  
-  footer: {
-    backgroundColor: colors.background.secondary,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: colors.border.default,
-  },
-  footerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.sm,
-  },
-  footerText: {
-    marginLeft: spacing.sm,
-    fontSize: 12,
-    color: colors.text.tertiary,
-    textAlign: 'center',
-  },
-  historyButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: colors.primary.main,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    borderRadius: spacing.borderRadius.md,
-  },
-  historyButtonText: {
-    marginLeft: spacing.xs,
-    fontSize: 14,
-    color: colors.primary.main,
-    fontWeight: '600',
-  },
-});
 
 export default QRScannerScreen;

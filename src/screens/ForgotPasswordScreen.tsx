@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { View, Text, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Button, TextInput, Card, H1, Body, BodySmall } from '../components/ui';
-import { colors, spacing, typography } from '../theme';
+import { useTheme } from '../theme';
 import { sendPasswordResetEmail } from '../services/authService';
 
 interface ForgotPasswordScreenProps {
@@ -10,7 +10,21 @@ interface ForgotPasswordScreenProps {
 }
 
 const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation }) => {
+  const { colors, spacing, borderRadius, typography, shadows } = useTheme();
   const { t } = useTranslation();
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: { flex: 1, justifyContent: 'center', backgroundColor: colors.background.primary },
+    card: { margin: spacing.lg, padding: spacing.lg },
+    title: { ...typography.h1, marginBottom: spacing.md },
+    subtitle: { marginBottom: spacing.md },
+    input: { marginBottom: spacing.md },
+    button: { marginTop: spacing.md },
+    backButton: { marginTop: spacing.sm },
+    error: { color: colors.status.error.main, marginTop: spacing.sm },
+    success: { color: colors.status.success.main, marginTop: spacing.sm },
+  }), [colors, spacing, borderRadius, typography, shadows]);
+
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -67,17 +81,5 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
     </KeyboardAvoidingView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', backgroundColor: colors.background.primary },
-  card: { margin: spacing.lg, padding: spacing.lg },
-  title: { ...typography.h1, marginBottom: spacing.md },
-  subtitle: { marginBottom: spacing.md },
-  input: { marginBottom: spacing.md },
-  button: { marginTop: spacing.md },
-  backButton: { marginTop: spacing.sm },
-  error: { color: colors.status.error.main, marginTop: spacing.sm },
-  success: { color: colors.status.success.main, marginTop: spacing.sm },
-});
 
 export default ForgotPasswordScreen;

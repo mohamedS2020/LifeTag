@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   View,
   Text,
@@ -25,7 +25,7 @@ import * as FileSystem from 'expo-file-system';
 import { UserProfile } from '../../types';
 import { QRService, QRCodeGenerator, EmergencyQRData } from '../../services/qrService';
 import { BackupTextDisplay } from './BackupTextDisplay';
-import { colors, spacing } from '../../theme';
+import { useTheme } from '../../theme';
 
 /**
  * QR Display Screen Props
@@ -50,6 +50,7 @@ export const QRDisplay: React.FC<QRDisplayProps> = ({
   fullScreen = true
 }) => {
   const { t } = useTranslation();
+  const { colors, spacing, borderRadius, typography, shadows } = useTheme();
   const [qrData, setQrData] = useState<string>('');
   const [emergencyData, setEmergencyData] = useState<EmergencyQRData | null>(null);
   const [isGenerating, setIsGenerating] = useState<boolean>(true);
@@ -497,6 +498,337 @@ export const QRDisplay: React.FC<QRDisplayProps> = ({
     };
   }, []);
 
+  const styles = useMemo(() => StyleSheet.create({
+    fullScreenContainer: {
+      flex: 1,
+      backgroundColor: colors.background.primary,
+    },
+    normalContainer: {
+      flex: 1,
+      backgroundColor: colors.background.primary,
+    },
+    normalBackground: {
+      backgroundColor: colors.background.primary,
+    },
+    maxBrightnessBackground: {
+      backgroundColor: '#FFFFFF',
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.md,
+      backgroundColor: colors.background.secondary,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border.default,
+    },
+    closeButton: {
+      padding: spacing.xxs,
+    },
+    headerCenter: {
+      flex: 1,
+      alignItems: 'center',
+    },
+    headerTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: colors.text.primary,
+      textAlign: 'center',
+    },
+    headerSubtitle: {
+      fontSize: 14,
+      color: colors.text.secondary,
+      textAlign: 'center',
+      marginTop: 2,
+    },
+    helpButton: {
+      padding: spacing.xxs,
+    },
+    shareButton: {
+      padding: spacing.xxs,
+    },
+    headerRight: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+    },
+    scrollContent: {
+      flexGrow: 1,
+      alignItems: 'center',
+      paddingVertical: spacing.lg,
+    },
+    qrContainer: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: spacing.xl,
+    },
+    qrWrapper: {
+      position: 'relative',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: '#FFFFFF',
+      padding: spacing.lg,
+      borderRadius: borderRadius.lg,
+      shadowColor: '#000000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 8,
+    },
+    qrBorder: {
+      position: 'absolute',
+      borderWidth: 3,
+      borderColor: '#000000',
+      backgroundColor: '#FFFFFF',
+      borderRadius: borderRadius.lg,
+    },
+    cornerMarker: {
+      position: 'absolute',
+      width: 20,
+      height: 20,
+      backgroundColor: colors.medical.emergency,
+      borderRadius: 10,
+    },
+    topLeft: { top: -10, left: -10 },
+    topRight: { top: -10, right: -10 },
+    bottomLeft: { bottom: -10, left: -10 },
+    bottomRight: { bottom: -10, right: -10 },
+    qrPlaceholder: {
+      borderWidth: 3,
+      borderColor: colors.border.default,
+      borderStyle: 'dashed',
+      borderRadius: borderRadius.lg,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: colors.background.secondary,
+    },
+    loadingText: {
+      marginTop: spacing.md,
+      fontSize: 16,
+      color: colors.text.secondary,
+      textAlign: 'center',
+    },
+    errorText: {
+      marginTop: spacing.md,
+      fontSize: 16,
+      color: colors.status.error.main,
+      textAlign: 'center',
+    },
+    emergencyInfoContainer: {
+      backgroundColor: colors.background.secondary,
+      padding: spacing.lg,
+      borderRadius: borderRadius.lg,
+      width: '90%',
+      marginBottom: spacing.lg,
+      borderLeftWidth: 5,
+      borderLeftColor: colors.primary.main,
+    },
+    emergencyTitle: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: colors.text.primary,
+      marginBottom: spacing.md,
+      textAlign: 'center',
+    },
+    infoGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'space-between',
+    },
+    infoItem: {
+      width: '48%',
+      marginBottom: spacing.md,
+    },
+    infoLabel: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: colors.text.tertiary,
+      textTransform: 'uppercase',
+      marginBottom: spacing.xxs,
+    },
+    infoValue: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: colors.text.primary,
+    },
+    criticalInfo: {
+      color: colors.medical.emergency,
+      fontSize: 18,
+    },
+    infoSubValue: {
+      fontSize: 14,
+      color: colors.text.secondary,
+      marginTop: 2,
+    },
+    noteContainer: {
+      marginTop: spacing.md,
+      padding: spacing.md,
+      backgroundColor: colors.background.elevated,
+      borderRadius: borderRadius.md,
+      borderLeftWidth: 3,
+      borderLeftColor: colors.status.warning.main,
+    },
+    noteLabel: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: colors.status.warning.main,
+      marginBottom: spacing.xs,
+    },
+    noteText: {
+      fontSize: 15,
+      color: colors.text.primary,
+      lineHeight: 22,
+    },
+    instructionsContainer: {
+      backgroundColor: colors.background.secondary,
+      padding: spacing.lg,
+      borderRadius: borderRadius.lg,
+      width: '90%',
+      marginBottom: spacing.lg,
+    },
+    instructionsTitle: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: colors.text.primary,
+      marginBottom: spacing.sm,
+    },
+    instructionsText: {
+      fontSize: 14,
+      color: colors.text.secondary,
+      lineHeight: 20,
+    },
+    bottomControls: {
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.lg,
+      backgroundColor: colors.background.secondary,
+      borderTopWidth: 1,
+      borderTopColor: colors.border.default,
+    },
+    controlButton: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: colors.background.elevated,
+      borderRadius: 25,
+      paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.lg,
+      borderWidth: 2,
+      borderColor: colors.primary.main,
+      minWidth: 80,
+    },
+    controlButtonText: {
+      color: colors.primary.main,
+      fontSize: 12,
+      fontWeight: '600',
+      marginTop: spacing.xxs,
+    },
+    toggleButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: colors.background.elevated,
+      borderRadius: 25,
+      paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.lg,
+      marginBottom: spacing.lg,
+      borderWidth: 2,
+      borderColor: colors.primary.main,
+    },
+    toggleButtonText: {
+      color: colors.primary.main,
+      fontSize: 16,
+      fontWeight: '600',
+      marginLeft: spacing.xs,
+    },
+    backupTextContainer: {
+      width: '100%',
+      flex: 1,
+    },
+    fallbackButton: {
+      marginTop: spacing.md,
+      backgroundColor: colors.primary.main,
+      borderRadius: 20,
+      paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.lg,
+    },
+    fallbackButtonText: {
+      color: colors.text.inverse,
+      fontSize: 14,
+      fontWeight: '600',
+      textAlign: 'center',
+    },
+    // Modal Styles
+    modalContainer: {
+      flex: 1,
+      backgroundColor: colors.background.primary,
+    },
+    modalHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: spacing.lg,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border.default,
+      backgroundColor: colors.background.secondary,
+    },
+    modalTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: colors.text.primary,
+    },
+    modalContent: {
+      flex: 1,
+      padding: spacing.lg,
+    },
+    modalSubtitle: {
+      fontSize: 16,
+      color: colors.text.secondary,
+      textAlign: 'center',
+      marginBottom: spacing.xl,
+      lineHeight: 22,
+    },
+    optionsContainer: {
+      gap: spacing.md,
+    },
+    optionButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.background.secondary,
+      borderRadius: borderRadius.lg,
+      padding: spacing.md,
+      borderWidth: 1,
+      borderColor: colors.border.default,
+    },
+    optionButtonDisabled: {
+      opacity: 0.6,
+    },
+    optionIcon: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: colors.background.elevated,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: spacing.md,
+    },
+    optionText: {
+      flex: 1,
+    },
+    optionTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text.primary,
+      marginBottom: spacing.xxs,
+    },
+    optionDescription: {
+      fontSize: 14,
+      color: colors.text.secondary,
+      lineHeight: 20,
+    },
+  }), [colors, spacing, borderRadius, typography, shadows]);
+
   const containerStyle = fullScreen ? styles.fullScreenContainer : styles.normalContainer;
   const backgroundStyle = isMaxBrightness ? styles.maxBrightnessBackground : styles.normalBackground;
 
@@ -808,338 +1140,5 @@ export const QRDisplay: React.FC<QRDisplayProps> = ({
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  fullScreenContainer: {
-    flex: 1,
-    backgroundColor: colors.background.primary,
-  },
-  normalContainer: {
-    flex: 1,
-    backgroundColor: colors.background.primary,
-  },
-  normalBackground: {
-    backgroundColor: colors.background.primary,
-  },
-  maxBrightnessBackground: {
-    backgroundColor: '#FFFFFF',
-    // Simulate max brightness with pure white
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    backgroundColor: colors.background.secondary,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.default,
-  },
-  closeButton: {
-    padding: spacing.xxs,
-  },
-  headerCenter: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: colors.text.primary,
-    textAlign: 'center',
-  },
-  headerSubtitle: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    textAlign: 'center',
-    marginTop: 2,
-  },
-  helpButton: {
-    padding: spacing.xxs,
-  },
-  shareButton: {
-    padding: spacing.xxs,
-  },
-  headerRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    alignItems: 'center',
-    paddingVertical: spacing.lg,
-  },
-  qrContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.xl,
-  },
-  qrWrapper: {
-    position: 'relative',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FFFFFF', // Keep white for QR scanability
-    padding: spacing.lg,
-    borderRadius: spacing.borderRadius.lg,
-    // High contrast shadow for emergency visibility
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  qrBorder: {
-    position: 'absolute',
-    borderWidth: 3,
-    borderColor: '#000000',
-    backgroundColor: '#FFFFFF', // Keep white for QR
-    borderRadius: spacing.borderRadius.lg,
-  },
-  cornerMarker: {
-    position: 'absolute',
-    width: 20,
-    height: 20,
-    backgroundColor: colors.medical.emergency,
-    borderRadius: 10,
-  },
-  topLeft: { top: -10, left: -10 },
-  topRight: { top: -10, right: -10 },
-  bottomLeft: { bottom: -10, left: -10 },
-  bottomRight: { bottom: -10, right: -10 },
-  qrPlaceholder: {
-    borderWidth: 3,
-    borderColor: colors.border.default,
-    borderStyle: 'dashed',
-    borderRadius: spacing.borderRadius.lg,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.background.secondary,
-  },
-  loadingText: {
-    marginTop: spacing.md,
-    fontSize: 16,
-    color: colors.text.secondary,
-    textAlign: 'center',
-  },
-  errorText: {
-    marginTop: spacing.md,
-    fontSize: 16,
-    color: colors.status.error.main,
-    textAlign: 'center',
-  },
-  emergencyInfoContainer: {
-    backgroundColor: colors.background.secondary,
-    padding: spacing.lg,
-    borderRadius: spacing.borderRadius.lg,
-    width: '90%',
-    marginBottom: spacing.lg,
-    borderLeftWidth: 5,
-    borderLeftColor: colors.primary.main,
-  },
-  emergencyTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: colors.text.primary,
-    marginBottom: spacing.md,
-    textAlign: 'center',
-  },
-  infoGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  infoItem: {
-    width: '48%',
-    marginBottom: spacing.md,
-  },
-  infoLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: colors.text.tertiary,
-    textTransform: 'uppercase',
-    marginBottom: spacing.xxs,
-  },
-  infoValue: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: colors.text.primary,
-  },
-  criticalInfo: {
-    color: colors.medical.emergency,
-    fontSize: 18,
-  },
-  infoSubValue: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    marginTop: 2,
-  },
-  noteContainer: {
-    marginTop: spacing.md,
-    padding: spacing.md,
-    backgroundColor: colors.background.elevated,
-    borderRadius: spacing.borderRadius.md,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.status.warning.main,
-  },
-  noteLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.status.warning.main,
-    marginBottom: spacing.xs,
-  },
-  noteText: {
-    fontSize: 15,
-    color: colors.text.primary,
-    lineHeight: 22,
-  },
-  instructionsContainer: {
-    backgroundColor: colors.background.secondary,
-    padding: spacing.lg,
-    borderRadius: spacing.borderRadius.lg,
-    width: '90%',
-    marginBottom: spacing.lg,
-  },
-  instructionsTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: colors.text.primary,
-    marginBottom: spacing.sm,
-  },
-  instructionsText: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    lineHeight: 20,
-  },
-  bottomControls: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.lg,
-    backgroundColor: colors.background.secondary,
-    borderTopWidth: 1,
-    borderTopColor: colors.border.default,
-  },
-  controlButton: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.background.elevated,
-    borderRadius: 25,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.lg,
-    borderWidth: 2,
-    borderColor: colors.primary.main,
-    minWidth: 80,
-  },
-  controlButtonText: {
-    color: colors.primary.main,
-    fontSize: 12,
-    fontWeight: '600',
-    marginTop: spacing.xxs,
-  },
-  toggleButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.background.elevated,
-    borderRadius: 25,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.lg,
-    marginBottom: spacing.lg,
-    borderWidth: 2,
-    borderColor: colors.primary.main,
-  },
-  toggleButtonText: {
-    color: colors.primary.main,
-    fontSize: 16,
-    fontWeight: '600',
-    marginLeft: spacing.xs,
-  },
-  backupTextContainer: {
-    width: '100%',
-    flex: 1,
-  },
-  fallbackButton: {
-    marginTop: spacing.md,
-    backgroundColor: colors.primary.main,
-    borderRadius: 20,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.lg,
-  },
-  fallbackButtonText: {
-    color: colors.text.inverse,
-    fontSize: 14,
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-  // Modal Styles
-  modalContainer: {
-    flex: 1,
-    backgroundColor: colors.background.primary,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: spacing.lg,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.default,
-    backgroundColor: colors.background.secondary,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.text.primary,
-  },
-  modalContent: {
-    flex: 1,
-    padding: spacing.lg,
-  },
-  modalSubtitle: {
-    fontSize: 16,
-    color: colors.text.secondary,
-    textAlign: 'center',
-    marginBottom: spacing.xl,
-    lineHeight: 22,
-  },
-  optionsContainer: {
-    gap: spacing.md,
-  },
-  optionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.background.secondary,
-    borderRadius: spacing.borderRadius.lg,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.border.default,
-  },
-  optionButtonDisabled: {
-    opacity: 0.6,
-  },
-  optionIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.background.elevated,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: spacing.md,
-  },
-  optionText: {
-    flex: 1,
-  },
-  optionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text.primary,
-    marginBottom: spacing.xxs,
-  },
-  optionDescription: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    lineHeight: 20,
-  },
-});
 
 export default QRDisplay;

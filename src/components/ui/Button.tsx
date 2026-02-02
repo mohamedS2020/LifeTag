@@ -3,7 +3,7 @@
  * Reusable button with variants and animations
  */
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import {
   TouchableOpacity,
   Text,
@@ -20,7 +20,8 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, borderRadius, layout, typography, shadows, springConfig, duration } from '../../theme';
+import { useTheme } from '../../context/ThemeContext';
+import { springConfig, duration } from '../../theme';
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
@@ -56,6 +57,7 @@ const Button: React.FC<ButtonProps> = ({
   style,
   textStyle,
 }) => {
+  const { colors, shadows, spacing, borderRadius, layout, typography } = useTheme();
   const scale = useSharedValue(1);
   const opacity = useSharedValue(1);
 
@@ -74,7 +76,7 @@ const Button: React.FC<ButtonProps> = ({
     opacity: opacity.value,
   }));
 
-  const getVariantStyles = (): { container: ViewStyle; text: TextStyle } => {
+  const getVariantStyles = useCallback((): { container: ViewStyle; text: TextStyle } => {
     switch (variant) {
       case 'primary':
         return {
@@ -131,9 +133,9 @@ const Button: React.FC<ButtonProps> = ({
           text: { color: colors.white },
         };
     }
-  };
+  }, [colors, shadows, variant]);
 
-  const getSizeStyles = (): { container: ViewStyle; text: TextStyle; iconSize: number } => {
+  const getSizeStyles = useCallback((): { container: ViewStyle; text: TextStyle; iconSize: number } => {
     switch (size) {
       case 'sm':
         return {
@@ -167,10 +169,41 @@ const Button: React.FC<ButtonProps> = ({
           iconSize: 20,
         };
     }
-  };
+  }, [spacing, borderRadius, layout, typography, size]);
 
   const variantStyles = getVariantStyles();
   const sizeStyles = getSizeStyles();
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    fullWidth: {
+      width: '100%',
+    },
+    disabled: {
+      opacity: 0.5,
+    },
+    content: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    text: {
+      textAlign: 'center',
+    },
+    textDisabled: {
+      opacity: 0.7,
+    },
+    iconLeft: {
+      marginRight: spacing.sm,
+    },
+    iconRight: {
+      marginLeft: spacing.sm,
+    },
+  }), [spacing]);
 
   const renderContent = () => {
     if (loading) {
@@ -231,36 +264,5 @@ const Button: React.FC<ButtonProps> = ({
     </AnimatedTouchable>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  fullWidth: {
-    width: '100%',
-  },
-  disabled: {
-    opacity: 0.5,
-  },
-  content: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  text: {
-    textAlign: 'center',
-  },
-  textDisabled: {
-    opacity: 0.7,
-  },
-  iconLeft: {
-    marginRight: spacing.sm,
-  },
-  iconRight: {
-    marginLeft: spacing.sm,
-  },
-});
 
 export default Button;

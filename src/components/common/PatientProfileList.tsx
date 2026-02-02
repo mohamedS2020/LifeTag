@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -15,7 +15,7 @@ import { UserProfile } from '../../types';
 import { profileService } from '../../services';
 import { useMedicalProfessionalAccess } from '../../hooks';
 import { useTranslation } from 'react-i18next';
-import { colors, spacing } from '../../theme';
+import { useTheme } from '../../theme';
 
 /**
  * Props for PatientProfileList component
@@ -40,7 +40,155 @@ const PatientProfileList: React.FC<PatientProfileListProps> = ({
   searchQuery = '',
   compactView = false,
 }) => {
+  const { colors, spacing, borderRadius, typography } = useTheme();
   const { t } = useTranslation();
+
+  // Memoized styles for dynamic theming
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+    },
+    listContainer: {
+      paddingBottom: spacing.lg,
+    },
+    loadingContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: spacing.lg,
+    },
+    loadingText: {
+      marginTop: spacing.sm,
+      fontSize: 16,
+      color: colors.text.secondary,
+    },
+    emptyListContainer: {
+      flexGrow: 1,
+    },
+    profileCard: {
+      backgroundColor: colors.background.card,
+      borderRadius: spacing.md,
+      padding: spacing.md,
+      marginBottom: spacing.md,
+      borderWidth: 1,
+      borderColor: colors.border.default,
+      shadowColor: '#000',
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.1,
+      shadowRadius: 3.84,
+      elevation: 5,
+    },
+    compactCard: {
+      padding: spacing.md,
+      marginBottom: spacing.sm,
+    },
+    profileHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
+    },
+    profileInfo: {
+      flex: 1,
+    },
+    profileName: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: colors.text.primary,
+      marginBottom: spacing.xs,
+    },
+    profileContact: {
+      fontSize: 14,
+      color: colors.text.secondary,
+      marginBottom: spacing.xs,
+    },
+    profileDetail: {
+      fontSize: 13,
+      color: colors.text.tertiary,
+    },
+    accessIndicators: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+    },
+    indicator: {
+      width: 24,
+      height: 24,
+      borderRadius: 12,
+      backgroundColor: colors.background.tertiary,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    profileDetails: {
+      marginTop: spacing.md,
+      paddingTop: spacing.md,
+      borderTopWidth: 1,
+      borderTopColor: colors.border.default,
+    },
+    profileStat: {
+      fontSize: 13,
+      color: colors.text.secondary,
+      marginBottom: spacing.xs,
+    },
+    alertText: {
+      fontSize: 13,
+      color: colors.status.error.main,
+      fontWeight: '500',
+    },
+    emptyContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: spacing['2xl'],
+    },
+    emptyTitle: {
+      fontSize: 20,
+      fontWeight: '600',
+      color: colors.text.primary,
+      marginTop: spacing.md,
+      marginBottom: spacing.sm,
+    },
+    emptyText: {
+      fontSize: 16,
+      color: colors.text.secondary,
+      textAlign: 'center',
+      lineHeight: 22,
+    },
+    errorContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: spacing['2xl'],
+    },
+    errorTitle: {
+      fontSize: 20,
+      fontWeight: '600',
+      color: colors.status.error.main,
+      marginTop: spacing.md,
+      marginBottom: spacing.sm,
+    },
+    errorText: {
+      fontSize: 16,
+      color: colors.text.secondary,
+      textAlign: 'center',
+      lineHeight: 22,
+      marginBottom: spacing.lg,
+    },
+    retryButton: {
+      backgroundColor: colors.primary.main,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.sm,
+      borderRadius: spacing.sm,
+    },
+    retryButtonText: {
+      color: colors.text.inverse,
+      fontSize: 16,
+      fontWeight: '600',
+    },
+  }), [colors, spacing, borderRadius, typography]);
+
   // State management
   const [profiles, setProfiles] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -256,150 +404,5 @@ const PatientProfileList: React.FC<PatientProfileListProps> = ({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  listContainer: {
-    paddingBottom: spacing.lg,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: spacing.lg,
-  },
-  loadingText: {
-    marginTop: spacing.sm,
-    fontSize: 16,
-    color: colors.text.secondary,
-  },
-  emptyListContainer: {
-    flexGrow: 1,
-  },
-  profileCard: {
-    backgroundColor: colors.background.card,
-    borderRadius: spacing.md,
-    padding: spacing.md,
-    marginBottom: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.border.default,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  compactCard: {
-    padding: spacing.md,
-    marginBottom: spacing.sm,
-  },
-  profileHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-  },
-  profileInfo: {
-    flex: 1,
-  },
-  profileName: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.text.primary,
-    marginBottom: spacing.xs,
-  },
-  profileContact: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    marginBottom: spacing.xs,
-  },
-  profileDetail: {
-    fontSize: 13,
-    color: colors.text.tertiary,
-  },
-  accessIndicators: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-  indicator: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: colors.background.tertiary,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  profileDetails: {
-    marginTop: spacing.md,
-    paddingTop: spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: colors.border.default,
-  },
-  profileStat: {
-    fontSize: 13,
-    color: colors.text.secondary,
-    marginBottom: spacing.xs,
-  },
-  alertText: {
-    fontSize: 13,
-    color: colors.status.error.main,
-    fontWeight: '500',
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: spacing['2xl'],
-  },
-  emptyTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: colors.text.primary,
-    marginTop: spacing.md,
-    marginBottom: spacing.sm,
-  },
-  emptyText: {
-    fontSize: 16,
-    color: colors.text.secondary,
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: spacing['2xl'],
-  },
-  errorTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: colors.status.error.main,
-    marginTop: spacing.md,
-    marginBottom: spacing.sm,
-  },
-  errorText: {
-    fontSize: 16,
-    color: colors.text.secondary,
-    textAlign: 'center',
-    lineHeight: 22,
-    marginBottom: spacing.lg,
-  },
-  retryButton: {
-    backgroundColor: colors.primary.main,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-    borderRadius: spacing.sm,
-  },
-  retryButtonText: {
-    color: colors.text.inverse,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});
 
 export default PatientProfileList;

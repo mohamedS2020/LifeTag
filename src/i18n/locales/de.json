@@ -383,9 +383,11 @@
       },
       "relationships": {
         "spouse": "Ehepartner/in",
+        "partner": "Partner/in",
         "parent": "Elternteil",
         "child": "Kind",
         "sibling": "Geschwister",
+        "grandparent": "Großelternteil",
         "friend": "Freund/in",
         "other": "Andere"
       },
@@ -402,6 +404,9 @@
     "subtitle": "Verwalten Sie Ihr Konto und Ihre Präferenzen",
     "comingSoonDescription": "Weitere Einstellungen und Anpassungsoptionen werden in kommenden Updates verfügbar sein.",
     "appPreferences": "App-Einstellungen",
+    "theme": "Design",
+    "darkMode": "Dunkel",
+    "lightMode": "Hell",
     "language": "Sprache",
     "accountPrivacy": "Konto & Datenschutz",
     "profileSettings": "Profileinstellungen",
@@ -409,7 +414,9 @@
     "emergencySettings": "Notfalleinstellungen",
     "emergencyContacts": "Notfallkontakte",
     "alertPreferences": "Alarmeinstellungen",
-    "signOut": "Abmelden"
+    "signOut": "Abmelden",
+    "accountActions": "Konto",
+    "deleteAccount": "Konto Löschen"
   },
   "language": {
     "title": "Sprache",
@@ -931,6 +938,8 @@
     }
   },
   "verification": {
+    "verified": "Verifiziert",
+    "verifiedOnDate": "Verifiziert am {{date}}",
     "allUpdatesMarkedRead": "Alle aktuellen Updates wurden als gelesen markiert.",
     "reapplyTitle": "Erneut für Verifizierung bewerben",
     "reapplyMessage": "Sie können einen neuen Antrag auf Verifizierung als medizinischer Fachmann stellen. Möchten Sie fortfahren?",

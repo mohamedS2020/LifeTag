@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -14,7 +14,7 @@ import QRCode from 'react-native-qrcode-svg';
 import { Ionicons } from '@expo/vector-icons';
 import { UserProfile } from '../../types';
 import { QRService, QRCodeGenerator, EmergencyQRData } from '../../services/qrService';
-import { colors, spacing } from '../../theme';
+import { useTheme } from '../../theme';
 
 /**
  * QR Generator Component Props
@@ -42,6 +42,7 @@ export const QRGenerator: React.FC<QRGeneratorProps> = ({
   showWarnings = true,
   emergencyOnly = false
 }) => {
+  const { colors, spacing, borderRadius, typography, shadows } = useTheme();
   const [qrData, setQrData] = useState<string>('');
   const [emergencyData, setEmergencyData] = useState<EmergencyQRData | null>(null);
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
@@ -179,6 +180,143 @@ export const QRGenerator: React.FC<QRGeneratorProps> = ({
     checkForRegeneration();
   }, [profile.updatedAt]);
 
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: '#FFFFFF',
+    },
+    contentContainer: {
+      alignItems: 'center',
+      padding: 20,
+    },
+    header: {
+      alignItems: 'center',
+      marginBottom: 30,
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: colors.text.primary,
+      textAlign: 'center',
+    },
+    subtitle: {
+      fontSize: 16,
+      color: colors.text.secondary,
+      textAlign: 'center',
+      marginTop: 5,
+    },
+    qrContainer: {
+      alignItems: 'center',
+      marginBottom: 30,
+    },
+    qrCodeWrapper: {
+      position: 'relative',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    qrBorder: {
+      position: 'absolute',
+      borderWidth: 2,
+      borderColor: colors.border.default,
+      borderRadius: 10,
+      top: -10,
+      left: -10,
+    },
+    qrPlaceholder: {
+      borderWidth: 2,
+      borderColor: colors.border.default,
+      borderStyle: 'dashed',
+      borderRadius: 10,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: colors.background.secondary,
+    },
+    generatingText: {
+      marginTop: 10,
+      fontSize: 16,
+      color: colors.text.secondary,
+    },
+    placeholderText: {
+      marginTop: 10,
+      fontSize: 16,
+      color: colors.text.tertiary,
+      textAlign: 'center',
+    },
+    summaryContainer: {
+      backgroundColor: colors.background.secondary,
+      padding: 15,
+      borderRadius: 10,
+      width: '100%',
+      marginBottom: 20,
+    },
+    summaryTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: colors.text.primary,
+      marginBottom: 10,
+    },
+    summaryText: {
+      fontSize: 14,
+      color: colors.text.secondary,
+      marginBottom: 5,
+    },
+    warningsContainer: {
+      backgroundColor: colors.status.warning.light,
+      padding: 15,
+      borderRadius: 10,
+      width: '100%',
+      marginBottom: 20,
+      borderLeftWidth: 4,
+      borderLeftColor: colors.status.warning.main,
+    },
+    warningHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 10,
+    },
+    warningTitle: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: colors.status.warning.main,
+      marginLeft: 8,
+    },
+    warningText: {
+      fontSize: 14,
+      color: colors.status.warning.main,
+      marginBottom: 5,
+    },
+    controlsContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+      width: '100%',
+      marginBottom: 20,
+    },
+    controlButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.background.secondary,
+      paddingHorizontal: 15,
+      paddingVertical: 10,
+      borderRadius: 20,
+      borderWidth: 1,
+      borderColor: colors.primary.main,
+    },
+    controlButtonText: {
+      color: colors.primary.main,
+      fontSize: 14,
+      fontWeight: '600',
+      marginLeft: 5,
+    },
+    infoContainer: {
+      alignItems: 'center',
+    },
+    infoText: {
+      fontSize: 12,
+      color: colors.text.tertiary,
+      marginBottom: 2,
+    },
+  }), [colors, spacing, borderRadius, typography, shadows]);
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       {/* Header */}
@@ -302,142 +440,5 @@ export const QRGenerator: React.FC<QRGeneratorProps> = ({
     </ScrollView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  contentContainer: {
-    alignItems: 'center',
-    padding: 20,
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: 30,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333333',
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666666',
-    textAlign: 'center',
-    marginTop: 5,
-  },
-  qrContainer: {
-    alignItems: 'center',
-    marginBottom: 30,
-  },
-  qrCodeWrapper: {
-    position: 'relative',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  qrBorder: {
-    position: 'absolute',
-    borderWidth: 2,
-    borderColor: '#E0E0E0',
-    borderRadius: 10,
-    top: -10,
-    left: -10,
-  },
-  qrPlaceholder: {
-    borderWidth: 2,
-    borderColor: '#E0E0E0',
-    borderStyle: 'dashed',
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#F8F8F8',
-  },
-  generatingText: {
-    marginTop: 10,
-    fontSize: 16,
-    color: '#666666',
-  },
-  placeholderText: {
-    marginTop: 10,
-    fontSize: 16,
-    color: '#999999',
-    textAlign: 'center',
-  },
-  summaryContainer: {
-    backgroundColor: '#F0F8FF',
-    padding: 15,
-    borderRadius: 10,
-    width: '100%',
-    marginBottom: 20,
-  },
-  summaryTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333333',
-    marginBottom: 10,
-  },
-  summaryText: {
-    fontSize: 14,
-    color: '#666666',
-    marginBottom: 5,
-  },
-  warningsContainer: {
-    backgroundColor: '#FFF8E1',
-    padding: 15,
-    borderRadius: 10,
-    width: '100%',
-    marginBottom: 20,
-    borderLeftWidth: 4,
-    borderLeftColor: '#FF9500',
-  },
-  warningHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  warningTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#E65100',
-    marginLeft: 8,
-  },
-  warningText: {
-    fontSize: 14,
-    color: '#E65100',
-    marginBottom: 5,
-  },
-  controlsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
-    marginBottom: 20,
-  },
-  controlButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F0F8FF',
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#007AFF',
-  },
-  controlButtonText: {
-    color: '#007AFF',
-    fontSize: 14,
-    fontWeight: '600',
-    marginLeft: 5,
-  },
-  infoContainer: {
-    alignItems: 'center',
-  },
-  infoText: {
-    fontSize: 12,
-    color: '#999999',
-    marginBottom: 2,
-  },
-});
 
 export default QRGenerator;

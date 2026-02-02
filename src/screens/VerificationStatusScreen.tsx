@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -13,7 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { useVerificationStatusTracking, VerificationStatusUpdate } from '../hooks/useVerificationStatusTracking';
 import { LoadingOverlay, VerifiedBadge } from '../components/common';
-import { colors, spacing } from '../theme';
+import { useTheme } from '../theme';
 
 /**
  * Verification Status Screen Props
@@ -38,6 +38,7 @@ const VerificationStatusScreen: React.FC<VerificationStatusScreenProps> = ({
   onNavigateToReapply,
   onError,
 }) => {
+  const { colors, spacing, borderRadius, typography, shadows } = useTheme();
   const { t } = useTranslation();
   // Verification status tracking
   const {
@@ -358,6 +359,277 @@ const VerificationStatusScreen: React.FC<VerificationStatusScreenProps> = ({
   };
 
   // =============================================
+  // STYLES
+  // =============================================
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background.primary,
+    },
+    scrollContainer: {
+      flex: 1,
+    },
+    statusHeader: {
+      backgroundColor: colors.background.secondary,
+      padding: spacing.lg,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border.default,
+    },
+    statusContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      flex: 1,
+    },
+    statusIconContainer: {
+      position: 'relative',
+      marginRight: spacing.md,
+    },
+    notificationBadge: {
+      position: 'absolute',
+      top: -4,
+      right: -4,
+      backgroundColor: colors.status.error.main,
+      borderRadius: 10,
+      width: 20,
+      height: 20,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    notificationText: {
+      color: colors.text.inverse,
+      fontSize: 12,
+      fontWeight: '700',
+    },
+    statusTextContainer: {
+      flex: 1,
+    },
+    statusTitle: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: colors.text.primary,
+      marginBottom: spacing.xxs,
+    },
+    statusSubtitle: {
+      fontSize: 14,
+      color: colors.text.secondary,
+      lineHeight: 18,
+    },
+    section: {
+      backgroundColor: colors.background.secondary,
+      marginTop: spacing.sm,
+      marginHorizontal: spacing.md,
+      borderRadius: borderRadius.lg,
+      borderWidth: 1,
+      borderColor: colors.border.light,
+    },
+    sectionHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: spacing.md,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border.light,
+    },
+    sectionTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text.primary,
+      marginLeft: spacing.sm,
+      flex: 1,
+    },
+    unreadBadge: {
+      backgroundColor: colors.primary.main,
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 2,
+      borderRadius: borderRadius.full,
+    },
+    unreadText: {
+      color: colors.text.inverse,
+      fontSize: 12,
+      fontWeight: '600',
+    },
+    sectionContent: {
+      padding: spacing.md,
+    },
+    actionContainer: {
+      padding: spacing.md,
+    },
+    primaryButton: {
+      backgroundColor: colors.primary.main,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: spacing.md,
+      paddingHorizontal: spacing.lg,
+      borderRadius: borderRadius.lg,
+    },
+    primaryButtonText: {
+      color: colors.text.inverse,
+      fontSize: 16,
+      fontWeight: '600',
+      marginLeft: spacing.sm,
+    },
+    secondaryButton: {
+      backgroundColor: colors.background.elevated,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: spacing.md,
+      paddingHorizontal: spacing.lg,
+      borderRadius: borderRadius.lg,
+      borderWidth: 1,
+      borderColor: colors.primary.main,
+    },
+    secondaryButtonText: {
+      color: colors.primary.main,
+      fontSize: 16,
+      fontWeight: '600',
+      marginLeft: spacing.sm,
+    },
+    updateItem: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      marginBottom: spacing.md,
+    },
+    updateContent: {
+      flex: 1,
+      marginRight: spacing.sm,
+    },
+    updateMessage: {
+      fontSize: 14,
+      fontWeight: '500',
+      color: colors.text.primary,
+      marginBottom: spacing.xxs,
+    },
+    updateTime: {
+      fontSize: 12,
+      color: colors.text.tertiary,
+      marginBottom: spacing.xxs,
+    },
+    updateNotes: {
+      fontSize: 12,
+      color: colors.text.secondary,
+      fontStyle: 'italic',
+      marginBottom: 2,
+    },
+    updateAdmin: {
+      fontSize: 12,
+      color: colors.text.tertiary,
+    },
+    updateStatusDot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      marginTop: 4,
+    },
+    infoRow: {
+      flexDirection: 'row',
+      marginBottom: spacing.sm,
+    },
+    infoLabel: {
+      fontSize: 14,
+      fontWeight: '500',
+      color: colors.text.tertiary,
+      width: 100,
+    },
+    infoValue: {
+      fontSize: 14,
+      color: colors.text.primary,
+      flex: 1,
+    },
+    timelineItem: {
+      flexDirection: 'row',
+      marginBottom: spacing.md,
+    },
+    timelineIndicator: {
+      alignItems: 'center',
+      marginRight: spacing.sm,
+    },
+    timelineDot: {
+      width: 12,
+      height: 12,
+      borderRadius: 6,
+    },
+    timelineLine: {
+      width: 2,
+      flex: 1,
+      backgroundColor: colors.border.default,
+      marginTop: spacing.xxs,
+    },
+    timelineContent: {
+      flex: 1,
+    },
+    timelineMessage: {
+      fontSize: 14,
+      fontWeight: '500',
+      color: colors.text.primary,
+      marginBottom: spacing.xxs,
+    },
+    timelineDate: {
+      fontSize: 12,
+      color: colors.text.tertiary,
+      marginBottom: 2,
+    },
+    timelineAdmin: {
+      fontSize: 12,
+      color: colors.text.tertiary,
+      marginBottom: 2,
+    },
+    timelineNotes: {
+      fontSize: 12,
+      color: colors.text.secondary,
+      fontStyle: 'italic',
+    },
+    toggleButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: spacing.sm,
+      marginTop: spacing.sm,
+    },
+    toggleButtonText: {
+      fontSize: 14,
+      color: colors.primary.main,
+      fontWeight: '500',
+      marginRight: spacing.xxs,
+    },
+    errorContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: spacing.xxl,
+      backgroundColor: colors.background.primary,
+    },
+    errorTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: colors.status.error.main,
+      marginTop: spacing.md,
+      marginBottom: spacing.sm,
+    },
+    errorText: {
+      fontSize: 14,
+      color: colors.text.secondary,
+      textAlign: 'center',
+      marginBottom: spacing.lg,
+    },
+    retryButton: {
+      backgroundColor: colors.primary.main,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.sm,
+      borderRadius: borderRadius.md,
+    },
+    retryButtonText: {
+      color: colors.text.inverse,
+      fontSize: 16,
+      fontWeight: '600',
+    },
+  }), [colors, spacing, borderRadius, typography, shadows]);
+
+  // =============================================
   // MAIN RENDER
   // =============================================
 
@@ -400,276 +672,5 @@ const VerificationStatusScreen: React.FC<VerificationStatusScreenProps> = ({
     </SafeAreaView>
   );
 };
-
-// =============================================
-// STYLES
-// =============================================
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.primary,
-  },
-  scrollContainer: {
-    flex: 1,
-  },
-  statusHeader: {
-    backgroundColor: colors.background.secondary,
-    padding: spacing.lg,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.default,
-  },
-  statusContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  statusIconContainer: {
-    position: 'relative',
-    marginRight: spacing.md,
-  },
-  notificationBadge: {
-    position: 'absolute',
-    top: -4,
-    right: -4,
-    backgroundColor: colors.status.error.main,
-    borderRadius: 10,
-    width: 20,
-    height: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  notificationText: {
-    color: colors.text.inverse,
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  statusTextContainer: {
-    flex: 1,
-  },
-  statusTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.text.primary,
-    marginBottom: spacing.xxs,
-  },
-  statusSubtitle: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    lineHeight: 18,
-  },
-  section: {
-    backgroundColor: colors.background.secondary,
-    marginTop: spacing.sm,
-    marginHorizontal: spacing.md,
-    borderRadius: spacing.borderRadius.lg,
-    borderWidth: 1,
-    borderColor: colors.border.light,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.light,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text.primary,
-    marginLeft: spacing.sm,
-    flex: 1,
-  },
-  unreadBadge: {
-    backgroundColor: colors.primary.main,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
-    borderRadius: spacing.borderRadius.full,
-  },
-  unreadText: {
-    color: colors.text.inverse,
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  sectionContent: {
-    padding: spacing.md,
-  },
-  actionContainer: {
-    padding: spacing.md,
-  },
-  primaryButton: {
-    backgroundColor: colors.primary.main,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.lg,
-    borderRadius: spacing.borderRadius.lg,
-  },
-  primaryButtonText: {
-    color: colors.text.inverse,
-    fontSize: 16,
-    fontWeight: '600',
-    marginLeft: spacing.sm,
-  },
-  secondaryButton: {
-    backgroundColor: colors.background.elevated,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.lg,
-    borderRadius: spacing.borderRadius.lg,
-    borderWidth: 1,
-    borderColor: colors.primary.main,
-  },
-  secondaryButtonText: {
-    color: colors.primary.main,
-    fontSize: 16,
-    fontWeight: '600',
-    marginLeft: spacing.sm,
-  },
-  updateItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: spacing.md,
-  },
-  updateContent: {
-    flex: 1,
-    marginRight: spacing.sm,
-  },
-  updateMessage: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: colors.text.primary,
-    marginBottom: spacing.xxs,
-  },
-  updateTime: {
-    fontSize: 12,
-    color: colors.text.tertiary,
-    marginBottom: spacing.xxs,
-  },
-  updateNotes: {
-    fontSize: 12,
-    color: colors.text.secondary,
-    fontStyle: 'italic',
-    marginBottom: 2,
-  },
-  updateAdmin: {
-    fontSize: 12,
-    color: colors.text.tertiary,
-  },
-  updateStatusDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginTop: 4,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    marginBottom: spacing.sm,
-  },
-  infoLabel: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: colors.text.tertiary,
-    width: 100,
-  },
-  infoValue: {
-    fontSize: 14,
-    color: colors.text.primary,
-    flex: 1,
-  },
-  timelineItem: {
-    flexDirection: 'row',
-    marginBottom: spacing.md,
-  },
-  timelineIndicator: {
-    alignItems: 'center',
-    marginRight: spacing.sm,
-  },
-  timelineDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-  },
-  timelineLine: {
-    width: 2,
-    flex: 1,
-    backgroundColor: colors.border.default,
-    marginTop: spacing.xxs,
-  },
-  timelineContent: {
-    flex: 1,
-  },
-  timelineMessage: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: colors.text.primary,
-    marginBottom: spacing.xxs,
-  },
-  timelineDate: {
-    fontSize: 12,
-    color: colors.text.tertiary,
-    marginBottom: 2,
-  },
-  timelineAdmin: {
-    fontSize: 12,
-    color: colors.text.tertiary,
-    marginBottom: 2,
-  },
-  timelineNotes: {
-    fontSize: 12,
-    color: colors.text.secondary,
-    fontStyle: 'italic',
-  },
-  toggleButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: spacing.sm,
-    marginTop: spacing.sm,
-  },
-  toggleButtonText: {
-    fontSize: 14,
-    color: colors.primary.main,
-    fontWeight: '500',
-    marginRight: spacing.xxs,
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: spacing.xxl,
-    backgroundColor: colors.background.primary,
-  },
-  errorTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.status.error.main,
-    marginTop: spacing.md,
-    marginBottom: spacing.sm,
-  },
-  errorText: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    textAlign: 'center',
-    marginBottom: spacing.lg,
-  },
-  retryButton: {
-    backgroundColor: colors.primary.main,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-    borderRadius: spacing.borderRadius.md,
-  },
-  retryButtonText: {
-    color: colors.text.inverse,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});
 
 export default VerificationStatusScreen;

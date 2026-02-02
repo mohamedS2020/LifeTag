@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { EmergencyQRData } from '../../services/qrService';
-import { colors, spacing } from '../../theme';
+import { useTheme } from '../../theme';
 
 /**
  * Backup Text Display Props
@@ -37,6 +37,233 @@ export const BackupTextDisplay: React.FC<BackupTextDisplayProps> = ({
   onCopySuccess,
   compact = false
 }) => {
+  const { colors, spacing, borderRadius, typography, shadows } = useTheme();
+
+  const styles = useMemo(() => StyleSheet.create({
+    fullContainer: {
+      flex: 1,
+      backgroundColor: colors.background.primary,
+    },
+    compactContainer: {
+      backgroundColor: colors.background.secondary,
+      borderRadius: borderRadius.lg,
+      padding: spacing.md,
+      margin: spacing.sm,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.md,
+      backgroundColor: colors.background.secondary,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border.default,
+    },
+    headerLeft: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      flex: 1,
+    },
+    headerTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: colors.text.primary,
+      marginLeft: spacing.sm,
+    },
+    copyButton: {
+      padding: spacing.xs,
+      borderRadius: borderRadius.full,
+      backgroundColor: colors.background.tertiary,
+    },
+    scrollContainer: {
+      flex: 1,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+    },
+    
+    // Critical Information Card - keep visible with slight color tints
+    criticalCard: {
+      backgroundColor: 'rgba(255, 59, 48, 0.15)',
+      borderRadius: borderRadius.lg,
+      padding: spacing.lg,
+      marginBottom: spacing.md,
+      borderLeftWidth: 5,
+      borderLeftColor: colors.status.error.main,
+    },
+    cardHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: spacing.md,
+    },
+    cardTitle: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: colors.text.primary,
+      marginLeft: spacing.xs,
+    },
+    criticalGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'space-between',
+      marginBottom: spacing.md,
+    },
+    criticalItem: {
+      width: '48%',
+      marginBottom: spacing.sm,
+    },
+    criticalLabel: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: colors.text.secondary,
+      textTransform: 'uppercase',
+      marginBottom: spacing.xs,
+    },
+    criticalValue: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: colors.text.primary,
+    },
+    bloodType: {
+      color: colors.status.error.main,
+      fontSize: 24,
+    },
+    allergiesSection: {
+      marginTop: spacing.sm,
+    },
+    allergiesList: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      marginTop: spacing.xs,
+    },
+    allergyTag: {
+      backgroundColor: colors.status.error.main,
+      borderRadius: borderRadius.full,
+      paddingHorizontal: spacing.sm,
+      paddingVertical: spacing.xs,
+      marginRight: spacing.xs,
+      marginBottom: spacing.xs,
+    },
+    allergyText: {
+      color: colors.text.inverse,
+      fontSize: 14,
+      fontWeight: '600',
+    },
+
+    // Emergency Contact Card
+    contactCard: {
+      backgroundColor: 'rgba(64, 124, 226, 0.15)',
+      borderRadius: borderRadius.lg,
+      padding: spacing.lg,
+      marginBottom: spacing.md,
+      borderLeftWidth: 5,
+      borderLeftColor: colors.primary.main,
+    },
+    contactInfo: {
+      alignItems: 'center',
+    },
+    contactName: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: colors.text.primary,
+      marginBottom: spacing.xs,
+    },
+    contactPhone: {
+      fontSize: 18,
+      color: colors.primary.main,
+      fontWeight: '600',
+      marginBottom: spacing.xs,
+    },
+    contactRelation: {
+      fontSize: 14,
+      color: colors.text.secondary,
+      textTransform: 'capitalize',
+    },
+
+    // Medical Notes Card
+    notesCard: {
+      backgroundColor: 'rgba(255, 149, 0, 0.15)',
+      borderRadius: borderRadius.lg,
+      padding: spacing.lg,
+      marginBottom: spacing.md,
+      borderLeftWidth: 5,
+      borderLeftColor: colors.status.warning.main,
+    },
+    notesText: {
+      fontSize: 16,
+      color: colors.text.primary,
+      lineHeight: 24,
+    },
+
+    // QR Data Card
+    qrDataCard: {
+      backgroundColor: colors.background.tertiary,
+      borderRadius: borderRadius.lg,
+      padding: spacing.lg,
+      marginBottom: spacing.md,
+      borderLeftWidth: 5,
+      borderLeftColor: colors.text.tertiary,
+    },
+    qrDataScroll: {
+      maxHeight: 100,
+    },
+    qrDataText: {
+      fontSize: 12,
+      color: colors.text.secondary,
+      fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
+    },
+
+    // Instructions Card
+    instructionsCard: {
+      backgroundColor: 'rgba(52, 199, 89, 0.15)',
+      borderRadius: borderRadius.lg,
+      padding: spacing.lg,
+      marginBottom: spacing.md,
+      borderLeftWidth: 5,
+      borderLeftColor: colors.status.success.main,
+    },
+    instructionsText: {
+      fontSize: 14,
+      color: colors.text.primary,
+      lineHeight: 20,
+      marginBottom: spacing.md,
+    },
+    timestampContainer: {
+      alignItems: 'center',
+    },
+    timestampText: {
+      fontSize: 12,
+      color: colors.text.tertiary,
+      fontStyle: 'italic',
+    },
+
+    // Action Bar
+    actionBar: {
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.md,
+      backgroundColor: colors.background.secondary,
+      borderTopWidth: 1,
+      borderTopColor: colors.border.default,
+    },
+    actionButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.background.tertiary,
+      borderRadius: borderRadius.full,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.sm,
+      borderWidth: 1,
+      borderColor: colors.primary.main,
+    },
+    actionButtonText: {
+      color: colors.primary.main,
+      fontSize: 14,
+      fontWeight: '600',
+      marginLeft: spacing.xs,
+    },
+  }), [colors, spacing, borderRadius, typography, shadows]);
 
   /**
    * Copy emergency information to clipboard
@@ -269,231 +496,5 @@ export const BackupTextDisplay: React.FC<BackupTextDisplayProps> = ({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  fullContainer: {
-    flex: 1,
-    backgroundColor: colors.background.primary,
-  },
-  compactContainer: {
-    backgroundColor: colors.background.secondary,
-    borderRadius: spacing.borderRadius.lg,
-    padding: spacing.md,
-    margin: spacing.sm,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    backgroundColor: colors.background.secondary,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.default,
-  },
-  headerLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: colors.text.primary,
-    marginLeft: spacing.sm,
-  },
-  copyButton: {
-    padding: spacing.xs,
-    borderRadius: spacing.borderRadius.full,
-    backgroundColor: colors.background.tertiary,
-  },
-  scrollContainer: {
-    flex: 1,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-  },
-  
-  // Critical Information Card - keep visible with slight color tints
-  criticalCard: {
-    backgroundColor: 'rgba(255, 59, 48, 0.15)',
-    borderRadius: spacing.borderRadius.lg,
-    padding: spacing.lg,
-    marginBottom: spacing.md,
-    borderLeftWidth: 5,
-    borderLeftColor: colors.status.error.main,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.md,
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: colors.text.primary,
-    marginLeft: spacing.xs,
-  },
-  criticalGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    marginBottom: spacing.md,
-  },
-  criticalItem: {
-    width: '48%',
-    marginBottom: spacing.sm,
-  },
-  criticalLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: colors.text.secondary,
-    textTransform: 'uppercase',
-    marginBottom: spacing.xs,
-  },
-  criticalValue: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: colors.text.primary,
-  },
-  bloodType: {
-    color: colors.status.error.main,
-    fontSize: 24,
-  },
-  allergiesSection: {
-    marginTop: spacing.sm,
-  },
-  allergiesList: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginTop: spacing.xs,
-  },
-  allergyTag: {
-    backgroundColor: colors.status.error.main,
-    borderRadius: spacing.borderRadius.full,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    marginRight: spacing.xs,
-    marginBottom: spacing.xs,
-  },
-  allergyText: {
-    color: colors.text.inverse,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-
-  // Emergency Contact Card
-  contactCard: {
-    backgroundColor: 'rgba(64, 124, 226, 0.15)',
-    borderRadius: spacing.borderRadius.lg,
-    padding: spacing.lg,
-    marginBottom: spacing.md,
-    borderLeftWidth: 5,
-    borderLeftColor: colors.primary.main,
-  },
-  contactInfo: {
-    alignItems: 'center',
-  },
-  contactName: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: colors.text.primary,
-    marginBottom: spacing.xs,
-  },
-  contactPhone: {
-    fontSize: 18,
-    color: colors.primary.main,
-    fontWeight: '600',
-    marginBottom: spacing.xs,
-  },
-  contactRelation: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    textTransform: 'capitalize',
-  },
-
-  // Medical Notes Card
-  notesCard: {
-    backgroundColor: 'rgba(255, 149, 0, 0.15)',
-    borderRadius: spacing.borderRadius.lg,
-    padding: spacing.lg,
-    marginBottom: spacing.md,
-    borderLeftWidth: 5,
-    borderLeftColor: colors.status.warning.main,
-  },
-  notesText: {
-    fontSize: 16,
-    color: colors.text.primary,
-    lineHeight: 24,
-  },
-
-  // QR Data Card
-  qrDataCard: {
-    backgroundColor: colors.background.tertiary,
-    borderRadius: spacing.borderRadius.lg,
-    padding: spacing.lg,
-    marginBottom: spacing.md,
-    borderLeftWidth: 5,
-    borderLeftColor: colors.text.tertiary,
-  },
-  qrDataScroll: {
-    maxHeight: 100,
-  },
-  qrDataText: {
-    fontSize: 12,
-    color: colors.text.secondary,
-    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
-  },
-
-  // Instructions Card
-  instructionsCard: {
-    backgroundColor: 'rgba(52, 199, 89, 0.15)',
-    borderRadius: spacing.borderRadius.lg,
-    padding: spacing.lg,
-    marginBottom: spacing.md,
-    borderLeftWidth: 5,
-    borderLeftColor: colors.status.success.main,
-  },
-  instructionsText: {
-    fontSize: 14,
-    color: colors.text.primary,
-    lineHeight: 20,
-    marginBottom: spacing.md,
-  },
-  timestampContainer: {
-    alignItems: 'center',
-  },
-  timestampText: {
-    fontSize: 12,
-    color: colors.text.tertiary,
-    fontStyle: 'italic',
-  },
-
-  // Action Bar
-  actionBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    backgroundColor: colors.background.secondary,
-    borderTopWidth: 1,
-    borderTopColor: colors.border.default,
-  },
-  actionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.background.tertiary,
-    borderRadius: spacing.borderRadius.full,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-    borderWidth: 1,
-    borderColor: colors.primary.main,
-  },
-  actionButtonText: {
-    color: colors.primary.main,
-    fontSize: 14,
-    fontWeight: '600',
-    marginLeft: spacing.xs,
-  },
-});
 
 export default BackupTextDisplay;

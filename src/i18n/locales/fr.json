@@ -383,9 +383,11 @@
       },
       "relationships": {
         "spouse": "Conjoint(e)",
+        "partner": "Partenaire",
         "parent": "Parent",
         "child": "Enfant",
         "sibling": "Frère/Sœur",
+        "grandparent": "Grand-parent",
         "friend": "Ami(e)",
         "other": "Autre"
       },
@@ -402,6 +404,9 @@
     "subtitle": "Gérez votre compte et vos préférences",
     "comingSoonDescription": "Plus de paramètres et d'options de personnalisation seront disponibles dans les prochaines mises à jour.",
     "appPreferences": "Préférences de l'application",
+    "theme": "Thème",
+    "darkMode": "Sombre",
+    "lightMode": "Clair",
     "language": "Langue",
     "accountPrivacy": "Compte et confidentialité",
     "profileSettings": "Paramètres du profil",
@@ -409,7 +414,9 @@
     "emergencySettings": "Paramètres d'urgence",
     "emergencyContacts": "Contacts d'urgence",
     "alertPreferences": "Préférences d'alertes",
-    "signOut": "Déconnexion"
+    "signOut": "Déconnexion",
+    "accountActions": "Compte",
+    "deleteAccount": "Supprimer le Compte"
   },
   "language": {
     "title": "Langue",
@@ -930,6 +937,8 @@
     }
   },
   "verification": {
+    "verified": "Vérifié",
+    "verifiedOnDate": "Vérifié le {{date}}",
     "allUpdatesMarkedRead": "Toutes les mises à jour récentes ont été marquées comme lues.",
     "reapplyTitle": "Repostuler pour Vérification",
     "reapplyMessage": "Vous pouvez soumettre une nouvelle demande de vérification de professionnel médical. Voulez-vous continuer?",

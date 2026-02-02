@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   Alert,
   RefreshControl,
   Platform,
+  Dimensions,
 } from 'react-native';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,7 +18,7 @@ import { LoadingOverlay } from '../common/LoadingOverlay';
 import { PasswordVerificationModal } from '../common/PasswordVerificationModal';
 import { VerifiedProfessionalIndicator } from '../common/VerifiedBadge';
 import { useAuth } from '../../context/AuthContext';
-import { colors, spacing } from '../../theme';
+import { useTheme } from '../../theme';
 
 interface ProfileDisplayProps {
   userId: string;
@@ -83,8 +84,330 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
   onEdit,
   onError,
 }) => {
+  const { colors, spacing, borderRadius, typography, shadows } = useTheme();
   const { t } = useTranslation();
   const { user: currentUser } = useAuth();
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background.primary,
+      paddingBottom: spacing.lg,
+      minHeight: '100%',
+    },
+    accessBanner: {
+      padding: spacing.md,
+      backgroundColor: colors.background.elevated,
+      borderRadius: borderRadius.md,
+      marginBottom: spacing.md,
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderLeftWidth: 4,
+      borderLeftColor: colors.medical.verified,
+    },
+    bannerIcon: {
+      marginRight: spacing.sm,
+    },
+    accessTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text.primary,
+    },
+    accessSubtitle: {
+      fontSize: 14,
+      color: colors.text.secondary,
+      marginTop: spacing.xxs,
+    },
+    header: {
+      backgroundColor: colors.background.secondary,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.md,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border.default,
+    },
+    headerContent: {
+      flex: 1,
+    },
+    profileName: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: colors.text.primary,
+      marginBottom: spacing.xxs,
+    },
+    lastUpdated: {
+      fontSize: 14,
+      color: colors.text.secondary,
+    },
+    editButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.primary.main,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.xs,
+      borderRadius: borderRadius.md,
+    },
+    editButtonText: {
+      color: colors.text.inverse,
+      fontSize: 14,
+      fontWeight: '600',
+      marginLeft: spacing.xxs,
+    },
+    section: {
+      backgroundColor: colors.background.secondary,
+      marginHorizontal: spacing.md,
+      marginVertical: spacing.xs,
+      borderRadius: borderRadius.lg,
+      overflow: 'hidden',
+      borderWidth: 1,
+      borderColor: colors.border.light,
+    },
+    sectionHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.background.elevated,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border.default,
+    },
+    sectionTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text.primary,
+      marginLeft: spacing.xs,
+    },
+    sectionContent: {
+      padding: spacing.md,
+    },
+    infoRow: {
+      marginBottom: spacing.sm,
+    },
+    label: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: colors.text.tertiary,
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
+      marginBottom: spacing.xxs,
+    },
+    value: {
+      fontSize: 16,
+      color: colors.text.primary,
+      lineHeight: 22,
+    },
+    criticalValue: {
+      fontWeight: '600',
+      color: colors.status.error.main,
+    },
+    contactCard: {
+      backgroundColor: colors.background.elevated,
+      borderRadius: borderRadius.md,
+      padding: spacing.sm,
+      marginBottom: spacing.sm,
+      borderLeftWidth: 4,
+      borderLeftColor: colors.medical.emergency,
+    },
+    contactHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: spacing.xs,
+    },
+    contactName: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text.primary,
+    },
+    primaryBadge: {
+      backgroundColor: colors.medical.emergency,
+      paddingHorizontal: spacing.xs,
+      paddingVertical: 2,
+      borderRadius: borderRadius.sm,
+    },
+    primaryBadgeText: {
+      fontSize: 10,
+      fontWeight: '700',
+      color: colors.text.inverse,
+    },
+    contactDetails: {
+      gap: spacing.xxs,
+    },
+    contactRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    contactInfo: {
+      fontSize: 14,
+      color: colors.text.secondary,
+      marginLeft: spacing.xs,
+    },
+    privacyRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: spacing.sm,
+    },
+    privacyLabel: {
+      fontSize: 14,
+      color: colors.text.primary,
+      flex: 1,
+    },
+    statusBadge: {
+      paddingHorizontal: spacing.sm,
+      paddingVertical: spacing.xxs,
+      borderRadius: borderRadius.lg,
+    },
+    enabledBadge: {
+      backgroundColor: 'transparent',
+    },
+    disabledBadge: {
+      backgroundColor: colors.status.error.main + '30',
+    },
+    statusText: {
+      fontSize: 12,
+      fontWeight: '600',
+    },
+    accessTimeRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.background.elevated,
+      padding: spacing.sm,
+      borderRadius: borderRadius.md,
+      marginTop: spacing.xs,
+    },
+    accessTimeText: {
+      fontSize: 14,
+      color: colors.primary.main,
+      marginLeft: spacing.xs,
+      fontWeight: '500',
+    },
+    passwordProtectionContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: spacing.xl,
+      minHeight: Dimensions.get('window').height - 150,
+    },
+    lockIconContainer: {
+      marginBottom: spacing.lg,
+    },
+    protectionTitle: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: colors.text.primary,
+      marginBottom: spacing.sm,
+      textAlign: 'center',
+    },
+    protectionMessage: {
+      fontSize: 16,
+      color: colors.text.secondary,
+      textAlign: 'center',
+      lineHeight: 22,
+      marginBottom: spacing.xl,
+    },
+    unlockButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.primary.main,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.sm,
+      borderRadius: borderRadius.md,
+      marginBottom: spacing.xl,
+    },
+    unlockButtonText: {
+      color: colors.text.inverse,
+      fontSize: 16,
+      fontWeight: '600',
+      marginLeft: spacing.xs,
+    },
+    emergencyInfoCard: {
+      backgroundColor: colors.background.secondary,
+      borderWidth: 1,
+      borderColor: colors.medical.emergency,
+      borderRadius: borderRadius.md,
+      padding: spacing.md,
+      width: '100%',
+    },
+    emergencyInfoTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.medical.emergency,
+      marginBottom: spacing.xs,
+    },
+    emergencyInfoText: {
+      fontSize: 14,
+      color: colors.text.primary,
+      marginBottom: spacing.xxs,
+    },
+    errorContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: spacing.xl,
+    },
+    errorTitle: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: colors.text.primary,
+      marginTop: spacing.md,
+      marginBottom: spacing.xs,
+    },
+    errorMessage: {
+      fontSize: 16,
+      color: colors.text.secondary,
+      textAlign: 'center',
+      lineHeight: 22,
+      marginBottom: spacing.lg,
+    },
+    retryButton: {
+      backgroundColor: colors.primary.main,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.sm,
+      borderRadius: borderRadius.md,
+    },
+    retryButtonText: {
+      color: colors.text.inverse,
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    medicalAccessBanner: {
+      backgroundColor: colors.background.elevated,
+      borderLeftWidth: 4,
+      borderLeftColor: colors.medical.verified,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginHorizontal: spacing.md,
+      marginVertical: spacing.xs,
+      borderRadius: borderRadius.md,
+    },
+    medicalAccessContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      flex: 1,
+    },
+    medicalAccessText: {
+      marginLeft: spacing.sm,
+      flex: 1,
+    },
+    medicalAccessTitle: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: colors.medical.verified,
+      marginBottom: 2,
+    },
+    medicalAccessSubtitle: {
+      fontSize: 12,
+      color: colors.text.secondary,
+      lineHeight: 16,
+    },
+  }), [colors, spacing, borderRadius, typography, shadows]);
+
   const [profile, setProfile] = useState<UserProfile | null>(initialProfile || null);
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -570,21 +893,6 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
         <Ionicons name="lock-open" size={20} color="white" />
         <Text style={styles.unlockButtonText}>{t('profile.enterPassword')}</Text>
       </TouchableOpacity>
-
-      {/* Show basic emergency info even when locked */}
-      {profile?.medicalInfo.bloodType && (
-        <View style={styles.emergencyInfoCard}>
-          <Text style={styles.emergencyInfoTitle}>{t('emergency.title')}</Text>
-          <Text style={styles.emergencyInfoText}>
-            {t('profile.bloodType')}: {profile.medicalInfo.bloodType}
-          </Text>
-          {profile.medicalInfo.allergies && profile.medicalInfo.allergies.length > 0 && (
-            <Text style={styles.emergencyInfoText}>
-              {t('profile.allergies')}: {formatMedicalConditions(profile.medicalInfo.allergies)}
-            </Text>
-          )}
-        </View>
-      )}
     </View>
   );
 
@@ -682,324 +990,5 @@ export const ProfileDisplay: React.FC<ProfileDisplayProps> = ({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: colors.background.primary,
-    paddingBottom: spacing.lg,
-    minHeight: '100%',
-  },
-  accessBanner: {
-    padding: spacing.md,
-    backgroundColor: colors.background.elevated,
-    borderRadius: spacing.borderRadius.md,
-    marginBottom: spacing.md,
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderLeftWidth: 4,
-    borderLeftColor: colors.medical.verified,
-  },
-  bannerIcon: {
-    marginRight: spacing.sm,
-  },
-  accessTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text.primary,
-  },
-  accessSubtitle: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    marginTop: spacing.xxs,
-  },
-  header: {
-    backgroundColor: colors.background.secondary,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.default,
-  },
-  headerContent: {
-    flex: 1,
-  },
-  profileName: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: colors.text.primary,
-    marginBottom: spacing.xxs,
-  },
-  lastUpdated: {
-    fontSize: 14,
-    color: colors.text.secondary,
-  },
-  editButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.primary.main,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    borderRadius: spacing.borderRadius.md,
-  },
-  editButtonText: {
-    color: colors.text.inverse,
-    fontSize: 14,
-    fontWeight: '600',
-    marginLeft: spacing.xxs,
-  },
-  section: {
-    backgroundColor: colors.background.secondary,
-    marginHorizontal: spacing.md,
-    marginVertical: spacing.xs,
-    borderRadius: spacing.borderRadius.lg,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: colors.border.light,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.background.elevated,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.default,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text.primary,
-    marginLeft: spacing.xs,
-  },
-  sectionContent: {
-    padding: spacing.md,
-  },
-  infoRow: {
-    marginBottom: spacing.sm,
-  },
-  label: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: colors.text.tertiary,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: spacing.xxs,
-  },
-  value: {
-    fontSize: 16,
-    color: colors.text.primary,
-    lineHeight: 22,
-  },
-  criticalValue: {
-    fontWeight: '600',
-    color: colors.status.error.main,
-  },
-  contactCard: {
-    backgroundColor: colors.background.elevated,
-    borderRadius: spacing.borderRadius.md,
-    padding: spacing.sm,
-    marginBottom: spacing.sm,
-    borderLeftWidth: 4,
-    borderLeftColor: colors.medical.emergency,
-  },
-  contactHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.xs,
-  },
-  contactName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text.primary,
-  },
-  primaryBadge: {
-    backgroundColor: colors.medical.emergency,
-    paddingHorizontal: spacing.xs,
-    paddingVertical: 2,
-    borderRadius: spacing.borderRadius.sm,
-  },
-  primaryBadgeText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: colors.text.inverse,
-  },
-  contactDetails: {
-    gap: spacing.xxs,
-  },
-  contactRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  contactInfo: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    marginLeft: spacing.xs,
-  },
-  privacyRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.sm,
-  },
-  privacyLabel: {
-    fontSize: 14,
-    color: colors.text.primary,
-    flex: 1,
-  },
-  statusBadge: {
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xxs,
-    borderRadius: spacing.borderRadius.lg,
-  },
-  enabledBadge: {
-    backgroundColor: 'transparent',
-  },
-  disabledBadge: {
-    backgroundColor: colors.status.error.main + '30',
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  accessTimeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.background.elevated,
-    padding: spacing.sm,
-    borderRadius: spacing.borderRadius.md,
-    marginTop: spacing.xs,
-  },
-  accessTimeText: {
-    fontSize: 14,
-    color: colors.primary.main,
-    marginLeft: spacing.xs,
-    fontWeight: '500',
-  },
-  passwordProtectionContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: spacing.xl,
-  },
-  lockIconContainer: {
-    marginBottom: spacing.lg,
-  },
-  protectionTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.text.primary,
-    marginBottom: spacing.sm,
-    textAlign: 'center',
-  },
-  protectionMessage: {
-    fontSize: 16,
-    color: colors.text.secondary,
-    textAlign: 'center',
-    lineHeight: 22,
-    marginBottom: spacing.xl,
-  },
-  unlockButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.primary.main,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-    borderRadius: spacing.borderRadius.md,
-    marginBottom: spacing.xl,
-  },
-  unlockButtonText: {
-    color: colors.text.inverse,
-    fontSize: 16,
-    fontWeight: '600',
-    marginLeft: spacing.xs,
-  },
-  emergencyInfoCard: {
-    backgroundColor: colors.background.secondary,
-    borderWidth: 1,
-    borderColor: colors.medical.emergency,
-    borderRadius: spacing.borderRadius.md,
-    padding: spacing.md,
-    width: '100%',
-  },
-  emergencyInfoTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.medical.emergency,
-    marginBottom: spacing.xs,
-  },
-  emergencyInfoText: {
-    fontSize: 14,
-    color: colors.text.primary,
-    marginBottom: spacing.xxs,
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: spacing.xl,
-  },
-  errorTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: colors.text.primary,
-    marginTop: spacing.md,
-    marginBottom: spacing.xs,
-  },
-  errorMessage: {
-    fontSize: 16,
-    color: colors.text.secondary,
-    textAlign: 'center',
-    lineHeight: 22,
-    marginBottom: spacing.lg,
-  },
-  retryButton: {
-    backgroundColor: colors.primary.main,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-    borderRadius: spacing.borderRadius.md,
-  },
-  retryButtonText: {
-    color: colors.text.inverse,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  // Medical Professional Access Banner Styles
-  medicalAccessBanner: {
-    backgroundColor: colors.background.elevated,
-    borderLeftWidth: 4,
-    borderLeftColor: colors.medical.verified,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginHorizontal: spacing.md,
-    marginVertical: spacing.xs,
-    borderRadius: spacing.borderRadius.md,
-  },
-  medicalAccessContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  medicalAccessText: {
-    marginLeft: spacing.sm,
-    flex: 1,
-  },
-  medicalAccessTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.medical.verified,
-    marginBottom: 2,
-  },
-  medicalAccessSubtitle: {
-    fontSize: 12,
-    color: colors.text.secondary,
-    lineHeight: 16,
-  },
-});
 
 export default ProfileDisplay;

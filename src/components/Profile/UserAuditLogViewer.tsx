@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing } from '../../theme';
+import { useTheme } from '../../theme';
 import { useAuth } from '../../context/AuthContext';
 import { AuditLog, User, MedicalProfessional } from '../../types';
 import { profileService } from '../../services';
@@ -35,11 +35,152 @@ interface AccessorInfo {
  * Shows regular users who has accessed their profile
  */
 const UserAuditLogViewer: React.FC<UserAuditLogViewerProps> = ({ profileId }) => {
+  const { colors, spacing, borderRadius, typography, shadows } = useTheme();
   const { t } = useTranslation();
   const { user } = useAuth();
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [accessorInfos, setAccessorInfos] = useState<{ [userId: string]: AccessorInfo }>({});
   const [loading, setLoading] = useState(false);
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background.secondary,
+    },
+    title: {
+      fontSize: 20,
+      fontWeight: '700',
+      color: colors.text.primary,
+      marginBottom: spacing.xs,
+      paddingHorizontal: spacing.md,
+      paddingTop: spacing.md,
+    },
+    subtitle: {
+      fontSize: 14,
+      color: colors.text.secondary,
+      marginBottom: spacing.lg,
+      lineHeight: 20,
+      paddingHorizontal: spacing.md,
+    },
+    logsList: {
+      flex: 1,
+    },
+    listContent: {
+      paddingHorizontal: spacing.md,
+      paddingBottom: spacing.md,
+    },
+    auditLogItem: {
+      backgroundColor: colors.text.inverse,
+      borderRadius: 12,
+      padding: spacing.md,
+      marginBottom: spacing.sm,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.05,
+      shadowRadius: 4,
+      elevation: 2,
+    },
+    auditLogHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    auditLogIcon: {
+      width: 36,
+      height: 36,
+      backgroundColor: colors.primary.main + '20',
+      borderRadius: 18,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: spacing.sm,
+    },
+    auditLogInfo: {
+      flex: 1,
+    },
+    accessorNameContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 4,
+    },
+    accessorName: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text.primary,
+      marginRight: spacing.xs,
+    },
+    medicalBadge: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.status.success.main,
+      paddingHorizontal: 6,
+      paddingVertical: 2,
+      borderRadius: 8,
+    },
+    medicalBadgeText: {
+      fontSize: 10,
+      fontWeight: '600',
+      color: colors.text.inverse,
+      marginLeft: 2,
+    },
+    accessType: {
+      fontSize: 14,
+      color: colors.primary.main,
+      fontWeight: '500',
+      marginBottom: 2,
+    },
+    accessTime: {
+      fontSize: 12,
+      color: colors.text.secondary,
+      fontWeight: '500',
+    },
+    medicalSpecialty: {
+      fontSize: 12,
+      color: colors.status.success.main,
+      fontStyle: 'italic',
+      marginTop: 2,
+    },
+    accessMethodBadge: {
+      backgroundColor: colors.primary.main,
+      paddingHorizontal: spacing.xs,
+      paddingVertical: 4,
+      borderRadius: 6,
+    },
+    accessMethodText: {
+      fontSize: 10,
+      fontWeight: '600',
+      color: colors.text.inverse,
+    },
+    loadingContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: spacing.xl,
+    },
+    loadingText: {
+      fontSize: 16,
+      color: colors.text.secondary,
+      marginTop: spacing.md,
+      fontWeight: '500',
+    },
+    emptyStateContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: spacing.xl,
+    },
+    emptyStateTitle: {
+      fontSize: 20,
+      fontWeight: '600',
+      color: colors.text.primary,
+      marginTop: spacing.lg,
+      marginBottom: spacing.sm,
+    },
+    emptyStateText: {
+      fontSize: 16,
+      color: colors.text.secondary,
+      textAlign: 'center',
+      lineHeight: 22,
+    },
+  }), [colors, spacing, borderRadius, typography, shadows]);
 
   /**
    * Fetch accessor information (names and medical professional status)
@@ -287,145 +428,5 @@ const UserAuditLogViewer: React.FC<UserAuditLogViewerProps> = ({ profileId }) =>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.secondary,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: colors.text.primary,
-    marginBottom: spacing.xs,
-    paddingHorizontal: spacing.md,
-    paddingTop: spacing.md,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    marginBottom: spacing.lg,
-    lineHeight: 20,
-    paddingHorizontal: spacing.md,
-  },
-  logsList: {
-    flex: 1,
-  },
-  listContent: {
-    paddingHorizontal: spacing.md,
-    paddingBottom: spacing.md,
-  },
-  auditLogItem: {
-    backgroundColor: colors.text.inverse,
-    borderRadius: 12,
-    padding: spacing.md,
-    marginBottom: spacing.sm,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  auditLogHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  auditLogIcon: {
-    width: 36,
-    height: 36,
-    backgroundColor: colors.primary.main + '20',
-    borderRadius: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: spacing.sm,
-  },
-  auditLogInfo: {
-    flex: 1,
-  },
-  accessorNameContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 4,
-  },
-  accessorName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text.primary,
-    marginRight: spacing.xs,
-  },
-  medicalBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.status.success.main,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 8,
-  },
-  medicalBadgeText: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: colors.text.inverse,
-    marginLeft: 2,
-  },
-  accessType: {
-    fontSize: 14,
-    color: colors.primary.main,
-    fontWeight: '500',
-    marginBottom: 2,
-  },
-  accessTime: {
-    fontSize: 12,
-    color: colors.text.secondary,
-    fontWeight: '500',
-  },
-  medicalSpecialty: {
-    fontSize: 12,
-    color: colors.status.success.main,
-    fontStyle: 'italic',
-    marginTop: 2,
-  },
-  accessMethodBadge: {
-    backgroundColor: colors.primary.main,
-    paddingHorizontal: spacing.xs,
-    paddingVertical: 4,
-    borderRadius: 6,
-  },
-  accessMethodText: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: colors.text.inverse,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: spacing.xl,
-  },
-  loadingText: {
-    fontSize: 16,
-    color: colors.text.secondary,
-    marginTop: spacing.md,
-    fontWeight: '500',
-  },
-  emptyStateContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: spacing.xl,
-  },
-  emptyStateTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: colors.text.primary,
-    marginTop: spacing.lg,
-    marginBottom: spacing.sm,
-  },
-  emptyStateText: {
-    fontSize: 16,
-    color: colors.text.secondary,
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-});
 
 export default UserAuditLogViewer;

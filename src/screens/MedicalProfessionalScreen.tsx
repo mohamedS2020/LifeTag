@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, StyleSheet, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { MedicalProfessionalDashboard } from '../components/common';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { colors } from '../theme';
+import { useTheme } from '../theme';
 
 type MedicalProfessionalScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
@@ -16,7 +16,18 @@ type MedicalProfessionalScreenNavigationProp = StackNavigationProp<RootStackPara
  * Task 7.5: Add medical professional navigation flow and dashboard
  */
 const MedicalProfessionalScreen: React.FC = () => {
+  const { colors, spacing, borderRadius, typography, shadows } = useTheme();
   const navigation = useNavigation<MedicalProfessionalScreenNavigationProp>();
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background.primary,
+    },
+    content: {
+      flex: 1,
+    },
+  }), [colors, spacing, borderRadius, typography, shadows]);
 
   /**
    * Handle navigation to profile display
@@ -48,15 +59,5 @@ const MedicalProfessionalScreen: React.FC = () => {
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.primary,
-  },
-  content: {
-    flex: 1,
-  },
-});
 
 export default MedicalProfessionalScreen;

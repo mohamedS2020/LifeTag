@@ -3,7 +3,7 @@
  * Provides quick access to QR-related features from the main tab
  */
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -15,7 +15,7 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
-import { colors, spacing } from '../theme';
+import { useTheme } from '../theme';
 import { Card, H1, Body, Caption, Badge } from '../components/ui';
 
 interface QRTabScreenProps {
@@ -23,8 +23,91 @@ interface QRTabScreenProps {
 }
 
 const QRTabScreen: React.FC<QRTabScreenProps> = ({ navigation }) => {
+  const { colors, spacing, borderRadius, typography, shadows } = useTheme();
   const { t } = useTranslation();
   const { user } = useAuth();
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background.primary,
+    },
+    content: {
+      flex: 1,
+      padding: spacing.lg,
+    },
+    header: {
+      alignItems: 'center',
+      marginBottom: spacing.xl,
+    },
+    iconContainer: {
+      width: 80,
+      height: 80,
+      borderRadius: 40,
+      backgroundColor: colors.background.elevated,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: spacing.md,
+      borderWidth: 1,
+      borderColor: colors.border.light,
+    },
+    title: {
+      color: colors.text.primary,
+      marginBottom: spacing.xs,
+    },
+    subtitle: {
+      color: colors.text.secondary,
+      textAlign: 'center',
+    },
+    
+    actionsContainer: {
+      gap: spacing.md,
+    },
+    actionButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: spacing.md,
+    },
+    actionIconBg: {
+      width: 48,
+      height: 48,
+      borderRadius: 24,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: spacing.md,
+    },
+    actionContent: {
+      flex: 1,
+    },
+    actionTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text.primary,
+      marginBottom: spacing.xxs,
+    },
+    
+    professionalSection: {
+      marginTop: spacing.xl,
+      backgroundColor: `${colors.medical.verified}10`,
+      borderLeftWidth: 3,
+      borderLeftColor: colors.medical.verified,
+    },
+    professionalBadge: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: spacing.sm,
+    },
+    professionalText: {
+      marginLeft: spacing.sm,
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.medical.verified,
+    },
+    professionalDescription: {
+      color: colors.text.secondary,
+      lineHeight: 20,
+    },
+  }), [colors, spacing, borderRadius, typography, shadows]);
 
   const handleShowMyQR = () => {
     navigation.navigate('QRDisplay');
@@ -99,87 +182,5 @@ const QRTabScreen: React.FC<QRTabScreenProps> = ({ navigation }) => {
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.primary,
-  },
-  content: {
-    flex: 1,
-    padding: spacing.lg,
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: spacing.xl,
-  },
-  iconContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: colors.background.elevated,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.border.light,
-  },
-  title: {
-    color: colors.text.primary,
-    marginBottom: spacing.xs,
-  },
-  subtitle: {
-    color: colors.text.secondary,
-    textAlign: 'center',
-  },
-  
-  actionsContainer: {
-    gap: spacing.md,
-  },
-  actionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: spacing.md,
-  },
-  actionIconBg: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: spacing.md,
-  },
-  actionContent: {
-    flex: 1,
-  },
-  actionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text.primary,
-    marginBottom: spacing.xxs,
-  },
-  
-  professionalSection: {
-    marginTop: spacing.xl,
-    backgroundColor: `${colors.medical.verified}10`,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.medical.verified,
-  },
-  professionalBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.sm,
-  },
-  professionalText: {
-    marginLeft: spacing.sm,
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.medical.verified,
-  },
-  professionalDescription: {
-    color: colors.text.secondary,
-    lineHeight: 20,
-  },
-});
 
 export default QRTabScreen;

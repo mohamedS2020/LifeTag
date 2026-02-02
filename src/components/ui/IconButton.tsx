@@ -3,7 +3,7 @@
  * Circular icon button with variants
  */
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { TouchableOpacity, StyleSheet, ViewStyle } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -11,7 +11,8 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, borderRadius, shadows, springConfig } from '../../theme';
+import { useTheme } from '../../context/ThemeContext';
+import { springConfig } from '../../theme';
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
@@ -35,6 +36,7 @@ const IconButton: React.FC<IconButtonProps> = ({
   disabled = false,
   style,
 }) => {
+  const { colors, shadows } = useTheme();
   const scale = useSharedValue(1);
 
   const handlePressIn = useCallback(() => {
@@ -49,7 +51,7 @@ const IconButton: React.FC<IconButtonProps> = ({
     transform: [{ scale: scale.value }],
   }));
 
-  const getVariantStyles = (): { container: ViewStyle; iconColor: string } => {
+  const getVariantStyles = useCallback((): { container: ViewStyle; iconColor: string } => {
     switch (variant) {
       case 'primary':
         return {
@@ -86,9 +88,9 @@ const IconButton: React.FC<IconButtonProps> = ({
           iconColor: colors.text.primary,
         };
     }
-  };
+  }, [colors, shadows, variant]);
 
-  const getSizeStyles = (): { size: number; iconSize: number } => {
+  const getSizeStyles = useCallback((): { size: number; iconSize: number } => {
     switch (size) {
       case 'sm':
         return { size: 36, iconSize: 18 };
@@ -98,10 +100,20 @@ const IconButton: React.FC<IconButtonProps> = ({
       default:
         return { size: 44, iconSize: 22 };
     }
-  };
+  }, [size]);
 
   const variantStyles = getVariantStyles();
   const sizeStyles = getSizeStyles();
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    disabled: {
+      opacity: 0.5,
+    },
+  }), []);
 
   return (
     <AnimatedTouchable
@@ -131,15 +143,5 @@ const IconButton: React.FC<IconButtonProps> = ({
     </AnimatedTouchable>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  disabled: {
-    opacity: 0.5,
-  },
-});
 
 export default IconButton;

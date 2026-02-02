@@ -383,9 +383,11 @@
       },
       "relationships": {
         "spouse": "الزوج/الزوجة",
+        "partner": "الشريك",
         "parent": "الوالد",
         "child": "الطفل",
         "sibling": "الأخ/الأخت",
+        "grandparent": "الجد/الجدة",
         "friend": "صديق",
         "other": "آخر"
       },
@@ -402,6 +404,9 @@
     "subtitle": "إدارة حسابك وتفضيلاتك",
     "comingSoonDescription": "ستتوفر المزيد من الإعدادات وخيارات التخصيص في التحديثات القادمة.",
     "appPreferences": "تفضيلات التطبيق",
+    "theme": "المظهر",
+    "darkMode": "داكن",
+    "lightMode": "فاتح",
     "language": "اللغة",
     "accountPrivacy": "الحساب والخصوصية",
     "profileSettings": "إعدادات الملف الشخصي",
@@ -409,7 +414,9 @@
     "emergencySettings": "إعدادات الطوارئ",
     "emergencyContacts": "جهات اتصال الطوارئ",
     "alertPreferences": "تفضيلات التنبيهات",
-    "signOut": "تسجيل الخروج"
+    "signOut": "تسجيل الخروج",
+    "accountActions": "الحساب",
+    "deleteAccount": "حذف الحساب"
   },
   "language": {
     "title": "اللغة",
@@ -930,6 +937,8 @@
     }
   },
   "verification": {
+    "verified": "موثق",
+    "verifiedOnDate": "تم التحقق في {{date}}",
     "allUpdatesMarkedRead": "تم تحديد جميع التحديثات الأخيرة كمقروءة.",
     "reapplyTitle": "إعادة التقديم للتحقق",
     "reapplyMessage": "يمكنك تقديم طلب جديد للتحقق كمحترف طبي. هل تريد المتابعة؟",

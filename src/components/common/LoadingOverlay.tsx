@@ -3,7 +3,7 @@
  * Displays loading state with spinner and message
  */
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { 
   View, 
   Text, 
@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
-import { colors, spacing, borderRadius, typography, shadows } from '../../theme';
+import { useTheme } from '../../theme';
 
 interface LoadingOverlayProps {
   visible: boolean;
@@ -30,12 +30,46 @@ export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
   onCancel 
 }) => {
   const { t } = useTranslation();
+  const { colors, spacing, borderRadius, typography, shadows } = useTheme();
   const displayMessage = message || t('common.loading');
   const handleBackdropPress = () => {
     if (cancelable && onCancel) {
       onCancel();
     }
   };
+
+  const styles = useMemo(() => StyleSheet.create({
+    overlay: {
+      flex: 1,
+      backgroundColor: colors.overlay.heavy,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    container: {
+      backgroundColor: colors.background.card,
+      borderRadius: borderRadius.lg,
+      padding: spacing['2xl'],
+      alignItems: 'center',
+      minWidth: 200,
+      borderWidth: 1,
+      borderColor: colors.border.default,
+      ...shadows.lg,
+    },
+    spinner: {
+      marginBottom: spacing.lg,
+    },
+    message: {
+      ...typography.body,
+      color: colors.text.primary,
+      textAlign: 'center',
+    },
+    cancelHint: {
+      ...typography.caption,
+      color: colors.text.tertiary,
+      textAlign: 'center',
+      marginTop: spacing.sm,
+    },
+  }), [colors, spacing, borderRadius, typography, shadows]);
 
   return (
     <Modal
@@ -77,7 +111,25 @@ export const InlineLoading: React.FC<InlineLoadingProps> = ({
   size = 'small' 
 }) => {
   const { t } = useTranslation();
+  const { colors, spacing, typography } = useTheme();
   const displayMessage = message || t('common.loading');
+
+  const styles = useMemo(() => StyleSheet.create({
+    inlineContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: spacing.md,
+    },
+    inlineSpinner: {
+      marginRight: spacing.sm,
+    },
+    inlineMessage: {
+      ...typography.bodySmall,
+      color: colors.text.secondary,
+    },
+  }), [colors, spacing, typography]);
+
   if (!visible) return null;
 
   return (
@@ -87,49 +139,3 @@ export const InlineLoading: React.FC<InlineLoadingProps> = ({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: colors.overlay.heavy,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  container: {
-    backgroundColor: colors.background.card,
-    borderRadius: borderRadius.lg,
-    padding: spacing['2xl'],
-    alignItems: 'center',
-    minWidth: 200,
-    borderWidth: 1,
-    borderColor: colors.border.default,
-    ...shadows.lg,
-  },
-  spinner: {
-    marginBottom: spacing.lg,
-  },
-  message: {
-    ...typography.body,
-    color: colors.text.primary,
-    textAlign: 'center',
-  },
-  cancelHint: {
-    ...typography.caption,
-    color: colors.text.tertiary,
-    textAlign: 'center',
-    marginTop: spacing.sm,
-  },
-  inlineContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: spacing.md,
-  },
-  inlineSpinner: {
-    marginRight: spacing.sm,
-  },
-  inlineMessage: {
-    ...typography.bodySmall,
-    color: colors.text.secondary,
-  },
-});

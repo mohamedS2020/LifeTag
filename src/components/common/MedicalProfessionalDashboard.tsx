@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -21,7 +21,7 @@ import PatientProfileList from './PatientProfileList';
 import { ProfileDisplay } from '../Profile';
 import { QRScanner } from '../QR';
 import { useMedicalProfessionalAccess } from '../../hooks';
-import { colors, spacing } from '../../theme';
+import { useTheme } from '../../theme';
 import { useTranslation } from 'react-i18next';
 
 /**
@@ -45,6 +45,9 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
   onNavigateToProfile,
   onError,
 }) => {
+  // Theme hook
+  const { colors, spacing, borderRadius, typography } = useTheme();
+
   // Medical professional access hook
   const {
     isVerifiedProfessional,
@@ -558,6 +561,309 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
   };
 
   // =============================================
+  // STYLES
+  // =============================================
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background.primary,
+    },
+    verificationHeader: {
+      backgroundColor: colors.background.secondary,
+      padding: spacing.lg,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border.default,
+    },
+    verificationContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      flex: 1,
+    },
+    verificationText: {
+      marginLeft: spacing.sm,
+      flex: 1,
+    },
+    verificationTitle: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: colors.text.primary,
+      marginBottom: spacing.xxs,
+    },
+    verificationSubtitle: {
+      fontSize: 14,
+      color: colors.text.secondary,
+      lineHeight: 18,
+    },
+    tabContainer: {
+      flexDirection: 'row',
+      backgroundColor: colors.background.secondary,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border.default,
+    },
+    tab: {
+      flex: 1,
+      paddingVertical: spacing.md,
+      alignItems: 'center',
+      flexDirection: 'row',
+      justifyContent: 'center',
+    },
+    activeTab: {
+      borderBottomWidth: 2,
+      borderBottomColor: colors.primary.main,
+    },
+    tabText: {
+      fontSize: 14,
+      color: colors.text.secondary,
+      marginLeft: spacing.xxs,
+      fontWeight: '500',
+    },
+    activeTabText: {
+      color: colors.primary.main,
+      fontWeight: '600',
+    },
+    content: {
+      flex: 1,
+    },
+    tabContent: {
+      flex: 1,
+      padding: spacing.lg,
+    },
+    scannerCard: {
+      backgroundColor: colors.background.secondary,
+      borderRadius: borderRadius.xl,
+      padding: spacing.xl,
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: colors.border.light,
+    },
+    scannerTitle: {
+      fontSize: 22,
+      fontWeight: '700',
+      color: colors.text.primary,
+      marginTop: spacing.md,
+      marginBottom: spacing.xs,
+    },
+    scannerDescription: {
+      fontSize: 16,
+      color: colors.text.secondary,
+      textAlign: 'center',
+      lineHeight: 22,
+      marginBottom: spacing.lg,
+    },
+    scanButton: {
+      backgroundColor: colors.primary.main,
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.sm,
+      borderRadius: borderRadius.lg,
+      marginBottom: spacing.md,
+    },
+    scanButtonText: {
+      color: colors.text.inverse,
+      fontSize: 16,
+      fontWeight: '600',
+      marginLeft: spacing.xs,
+    },
+    privilegeNotice: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.background.elevated,
+      paddingHorizontal: spacing.sm,
+      paddingVertical: spacing.xs,
+      borderRadius: borderRadius.md,
+    },
+    privilegeText: {
+      fontSize: 12,
+      color: colors.medical.verified,
+      marginLeft: spacing.xxs,
+      fontWeight: '500',
+    },
+    comingSoonText: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: colors.text.primary,
+      textAlign: 'center',
+      marginBottom: spacing.xs,
+    },
+    comingSoonSubtext: {
+      fontSize: 14,
+      color: colors.text.secondary,
+      textAlign: 'center',
+      lineHeight: 20,
+    },
+    accessDeniedContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: spacing.xxl,
+      backgroundColor: colors.background.primary,
+    },
+    accessDeniedTitle: {
+      fontSize: 20,
+      fontWeight: '700',
+      color: colors.status.error.main,
+      marginTop: spacing.lg,
+      marginBottom: spacing.sm,
+    },
+    accessDeniedText: {
+      fontSize: 16,
+      color: colors.text.secondary,
+      textAlign: 'center',
+      lineHeight: 22,
+    },
+    profileModal: {
+      flex: 1,
+      backgroundColor: colors.background.primary,
+    },
+    profileModalHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: spacing.lg,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border.default,
+      backgroundColor: colors.background.secondary,
+    },
+    profileModalTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: colors.text.primary,
+    },
+    profileModalContent: {
+      flex: 1,
+    },
+    loadingContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: spacing.xxl,
+    },
+    loadingText: {
+      fontSize: 16,
+      color: colors.text.secondary,
+      marginTop: spacing.md,
+      fontWeight: '500',
+    },
+    emptyStateContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: spacing.xxl,
+    },
+    emptyStateTitle: {
+      fontSize: 20,
+      fontWeight: '600',
+      color: colors.text.primary,
+      marginTop: spacing.lg,
+      marginBottom: spacing.sm,
+    },
+    emptyStateText: {
+      fontSize: 16,
+      color: colors.text.secondary,
+      textAlign: 'center',
+      lineHeight: 22,
+    },
+    historyTitle: {
+      fontSize: 20,
+      fontWeight: '700',
+      color: colors.text.primary,
+      marginBottom: spacing.xs,
+    },
+    historySubtitle: {
+      fontSize: 14,
+      color: colors.text.secondary,
+      marginBottom: spacing.lg,
+      lineHeight: 20,
+    },
+    historyList: {
+      flex: 1,
+    },
+    auditLogItem: {
+      backgroundColor: colors.background.secondary,
+      borderRadius: borderRadius.lg,
+      padding: spacing.md,
+      marginBottom: spacing.sm,
+      borderWidth: 1,
+      borderColor: colors.border.light,
+    },
+    auditLogHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: spacing.sm,
+    },
+    auditLogIcon: {
+      width: 36,
+      height: 36,
+      backgroundColor: colors.background.elevated,
+      borderRadius: 18,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: spacing.sm,
+    },
+    auditLogInfo: {
+      flex: 1,
+    },
+    auditLogAction: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text.primary,
+      marginBottom: spacing.xxs,
+    },
+    auditLogTimestamp: {
+      fontSize: 12,
+      color: colors.text.secondary,
+      fontWeight: '500',
+    },
+    auditLogAccessType: {
+      backgroundColor: colors.primary.main,
+      paddingHorizontal: spacing.xs,
+      paddingVertical: spacing.xxs,
+      borderRadius: borderRadius.sm,
+    },
+    accessTypeText: {
+      fontSize: 10,
+      fontWeight: '600',
+      color: colors.text.inverse,
+    },
+    auditLogDetails: {
+      paddingLeft: 48,
+    },
+    auditLogProfile: {
+      fontSize: 12,
+      color: colors.text.secondary,
+      fontFamily: 'monospace',
+      marginBottom: spacing.xxs,
+    },
+    auditLogNotes: {
+      fontSize: 14,
+      color: colors.text.primary,
+      fontStyle: 'italic',
+    },
+    auditLogPatient: {
+      fontSize: 14,
+      color: colors.primary.main,
+      fontWeight: '500',
+      marginBottom: 2,
+    },
+    auditLogFields: {
+      fontSize: 11,
+      color: colors.text.tertiary,
+      fontStyle: 'italic',
+    },
+    auditLogPatientName: {
+      fontSize: 14,
+      color: colors.text.primary,
+      fontWeight: '600',
+      marginBottom: spacing.xxs,
+    },
+  }), [colors, spacing, borderRadius]);
+
+  // =============================================
   // MAIN RENDER
   // =============================================
 
@@ -648,309 +954,5 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
     </SafeAreaView>
   );
 };
-
-// =============================================
-// STYLES
-// =============================================
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.primary,
-  },
-  verificationHeader: {
-    backgroundColor: colors.background.secondary,
-    padding: spacing.lg,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.default,
-  },
-  verificationContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  verificationText: {
-    marginLeft: spacing.sm,
-    flex: 1,
-  },
-  verificationTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.text.primary,
-    marginBottom: spacing.xxs,
-  },
-  verificationSubtitle: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    lineHeight: 18,
-  },
-  tabContainer: {
-    flexDirection: 'row',
-    backgroundColor: colors.background.secondary,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.default,
-  },
-  tab: {
-    flex: 1,
-    paddingVertical: spacing.md,
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  activeTab: {
-    borderBottomWidth: 2,
-    borderBottomColor: colors.primary.main,
-  },
-  tabText: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    marginLeft: spacing.xxs,
-    fontWeight: '500',
-  },
-  activeTabText: {
-    color: colors.primary.main,
-    fontWeight: '600',
-  },
-  content: {
-    flex: 1,
-  },
-  tabContent: {
-    flex: 1,
-    padding: spacing.lg,
-  },
-  scannerCard: {
-    backgroundColor: colors.background.secondary,
-    borderRadius: spacing.borderRadius.xl,
-    padding: spacing.xl,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: colors.border.light,
-  },
-  scannerTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: colors.text.primary,
-    marginTop: spacing.md,
-    marginBottom: spacing.xs,
-  },
-  scannerDescription: {
-    fontSize: 16,
-    color: colors.text.secondary,
-    textAlign: 'center',
-    lineHeight: 22,
-    marginBottom: spacing.lg,
-  },
-  scanButton: {
-    backgroundColor: colors.primary.main,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-    borderRadius: spacing.borderRadius.lg,
-    marginBottom: spacing.md,
-  },
-  scanButtonText: {
-    color: colors.text.inverse,
-    fontSize: 16,
-    fontWeight: '600',
-    marginLeft: spacing.xs,
-  },
-  privilegeNotice: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.background.elevated,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    borderRadius: spacing.borderRadius.md,
-  },
-  privilegeText: {
-    fontSize: 12,
-    color: colors.medical.verified,
-    marginLeft: spacing.xxs,
-    fontWeight: '500',
-  },
-  comingSoonText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.text.primary,
-    textAlign: 'center',
-    marginBottom: spacing.xs,
-  },
-  comingSoonSubtext: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-  accessDeniedContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: spacing.xxl,
-    backgroundColor: colors.background.primary,
-  },
-  accessDeniedTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: colors.status.error.main,
-    marginTop: spacing.lg,
-    marginBottom: spacing.sm,
-  },
-  accessDeniedText: {
-    fontSize: 16,
-    color: colors.text.secondary,
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-  profileModal: {
-    flex: 1,
-    backgroundColor: colors.background.primary,
-  },
-  profileModalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: spacing.lg,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.default,
-    backgroundColor: colors.background.secondary,
-  },
-  profileModalTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.text.primary,
-  },
-  profileModalContent: {
-    flex: 1,
-  },
-  // History Tab Styles
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: spacing.xxl,
-  },
-  loadingText: {
-    fontSize: 16,
-    color: colors.text.secondary,
-    marginTop: spacing.md,
-    fontWeight: '500',
-  },
-  emptyStateContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: spacing.xxl,
-  },
-  emptyStateTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: colors.text.primary,
-    marginTop: spacing.lg,
-    marginBottom: spacing.sm,
-  },
-  emptyStateText: {
-    fontSize: 16,
-    color: colors.text.secondary,
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-  historyTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: colors.text.primary,
-    marginBottom: spacing.xs,
-  },
-  historySubtitle: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    marginBottom: spacing.lg,
-    lineHeight: 20,
-  },
-  historyList: {
-    flex: 1,
-  },
-  auditLogItem: {
-    backgroundColor: colors.background.secondary,
-    borderRadius: spacing.borderRadius.lg,
-    padding: spacing.md,
-    marginBottom: spacing.sm,
-    borderWidth: 1,
-    borderColor: colors.border.light,
-  },
-  auditLogHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.sm,
-  },
-  auditLogIcon: {
-    width: 36,
-    height: 36,
-    backgroundColor: colors.background.elevated,
-    borderRadius: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: spacing.sm,
-  },
-  auditLogInfo: {
-    flex: 1,
-  },
-  auditLogAction: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text.primary,
-    marginBottom: spacing.xxs,
-  },
-  auditLogTimestamp: {
-    fontSize: 12,
-    color: colors.text.secondary,
-    fontWeight: '500',
-  },
-  auditLogAccessType: {
-    backgroundColor: colors.primary.main,
-    paddingHorizontal: spacing.xs,
-    paddingVertical: spacing.xxs,
-    borderRadius: spacing.borderRadius.sm,
-  },
-  accessTypeText: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: colors.text.inverse,
-  },
-  auditLogDetails: {
-    paddingLeft: 48,
-  },
-  auditLogProfile: {
-    fontSize: 12,
-    color: colors.text.secondary,
-    fontFamily: 'monospace',
-    marginBottom: spacing.xxs,
-  },
-  auditLogNotes: {
-    fontSize: 14,
-    color: colors.text.primary,
-    fontStyle: 'italic',
-  },
-  auditLogPatient: {
-    fontSize: 14,
-    color: colors.primary.main,
-    fontWeight: '500',
-    marginBottom: 2,
-  },
-  auditLogFields: {
-    fontSize: 11,
-    color: colors.text.tertiary,
-    fontStyle: 'italic',
-  },
-  auditLogPatientName: {
-    fontSize: 14,
-    color: colors.text.primary,
-    fontWeight: '600',
-    marginBottom: spacing.xxs,
-  },
-});
 
 export default MedicalProfessionalDashboard;

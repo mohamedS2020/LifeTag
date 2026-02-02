@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, StyleSheet, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { AdminDashboard } from '../components/common';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { colors } from '../theme';
+import { useTheme } from '../theme';
 
 type AdminScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
@@ -15,7 +15,18 @@ type AdminScreenNavigationProp = StackNavigationProp<RootStackParamList>;
  * Provides access to medical professional verification, audit management, and system administration.
  */
 const AdminScreen: React.FC = () => {
+  const { colors, spacing, borderRadius, typography, shadows } = useTheme();
   const navigation = useNavigation<AdminScreenNavigationProp>();
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background.primary,
+    },
+    content: {
+      flex: 1,
+    },
+  }), [colors, spacing, borderRadius, typography, shadows]);
 
   /**
    * Handle navigation to profile display
@@ -47,15 +58,5 @@ const AdminScreen: React.FC = () => {
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.primary,
-  },
-  content: {
-    flex: 1,
-  },
-});
 
 export default AdminScreen;

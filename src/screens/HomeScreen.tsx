@@ -3,7 +3,7 @@
  * Task 7.3: Build HomeScreen with main dashboard and quick actions
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -21,7 +21,7 @@ import { useAuth } from '../context/AuthContext';
 import { UserProfile } from '../types';
 import { LoadingOverlay } from '../components/common';
 import { Card, Button, Badge, H2, H3, H4, Body, BodySmall, Caption } from '../components/ui';
-import { colors, spacing, borderRadius, typography, shadows } from '../theme';
+import { useTheme } from '../theme';
 
 // Service imports
 import { profileService } from '../services';
@@ -42,6 +42,7 @@ interface QuickAction {
 }
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
+  const { colors, spacing, borderRadius, typography, shadows } = useTheme();
   const { t } = useTranslation();
   const { user } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -49,6 +50,200 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [profileCompletion, setProfileCompletion] = useState(0);
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background.primary,
+    },
+    scrollView: {
+      flex: 1,
+    },
+    errorContainer: {
+      margin: spacing.lg,
+      padding: spacing.lg,
+      backgroundColor: colors.status.error.background,
+      borderRadius: borderRadius.md,
+      borderLeftWidth: 4,
+      borderLeftColor: colors.status.error.main,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    errorContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      flex: 1,
+      marginRight: spacing.md,
+      gap: spacing.sm,
+    },
+    errorText: {
+      ...typography.bodySmall,
+      color: colors.status.error.main,
+      flex: 1,
+    },
+    
+    // Welcome Card
+    welcomeCard: {
+      margin: spacing.lg,
+    },
+    welcomeHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    welcomeIconContainer: {
+      width: 56,
+      height: 56,
+      borderRadius: 28,
+      backgroundColor: colors.background.elevated,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderWidth: 1,
+      borderColor: colors.border.default,
+    },
+    welcomeText: {
+      marginLeft: spacing.lg,
+      flex: 1,
+    },
+    welcomeTitle: {
+      marginBottom: spacing.xxs,
+    },
+    statusBadge: {
+      marginTop: spacing.md,
+    },
+    
+    // Profile Status Card
+    statusCard: {
+      marginHorizontal: spacing.lg,
+      marginBottom: spacing.lg,
+    },
+    statusHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: spacing.md,
+    },
+    completionPercentage: {
+      ...typography.h3,
+      color: colors.primary.main,
+    },
+    progressBarContainer: {
+      marginBottom: spacing.md,
+    },
+    progressBarBackground: {
+      height: 8,
+      backgroundColor: colors.background.elevated,
+      borderRadius: borderRadius.full,
+      overflow: 'hidden',
+    },
+    progressBarFill: {
+      height: '100%',
+      backgroundColor: colors.status.success.main,
+      borderRadius: borderRadius.full,
+    },
+    statusDescription: {
+      marginBottom: spacing.md,
+    },
+    completeProfileButton: {
+      alignSelf: 'flex-start',
+    },
+    
+    // Quick Actions
+    quickActionsContainer: {
+      marginHorizontal: spacing.lg,
+      marginBottom: spacing.lg,
+    },
+    sectionTitle: {
+      marginBottom: spacing.md,
+    },
+    actionsGrid: {
+      gap: spacing.md,
+    },
+    actionCard: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderLeftWidth: 3,
+      paddingVertical: spacing.md,
+    },
+    actionIconContainer: {
+      position: 'relative',
+      marginRight: spacing.lg,
+    },
+    actionIconBg: {
+      width: 44,
+      height: 44,
+      borderRadius: 12,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    actionBadge: {
+      position: 'absolute',
+      top: -4,
+      right: -4,
+      backgroundColor: colors.status.error.main,
+      borderRadius: 10,
+      minWidth: 20,
+      height: 20,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    actionBadgeText: {
+      ...typography.caption,
+      color: colors.white,
+      fontWeight: 'bold',
+    },
+    actionContent: {
+      flex: 1,
+    },
+    actionTitle: {
+      ...typography.labelLarge,
+      color: colors.text.primary,
+    },
+    actionSubtitle: {
+      ...typography.caption,
+      color: colors.text.secondary,
+      marginTop: spacing.xxs,
+    },
+    
+    // Emergency Info Card
+    emergencyCard: {
+      marginHorizontal: spacing.lg,
+      marginBottom: spacing.lg,
+      borderLeftWidth: 3,
+      borderLeftColor: colors.medical.emergency,
+    },
+    emergencyHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: spacing.lg,
+      gap: spacing.sm,
+    },
+    emergencyTitle: {
+      ...typography.h4,
+      color: colors.medical.emergency,
+    },
+    emergencyContent: {
+      marginBottom: spacing.lg,
+    },
+    emergencyItem: {
+      flexDirection: 'row',
+      marginBottom: spacing.sm,
+    },
+    emergencyLabel: {
+      ...typography.label,
+      color: colors.text.secondary,
+      width: 120,
+    },
+    emergencyValue: {
+      ...typography.body,
+      color: colors.text.primary,
+      flex: 1,
+    },
+    
+    bottomSpacing: {
+      height: spacing.xl,
+    },
+  }), [colors, spacing, borderRadius, typography, shadows]);
 
   // Load user profile and dashboard data
   const loadDashboardData = async () => {
@@ -379,199 +574,5 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.primary,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  errorContainer: {
-    margin: spacing.lg,
-    padding: spacing.lg,
-    backgroundColor: colors.status.error.background,
-    borderRadius: borderRadius.md,
-    borderLeftWidth: 4,
-    borderLeftColor: colors.status.error.main,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  errorContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-    marginRight: spacing.md,
-    gap: spacing.sm,
-  },
-  errorText: {
-    ...typography.bodySmall,
-    color: colors.status.error.main,
-    flex: 1,
-  },
-  
-  // Welcome Card
-  welcomeCard: {
-    margin: spacing.lg,
-  },
-  welcomeHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  welcomeIconContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: colors.background.elevated,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: colors.border.default,
-  },
-  welcomeText: {
-    marginLeft: spacing.lg,
-    flex: 1,
-  },
-  welcomeTitle: {
-    marginBottom: spacing.xxs,
-  },
-  statusBadge: {
-    marginTop: spacing.md,
-  },
-  
-  // Profile Status Card
-  statusCard: {
-    marginHorizontal: spacing.lg,
-    marginBottom: spacing.lg,
-  },
-  statusHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.md,
-  },
-  completionPercentage: {
-    ...typography.h3,
-    color: colors.primary.main,
-  },
-  progressBarContainer: {
-    marginBottom: spacing.md,
-  },
-  progressBarBackground: {
-    height: 8,
-    backgroundColor: colors.background.elevated,
-    borderRadius: borderRadius.full,
-    overflow: 'hidden',
-  },
-  progressBarFill: {
-    height: '100%',
-    backgroundColor: colors.status.success.main,
-    borderRadius: borderRadius.full,
-  },
-  statusDescription: {
-    marginBottom: spacing.md,
-  },
-  completeProfileButton: {
-    alignSelf: 'flex-start',
-  },
-  
-  // Quick Actions
-  quickActionsContainer: {
-    marginHorizontal: spacing.lg,
-    marginBottom: spacing.lg,
-  },
-  sectionTitle: {
-    marginBottom: spacing.md,
-  },
-  actionsGrid: {
-    gap: spacing.md,
-  },
-  actionCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderLeftWidth: 3,
-    paddingVertical: spacing.md,
-  },
-  actionIconContainer: {
-    position: 'relative',
-    marginRight: spacing.lg,
-  },
-  actionIconBg: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  actionBadge: {
-    position: 'absolute',
-    top: -4,
-    right: -4,
-    backgroundColor: colors.status.error.main,
-    borderRadius: 10,
-    minWidth: 20,
-    height: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  actionBadgeText: {
-    ...typography.caption,
-    color: colors.white,
-    fontWeight: 'bold',
-  },
-  actionContent: {
-    flex: 1,
-  },
-  actionTitle: {
-    ...typography.labelLarge,
-    color: colors.text.primary,
-  },
-  actionSubtitle: {
-    ...typography.caption,
-    color: colors.text.secondary,
-    marginTop: spacing.xxs,
-  },
-  
-  // Emergency Info Card
-  emergencyCard: {
-    marginHorizontal: spacing.lg,
-    marginBottom: spacing.lg,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.medical.emergency,
-  },
-  emergencyHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.lg,
-    gap: spacing.sm,
-  },
-  emergencyTitle: {
-    ...typography.h4,
-    color: colors.medical.emergency,
-  },
-  emergencyContent: {
-    marginBottom: spacing.lg,
-  },
-  emergencyItem: {
-    flexDirection: 'row',
-    marginBottom: spacing.sm,
-  },
-  emergencyLabel: {
-    ...typography.label,
-    color: colors.text.secondary,
-    width: 120,
-  },
-  emergencyValue: {
-    ...typography.body,
-    color: colors.text.primary,
-    flex: 1,
-  },
-  
-  bottomSpacing: {
-    height: spacing.xl,
-  },
-});
 
 export default HomeScreen;

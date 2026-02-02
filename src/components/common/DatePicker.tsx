@@ -3,7 +3,7 @@
  * User-friendly date picker with proper platform support
  */
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { colors, spacing } from '../../theme';
+import { useTheme } from '../../theme';
 
 interface DatePickerProps {
   value?: Date | null;
@@ -35,6 +35,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   error,
   style,
 }) => {
+  const { colors, spacing, borderRadius, typography } = useTheme();
   const { t } = useTranslation();
   const defaultPlaceholder = placeholder || t('datePicker.selectDateOfBirth');
   // Helper function to safely convert value to Date
@@ -241,6 +242,148 @@ export const DatePicker: React.FC<DatePickerProps> = ({
     </View>
   );
 
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      marginVertical: spacing.sm,
+    },
+    label: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text.primary,
+      marginBottom: spacing.sm,
+    },
+    required: {
+      color: colors.status.error.main,
+    },
+    inputContainer: {
+      position: 'relative',
+    },
+    dateInput: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      borderWidth: 1,
+      borderColor: colors.border.default,
+      borderRadius: spacing.sm,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.md,
+      backgroundColor: colors.background.card,
+      minHeight: 50,
+    },
+    inputError: {
+      borderColor: colors.status.error.main,
+      borderWidth: 1.5,
+    },
+    placeholderContainer: {
+      borderStyle: 'dashed',
+    },
+    dateText: {
+      fontSize: 16,
+      color: colors.text.primary,
+      flex: 1,
+    },
+    placeholderText: {
+      color: colors.text.tertiary,
+      fontStyle: 'italic',
+    },
+    iconContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    clearButton: {
+      marginRight: spacing.sm,
+    },
+    errorText: {
+      color: colors.status.error.main,
+      fontSize: 14,
+      marginTop: spacing.xs,
+      marginLeft: spacing.xs,
+    },
+    
+    // Modal Styles
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: colors.overlay.medium,
+      justifyContent: 'flex-end',
+    },
+    modalContent: {
+      backgroundColor: colors.background.card,
+      borderTopLeftRadius: spacing.lg,
+      borderTopRightRadius: spacing.lg,
+      paddingBottom: 34, // Safe area padding
+      maxHeight: '80%',
+    },
+    pickerHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.md,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border.default,
+    },
+    pickerTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: colors.text.primary,
+    },
+    cancelButton: {
+      fontSize: 16,
+      color: colors.text.secondary,
+    },
+    confirmButton: {
+      fontSize: 16,
+      color: colors.primary.main,
+      fontWeight: '600',
+    },
+    
+    // Picker Sections
+    pickersContainer: {
+      flexDirection: 'row',
+      paddingHorizontal: spacing.sm,
+      paddingVertical: spacing.lg,
+    },
+    pickerSection: {
+      flex: 1,
+      marginHorizontal: spacing.xs,
+    },
+    sectionTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text.primary,
+      textAlign: 'center',
+      marginBottom: spacing.sm,
+    },
+    scrollPicker: {
+      maxHeight: 200,
+      borderWidth: 1,
+      borderColor: colors.border.default,
+      borderRadius: spacing.sm,
+      backgroundColor: colors.background.tertiary,
+    },
+    pickerItem: {
+      paddingVertical: spacing.md,
+      paddingHorizontal: spacing.sm,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border.default,
+    },
+    selectedItem: {
+      backgroundColor: colors.primary.main,
+    },
+    itemText: {
+      fontSize: 16,
+      color: colors.text.primary,
+      textAlign: 'center',
+    },
+    selectedItemText: {
+      color: colors.text.inverse,
+      fontWeight: '600',
+    },
+    picker: {
+      height: 200,
+    },
+  }), [colors, spacing, borderRadius, typography]);
+
   return (
     <View style={[styles.container, style]}>
       {label && (
@@ -315,145 +458,3 @@ export const DatePicker: React.FC<DatePickerProps> = ({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    marginVertical: spacing.sm,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text.primary,
-    marginBottom: spacing.sm,
-  },
-  required: {
-    color: colors.status.error.main,
-  },
-  inputContainer: {
-    position: 'relative',
-  },
-  dateInput: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderWidth: 1,
-    borderColor: colors.border.default,
-    borderRadius: spacing.sm,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
-    backgroundColor: colors.background.card,
-    minHeight: 50,
-  },
-  inputError: {
-    borderColor: colors.status.error.main,
-    borderWidth: 1.5,
-  },
-  placeholderContainer: {
-    borderStyle: 'dashed',
-  },
-  dateText: {
-    fontSize: 16,
-    color: colors.text.primary,
-    flex: 1,
-  },
-  placeholderText: {
-    color: colors.text.tertiary,
-    fontStyle: 'italic',
-  },
-  iconContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  clearButton: {
-    marginRight: spacing.sm,
-  },
-  errorText: {
-    color: colors.status.error.main,
-    fontSize: 14,
-    marginTop: spacing.xs,
-    marginLeft: spacing.xs,
-  },
-  
-  // Modal Styles
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: colors.overlay.medium,
-    justifyContent: 'flex-end',
-  },
-  modalContent: {
-    backgroundColor: colors.background.card,
-    borderTopLeftRadius: spacing.lg,
-    borderTopRightRadius: spacing.lg,
-    paddingBottom: 34, // Safe area padding
-    maxHeight: '80%',
-  },
-  pickerHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.default,
-  },
-  pickerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.text.primary,
-  },
-  cancelButton: {
-    fontSize: 16,
-    color: colors.text.secondary,
-  },
-  confirmButton: {
-    fontSize: 16,
-    color: colors.primary.main,
-    fontWeight: '600',
-  },
-  
-  // Picker Sections
-  pickersContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.lg,
-  },
-  pickerSection: {
-    flex: 1,
-    marginHorizontal: spacing.xs,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text.primary,
-    textAlign: 'center',
-    marginBottom: spacing.sm,
-  },
-  scrollPicker: {
-    maxHeight: 200,
-    borderWidth: 1,
-    borderColor: colors.border.default,
-    borderRadius: spacing.sm,
-    backgroundColor: colors.background.tertiary,
-  },
-  pickerItem: {
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.default,
-  },
-  selectedItem: {
-    backgroundColor: colors.primary.main,
-  },
-  itemText: {
-    fontSize: 16,
-    color: colors.text.primary,
-    textAlign: 'center',
-  },
-  selectedItemText: {
-    color: colors.text.inverse,
-    fontWeight: '600',
-  },
-  picker: {
-    height: 200,
-  },
-});

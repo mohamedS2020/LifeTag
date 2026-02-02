@@ -4,7 +4,7 @@
  * Displays supported languages with native names and selection indicator
  */
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -17,7 +17,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../context/LanguageContext';
 import { LanguageCode } from '../../i18n';
-import { colors, spacing, borderRadius, typography } from '../../theme';
+import { useTheme } from '../../theme';
 
 interface LanguageSelectorProps {
   visible: boolean;
@@ -31,6 +31,116 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   const { t } = useTranslation();
   const { currentLanguage, changeLanguage, supportedLanguages } = useLanguage();
   const [isChanging, setIsChanging] = useState(false);
+  const { colors, spacing, borderRadius, typography } = useTheme();
+
+  const styles = useMemo(() => StyleSheet.create({
+    overlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+      justifyContent: 'flex-end',
+    },
+    modalContainer: {
+      backgroundColor: colors.background.secondary,
+      borderTopLeftRadius: borderRadius.xl,
+      borderTopRightRadius: borderRadius.xl,
+      maxHeight: '70%',
+      minHeight: 420,
+      paddingBottom: spacing['3xl'],
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingVertical: spacing.lg,
+      paddingHorizontal: spacing.xl,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border.default,
+    },
+    closeButton: {
+      width: 40,
+      height: 40,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderRadius: borderRadius.md,
+      backgroundColor: colors.background.elevated,
+    },
+    title: {
+      ...typography.h4,
+      color: colors.text.primary,
+      textAlign: 'center',
+      flex: 1,
+    },
+    placeholder: {
+      width: 40,
+    },
+    languageList: {
+      flex: 1,
+    },
+    languageListContent: {
+      padding: spacing.lg,
+    },
+    languageItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: spacing.lg,
+      backgroundColor: colors.background.elevated,
+      borderRadius: borderRadius.lg,
+      marginBottom: spacing.md,
+      borderWidth: 2,
+      borderColor: 'transparent',
+    },
+    languageItemSelected: {
+      borderColor: colors.primary.main,
+      backgroundColor: `${colors.primary.main}10`,
+    },
+    languageInfo: {
+      flex: 1,
+    },
+    languageNativeName: {
+      ...typography.body,
+      color: colors.text.primary,
+      fontWeight: '600',
+      marginBottom: spacing.xs,
+    },
+    languageNativeNameSelected: {
+      color: colors.primary.main,
+    },
+    languageName: {
+      ...typography.caption,
+      color: colors.text.secondary,
+    },
+    rtlBadge: {
+      backgroundColor: colors.status.info.background,
+      paddingHorizontal: spacing.sm,
+      paddingVertical: spacing.xs,
+      borderRadius: borderRadius.sm,
+      marginRight: spacing.md,
+    },
+    rtlBadgeText: {
+      ...typography.caption,
+      color: colors.status.info.main,
+      fontWeight: '600',
+      fontSize: 10,
+    },
+    checkmark: {
+      marginLeft: spacing.sm,
+    },
+    noticeContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: spacing.xl,
+      paddingVertical: spacing.md,
+      backgroundColor: colors.background.elevated,
+      marginHorizontal: spacing.lg,
+      borderRadius: borderRadius.md,
+    },
+    noticeText: {
+      ...typography.caption,
+      color: colors.text.tertiary,
+      marginLeft: spacing.sm,
+      flex: 1,
+    },
+  }), [colors, spacing, borderRadius, typography]);
 
   const handleLanguageSelect = async (languageCode: LanguageCode) => {
     if (languageCode === currentLanguage) {
@@ -143,114 +253,5 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
     </Modal>
   );
 };
-
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    justifyContent: 'flex-end',
-  },
-  modalContainer: {
-    backgroundColor: colors.background.secondary,
-    borderTopLeftRadius: borderRadius.xl,
-    borderTopRightRadius: borderRadius.xl,
-    maxHeight: '70%',
-    minHeight: 420,
-    paddingBottom: spacing['3xl'],
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: spacing.lg,
-    paddingHorizontal: spacing.xl,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.default,
-  },
-  closeButton: {
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: borderRadius.md,
-    backgroundColor: colors.background.elevated,
-  },
-  title: {
-    ...typography.h4,
-    color: colors.text.primary,
-    textAlign: 'center',
-    flex: 1,
-  },
-  placeholder: {
-    width: 40,
-  },
-  languageList: {
-    flex: 1,
-  },
-  languageListContent: {
-    padding: spacing.lg,
-  },
-  languageItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: spacing.lg,
-    backgroundColor: colors.background.elevated,
-    borderRadius: borderRadius.lg,
-    marginBottom: spacing.md,
-    borderWidth: 2,
-    borderColor: 'transparent',
-  },
-  languageItemSelected: {
-    borderColor: colors.primary.main,
-    backgroundColor: `${colors.primary.main}10`,
-  },
-  languageInfo: {
-    flex: 1,
-  },
-  languageNativeName: {
-    ...typography.body,
-    color: colors.text.primary,
-    fontWeight: '600',
-    marginBottom: spacing.xs,
-  },
-  languageNativeNameSelected: {
-    color: colors.primary.main,
-  },
-  languageName: {
-    ...typography.caption,
-    color: colors.text.secondary,
-  },
-  rtlBadge: {
-    backgroundColor: colors.status.info.background,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    borderRadius: borderRadius.sm,
-    marginRight: spacing.md,
-  },
-  rtlBadgeText: {
-    ...typography.caption,
-    color: colors.status.info.main,
-    fontWeight: '600',
-    fontSize: 10,
-  },
-  checkmark: {
-    marginLeft: spacing.sm,
-  },
-  noticeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.md,
-    backgroundColor: colors.background.elevated,
-    marginHorizontal: spacing.lg,
-    borderRadius: borderRadius.md,
-  },
-  noticeText: {
-    ...typography.caption,
-    color: colors.text.tertiary,
-    marginLeft: spacing.sm,
-    flex: 1,
-  },
-});
 
 export default LanguageSelector;

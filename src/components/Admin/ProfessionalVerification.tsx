@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { MedicalProfessional } from '../../types';
 import { MedicalProfessionalApprovalService } from '../../services/medicalProfessionalApprovalService';
 import { VerifiedBadge } from '../common';
-import { colors, spacing } from '../../theme';
+import { useTheme } from '../../theme';
 
 /**
  * Props for ProfessionalVerification component
@@ -46,6 +46,273 @@ const ProfessionalVerification: React.FC<ProfessionalVerificationProps> = ({
   onProfessionalVerified,
   onProfessionalRejected,
 }) => {
+  const { colors, spacing, borderRadius, typography, shadows } = useTheme();
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background.primary,
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.md,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border.default,
+    },
+    headerTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: colors.text.primary,
+    },
+    filterContainer: {
+      flexDirection: 'row',
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.md,
+      backgroundColor: colors.background.secondary,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border.default,
+    },
+    filterButton: {
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.xs,
+      borderRadius: borderRadius.full,
+      backgroundColor: colors.background.elevated,
+      marginRight: spacing.sm,
+      borderWidth: 1,
+      borderColor: colors.border.default,
+    },
+    activeFilterButton: {
+      backgroundColor: colors.primary.main,
+      borderColor: colors.primary.main,
+    },
+    filterButtonText: {
+      fontSize: 14,
+      fontWeight: '500',
+      color: colors.text.secondary,
+    },
+    activeFilterButtonText: {
+      color: colors.text.inverse,
+    },
+    loadingContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    loadingText: {
+      fontSize: 16,
+      color: colors.text.secondary,
+      marginTop: spacing.sm,
+    },
+    scrollContainer: {
+      flex: 1,
+    },
+    scrollContent: {
+      padding: spacing.lg,
+    },
+    professionalCard: {
+      backgroundColor: colors.background.secondary,
+      borderRadius: borderRadius.lg,
+      padding: spacing.md,
+      marginBottom: spacing.sm,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+      borderWidth: 1,
+      borderColor: colors.border.light,
+    },
+    cardHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
+      marginBottom: spacing.sm,
+    },
+    professionalInfo: {
+      flex: 1,
+    },
+    nameAndBadgeRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: spacing.xxs,
+    },
+    professionalName: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: colors.text.primary,
+      marginRight: spacing.xs,
+      flex: 1,
+    },
+    professionalSpecialty: {
+      fontSize: 14,
+      color: colors.text.secondary,
+      marginBottom: 2,
+    },
+    professionalHospital: {
+      fontSize: 12,
+      color: colors.text.tertiary,
+    },
+    statusBadge: {
+      paddingHorizontal: spacing.xs,
+      paddingVertical: spacing.xxs,
+      borderRadius: borderRadius.md,
+    },
+    pendingBadge: {
+      backgroundColor: colors.status.warning.main + '30',
+    },
+    verifiedBadge: {
+      backgroundColor: colors.status.success.main + '30',
+    },
+    statusText: {
+      fontSize: 12,
+      fontWeight: '500',
+      color: colors.text.primary,
+    },
+    cardDetails: {
+      marginBottom: spacing.sm,
+    },
+    detailRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: spacing.xxs,
+    },
+    detailText: {
+      fontSize: 12,
+      color: colors.text.secondary,
+      marginLeft: spacing.xs,
+    },
+    cardFooter: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'flex-end',
+    },
+    reviewText: {
+      fontSize: 12,
+      color: colors.text.tertiary,
+      marginLeft: spacing.xxs,
+    },
+    emptyContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingVertical: spacing.xxl,
+    },
+    emptyTitle: {
+      fontSize: 20,
+      fontWeight: '600',
+      color: colors.text.primary,
+      marginTop: spacing.lg,
+      marginBottom: spacing.xs,
+    },
+    emptyText: {
+      fontSize: 14,
+      color: colors.text.secondary,
+      textAlign: 'center',
+      lineHeight: 20,
+    },
+    modalContainer: {
+      flex: 1,
+      backgroundColor: colors.background.primary,
+    },
+    modalHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.md,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border.default,
+    },
+    modalTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: colors.text.primary,
+    },
+    modalContent: {
+      flex: 1,
+      padding: spacing.lg,
+    },
+    section: {
+      marginBottom: spacing.xl,
+    },
+    sectionTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text.primary,
+      marginBottom: spacing.sm,
+    },
+    infoCard: {
+      backgroundColor: colors.background.secondary,
+      borderRadius: borderRadius.md,
+      padding: spacing.md,
+    },
+    infoRow: {
+      flexDirection: 'row',
+      marginBottom: spacing.xs,
+    },
+    infoLabel: {
+      fontSize: 14,
+      fontWeight: '500',
+      color: colors.text.secondary,
+      width: 120,
+    },
+    infoValue: {
+      fontSize: 14,
+      color: colors.text.primary,
+      flex: 1,
+    },
+    notesInput: {
+      borderWidth: 1,
+      borderColor: colors.border.default,
+      borderRadius: borderRadius.md,
+      padding: spacing.sm,
+      fontSize: 14,
+      color: colors.text.primary,
+      backgroundColor: colors.background.secondary,
+      minHeight: 100,
+    },
+    actionButtons: {
+      flexDirection: 'row',
+      padding: spacing.lg,
+      gap: spacing.sm,
+      borderTopWidth: 1,
+      borderTopColor: colors.border.default,
+    },
+    rejectButton: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: colors.status.error.main,
+      paddingVertical: spacing.sm,
+      borderRadius: borderRadius.md,
+    },
+    rejectButtonText: {
+      color: colors.text.inverse,
+      fontSize: 16,
+      fontWeight: '600',
+      marginLeft: spacing.xs,
+    },
+    approveButton: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: colors.status.success.main,
+      paddingVertical: spacing.sm,
+      borderRadius: borderRadius.md,
+    },
+    approveButtonText: {
+      color: colors.text.inverse,
+      fontSize: 16,
+      fontWeight: '600',
+      marginLeft: spacing.xs,
+    },
+  }), [colors, spacing, borderRadius, typography, shadows]);
+
   // State management
   const [professionals, setProfessionals] = useState<MedicalProfessional[]>([]);
   const [loading, setLoading] = useState(true);
@@ -453,273 +720,5 @@ const ProfessionalVerification: React.FC<ProfessionalVerificationProps> = ({
     </SafeAreaView>
   );
 };
-
-/**
- * Styles for ProfessionalVerification component
- */
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.primary,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.default,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.text.primary,
-  },
-  filterContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    backgroundColor: colors.background.secondary,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.default,
-  },
-  filterButton: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    borderRadius: spacing.borderRadius.full,
-    backgroundColor: colors.background.elevated,
-    marginRight: spacing.sm,
-    borderWidth: 1,
-    borderColor: colors.border.default,
-  },
-  activeFilterButton: {
-    backgroundColor: colors.primary.main,
-    borderColor: colors.primary.main,
-  },
-  filterButtonText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: colors.text.secondary,
-  },
-  activeFilterButtonText: {
-    color: colors.text.inverse,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    fontSize: 16,
-    color: colors.text.secondary,
-    marginTop: spacing.sm,
-  },
-  scrollContainer: {
-    flex: 1,
-  },
-  scrollContent: {
-    padding: spacing.lg,
-  },
-  professionalCard: {
-    backgroundColor: colors.background.secondary,
-    borderRadius: spacing.borderRadius.lg,
-    padding: spacing.md,
-    marginBottom: spacing.sm,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-    borderWidth: 1,
-    borderColor: colors.border.light,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: spacing.sm,
-  },
-  professionalInfo: {
-    flex: 1,
-  },
-  nameAndBadgeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.xxs,
-  },
-  professionalName: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.text.primary,
-    marginRight: spacing.xs,
-    flex: 1,
-  },
-  professionalSpecialty: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    marginBottom: 2,
-  },
-  professionalHospital: {
-    fontSize: 12,
-    color: colors.text.tertiary,
-  },
-  statusBadge: {
-    paddingHorizontal: spacing.xs,
-    paddingVertical: spacing.xxs,
-    borderRadius: spacing.borderRadius.md,
-  },
-  pendingBadge: {
-    backgroundColor: colors.status.warning.main + '30',
-  },
-  verifiedBadge: {
-    backgroundColor: colors.status.success.main + '30',
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: colors.text.primary,
-  },
-  cardDetails: {
-    marginBottom: spacing.sm,
-  },
-  detailRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.xxs,
-  },
-  detailText: {
-    fontSize: 12,
-    color: colors.text.secondary,
-    marginLeft: spacing.xs,
-  },
-  cardFooter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-  },
-  reviewText: {
-    fontSize: 12,
-    color: colors.text.tertiary,
-    marginLeft: spacing.xxs,
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: spacing.xxl,
-  },
-  emptyTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: colors.text.primary,
-    marginTop: spacing.lg,
-    marginBottom: spacing.xs,
-  },
-  emptyText: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-  modalContainer: {
-    flex: 1,
-    backgroundColor: colors.background.primary,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.default,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.text.primary,
-  },
-  modalContent: {
-    flex: 1,
-    padding: spacing.lg,
-  },
-  section: {
-    marginBottom: spacing.xl,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text.primary,
-    marginBottom: spacing.sm,
-  },
-  infoCard: {
-    backgroundColor: colors.background.secondary,
-    borderRadius: spacing.borderRadius.md,
-    padding: spacing.md,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    marginBottom: spacing.xs,
-  },
-  infoLabel: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: colors.text.secondary,
-    width: 120,
-  },
-  infoValue: {
-    fontSize: 14,
-    color: colors.text.primary,
-    flex: 1,
-  },
-  notesInput: {
-    borderWidth: 1,
-    borderColor: colors.border.default,
-    borderRadius: spacing.borderRadius.md,
-    padding: spacing.sm,
-    fontSize: 14,
-    color: colors.text.primary,
-    backgroundColor: colors.background.secondary,
-    minHeight: 100,
-  },
-  actionButtons: {
-    flexDirection: 'row',
-    padding: spacing.lg,
-    gap: spacing.sm,
-    borderTopWidth: 1,
-    borderTopColor: colors.border.default,
-  },
-  rejectButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.status.error.main,
-    paddingVertical: spacing.sm,
-    borderRadius: spacing.borderRadius.md,
-  },
-  rejectButtonText: {
-    color: colors.text.inverse,
-    fontSize: 16,
-    fontWeight: '600',
-    marginLeft: spacing.xs,
-  },
-  approveButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.status.success.main,
-    paddingVertical: spacing.sm,
-    borderRadius: spacing.borderRadius.md,
-  },
-  approveButtonText: {
-    color: colors.text.inverse,
-    fontSize: 16,
-    fontWeight: '600',
-    marginLeft: spacing.xs,
-  },
-});
 
 export default ProfessionalVerification;

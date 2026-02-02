@@ -3,7 +3,7 @@
  * Flexible container with variants and animations
  */
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import {
   View,
   StyleSheet,
@@ -19,7 +19,8 @@ import Animated, {
   FadeIn,
   FadeInDown,
 } from 'react-native-reanimated';
-import { colors, spacing, borderRadius, shadows, springConfig, duration } from '../../theme';
+import { useTheme } from '../../context/ThemeContext';
+import { springConfig, duration } from '../../theme';
 
 export type CardVariant = 'default' | 'elevated' | 'outlined' | 'filled' | 'gradient';
 
@@ -47,6 +48,7 @@ const Card: React.FC<CardProps> = ({
   pressable = false,
   disabled = false,
 }) => {
+  const { colors, shadows, spacing, borderRadius } = useTheme();
   const scale = useSharedValue(1);
 
   const handlePressIn = useCallback(() => {
@@ -65,7 +67,7 @@ const Card: React.FC<CardProps> = ({
     transform: [{ scale: scale.value }],
   }));
 
-  const getVariantStyles = (): ViewStyle => {
+  const getVariantStyles = useCallback((): ViewStyle => {
     switch (variant) {
       case 'elevated':
         return {
@@ -97,9 +99,20 @@ const Card: React.FC<CardProps> = ({
           borderColor: colors.border.default,
         };
     }
-  };
+  }, [colors, shadows, variant]);
 
   const variantStyles = getVariantStyles();
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      borderRadius: borderRadius.lg,
+      padding: spacing.lg,
+      overflow: 'hidden',
+    },
+    disabled: {
+      opacity: 0.6,
+    },
+  }), [borderRadius, spacing]);
 
   const enteringAnimation = animated
     ? FadeInDown.delay(animationDelay).duration(duration.normal).springify()
@@ -130,16 +143,5 @@ const Card: React.FC<CardProps> = ({
     </AnimatedView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    borderRadius: borderRadius.lg,
-    padding: spacing.lg,
-    overflow: 'hidden',
-  },
-  disabled: {
-    opacity: 0.6,
-  },
-});
 
 export default Card;

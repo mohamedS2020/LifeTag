@@ -1,10 +1,10 @@
 /**
  * LifeTag Shadow System
- * Elevation-based shadows for dark theme
+ * Elevation-based shadows supporting both dark and light themes
  */
 
 import { Platform, ViewStyle } from 'react-native';
-import { colors } from './colors';
+import { colors, type Colors } from './colors';
 
 // Shadow factory for cross-platform shadows
 const createShadow = (
@@ -26,7 +26,11 @@ const createShadow = (
   };
 };
 
-export const shadows = {
+/**
+ * Create shadows based on current theme colors
+ * This allows shadows to adapt to light/dark theme
+ */
+export const createShadows = (themeColors: Colors) => ({
   none: {} as ViewStyle,
 
   // Subtle elevation - for cards on dark bg
@@ -43,29 +47,29 @@ export const shadows = {
 
   // Colored shadows (for accent elements)
   primary: {
-    ...createShadow(4, 12, 0.4, colors.primary.main),
-    shadowColor: colors.primary.main,
+    ...createShadow(4, 12, 0.4, themeColors.primary.main),
+    shadowColor: themeColors.primary.main,
   } as ViewStyle,
 
   success: {
-    ...createShadow(4, 12, 0.3, colors.status.success.main),
-    shadowColor: colors.status.success.main,
+    ...createShadow(4, 12, 0.3, themeColors.status.success.main),
+    shadowColor: themeColors.status.success.main,
   } as ViewStyle,
 
   error: {
-    ...createShadow(4, 12, 0.3, colors.status.error.main),
-    shadowColor: colors.status.error.main,
+    ...createShadow(4, 12, 0.3, themeColors.status.error.main),
+    shadowColor: themeColors.status.error.main,
   } as ViewStyle,
 
   // Glow effects for interactive elements
   glow: {
     primary: {
-      ...createShadow(0, 20, 0.5, colors.primary.main),
-      shadowColor: colors.primary.main,
+      ...createShadow(0, 20, 0.5, themeColors.primary.main),
+      shadowColor: themeColors.primary.main,
     } as ViewStyle,
     success: {
-      ...createShadow(0, 16, 0.4, colors.status.success.main),
-      shadowColor: colors.status.success.main,
+      ...createShadow(0, 16, 0.4, themeColors.status.success.main),
+      shadowColor: themeColors.status.success.main,
     } as ViewStyle,
   },
 
@@ -73,9 +77,12 @@ export const shadows = {
   inner: {
     borderWidth: 1,
     borderColor: 'rgba(0, 0, 0, 0.2)',
-    backgroundColor: colors.background.input,
+    backgroundColor: themeColors.background.input,
   } as ViewStyle,
-} as const;
+});
 
-export type Shadows = typeof shadows;
+// Default shadows using default colors (for backwards compatibility)
+export const shadows = createShadows(colors);
+
+export type Shadows = ReturnType<typeof createShadows>;
 export default shadows;

@@ -4,15 +4,16 @@
  * Task 7.2: Create AppNavigator with authenticated and unauthenticated flows
  */
 
-import React from 'react';
-import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
+import React, { useMemo } from 'react';
+import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createStackNavigator, StackScreenProps } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity, Alert, Platform, StatusBar as RNStatusBar } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { LoginScreen, RegisterScreen, MedicalProfessionalRegister } from '../components/Auth';
 import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
 import { HomeScreen, ProfileFormScreen, ProfileDisplayScreen, QRTabScreen, QRDisplayScreen, QRScannerScreen, EmergencyInfoScreen, VerificationStatusScreen, MedicalProfessionalScreen, AdminScreen, SettingsScreen, ProfileAccessHistoryScreen } from '../screens';
@@ -21,22 +22,6 @@ import AdminAuditLogDetailScreen from '../screens/AdminAuditLogDetailScreen';
 import { MedicalProfessionalDashboard } from '../components/common';
 import { EmergencyQRData } from '../services/qrService';
 import { StatusBar } from 'expo-status-bar';
-import { colors, spacing, typography, borderRadius } from '../theme';
-
-// Dark Navigation Theme
-const DarkNavigationTheme = {
-  ...DefaultTheme,
-  dark: true,
-  colors: {
-    ...DefaultTheme.colors,
-    primary: colors.primary.main,
-    background: colors.background.primary,
-    card: colors.background.secondary,
-    text: colors.text.primary,
-    border: colors.border.default,
-    notification: colors.status.error.main,
-  },
-};
 
 // Type definitions for navigation
 export type RootStackParamList = {
@@ -91,6 +76,36 @@ const Tab = createBottomTabNavigator<TabParamList>();
 // Loading Screen Component
 const LoadingScreen: React.FC = () => {
   const { t } = useTranslation();
+  const { colors, spacing, typography } = useTheme();
+  
+  const styles = useMemo(() => StyleSheet.create({
+    loadingContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: colors.background.primary,
+      padding: spacing.xl,
+    },
+    appTitle: {
+      ...typography.displayMedium,
+      color: colors.primary.main,
+      marginBottom: spacing.sm,
+    },
+    appSubtitle: {
+      ...typography.body,
+      color: colors.text.secondary,
+      textAlign: 'center',
+      marginBottom: spacing['3xl'],
+    },
+    spinner: {
+      marginBottom: spacing.lg,
+    },
+    loadingText: {
+      ...typography.body,
+      color: colors.text.tertiary,
+    },
+  }), [colors, spacing, typography]);
+
   return (
     <View style={styles.loadingContainer}>
       <Text style={styles.appTitle}>LifeTag</Text>
@@ -103,6 +118,29 @@ const LoadingScreen: React.FC = () => {
 
 // Temporary placeholder screen components for authenticated app
 const PlaceholderScreen = ({ title }: { title: string }) => {
+  const { colors, spacing, typography } = useTheme();
+  
+  const styles = useMemo(() => StyleSheet.create({
+    placeholder: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: colors.background.primary,
+      padding: spacing.xl,
+    },
+    placeholderText: {
+      ...typography.h3,
+      color: colors.text.primary,
+      textAlign: 'center',
+      marginBottom: spacing.sm,
+    },
+    placeholderSubtext: {
+      ...typography.body,
+      color: colors.text.secondary,
+      textAlign: 'center',
+    },
+  }), [colors, spacing, typography]);
+
   return (
     <View style={styles.placeholder}>
       <Text style={styles.placeholderText}>{title}</Text>
@@ -118,8 +156,52 @@ const QRPlaceholderScreen = () => <PlaceholderScreen title="QR Scanner" />;
 const AuthenticatedTabs: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const { colors, spacing, typography, isDark } = useTheme();
   const isVerifiedMedicalProfessional = user?.userType === 'medical_professional' && user?.isVerified;
   const isAdmin = user?.userType === 'admin';
+
+  const screenOptions = useMemo(() => ({
+    tabBarActiveTintColor: colors.primary.main,
+    tabBarInactiveTintColor: colors.text.tertiary,
+    tabBarStyle: {
+      backgroundColor: colors.background.secondary,
+      borderTopColor: colors.border.default,
+      borderTopWidth: 1,
+      paddingTop: spacing.xs,
+      paddingBottom: spacing.sm,
+      height: 60,
+    },
+    tabBarLabelStyle: {
+      ...typography.caption,
+      marginTop: 2,
+    },
+    headerShown: true,
+    headerStyle: {
+      backgroundColor: isDark ? colors.background.primary : colors.primary.main,
+      shadowColor: colors.primary.dark,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: isDark ? 0 : 0.15,
+      shadowRadius: 8,
+      elevation: isDark ? 0 : 4,
+      borderBottomWidth: 0,
+      height: 100,
+    },
+    headerTintColor: isDark ? colors.text.primary : '#FFFFFF',
+    headerTitleStyle: {
+      fontSize: 28,
+      fontWeight: '800' as const,
+      color: isDark ? colors.text.primary : '#FFFFFF',
+      letterSpacing: -0.5,
+    },
+    headerTitleAlign: 'left' as const,
+    headerLeftContainerStyle: {
+      paddingLeft: spacing.md,
+    },
+    headerRightContainerStyle: {
+      paddingRight: spacing.md,
+    },
+    headerShadowVisible: !isDark,
+  }), [colors, spacing, typography, isDark]);
 
   return (
     <Tab.Navigator
@@ -143,33 +225,7 @@ const AuthenticatedTabs: React.FC = () => {
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: colors.primary.main,
-        tabBarInactiveTintColor: colors.text.tertiary,
-        tabBarStyle: {
-          backgroundColor: colors.background.secondary,
-          borderTopColor: colors.border.default,
-          borderTopWidth: 1,
-          paddingTop: spacing.xs,
-          paddingBottom: spacing.sm,
-          height: 60,
-        },
-        tabBarLabelStyle: {
-          ...typography.caption,
-          marginTop: 2,
-        },
-        headerShown: true,
-        headerStyle: {
-          backgroundColor: colors.background.primary,
-          shadowColor: 'transparent',
-          elevation: 0,
-          borderBottomWidth: 1,
-          borderBottomColor: colors.border.default,
-        },
-        headerTintColor: colors.text.primary,
-        headerTitleStyle: {
-          ...typography.h4,
-          color: colors.text.primary,
-        },
+        ...screenOptions,
       })}
     >
       {/* Home and QR tabs - Hide for admin users */}
@@ -369,10 +425,26 @@ const AuthStack: React.FC = () => {
 // Main App Navigator Component
 const AppNavigator: React.FC = () => {
   const { user, initializing } = useAuth();
+  const { colors, isDark } = useTheme();
+
+  // Create dynamic navigation theme based on current theme
+  const navigationTheme = useMemo(() => ({
+    ...(isDark ? DarkTheme : DefaultTheme),
+    dark: isDark,
+    colors: {
+      ...(isDark ? DarkTheme.colors : DefaultTheme.colors),
+      primary: colors.primary.main,
+      background: colors.background.primary,
+      card: colors.background.secondary,
+      text: colors.text.primary,
+      border: colors.border.default,
+      notification: colors.status.error.main,
+    },
+  }), [colors, isDark]);
 
   return (
     <SafeAreaProvider>
-      <NavigationContainer theme={DarkNavigationTheme}>
+      <NavigationContainer theme={navigationTheme}>
         {initializing ? (
           <LoadingScreen />
         ) : user ? (
@@ -380,58 +452,10 @@ const AppNavigator: React.FC = () => {
         ) : (
           <AuthStack />
         )}
-        <StatusBar style="light" />
+        <StatusBar style="light" translucent backgroundColor={isDark ? colors.background.primary : colors.primary.main} />
       </NavigationContainer>
     </SafeAreaProvider>
   );
 };
-
-// Styles
-const styles = StyleSheet.create({
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: colors.background.primary,
-    padding: spacing.xl,
-  },
-  appTitle: {
-    ...typography.displayMedium,
-    color: colors.primary.main,
-    marginBottom: spacing.sm,
-  },
-  appSubtitle: {
-    ...typography.body,
-    color: colors.text.secondary,
-    textAlign: 'center',
-    marginBottom: spacing['3xl'],
-  },
-  spinner: {
-    marginBottom: spacing.lg,
-  },
-  loadingText: {
-    ...typography.body,
-    color: colors.text.tertiary,
-  },
-  placeholder: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: colors.background.primary,
-    padding: spacing.xl,
-  },
-  placeholderText: {
-    ...typography.h3,
-    color: colors.text.primary,
-    textAlign: 'center',
-    marginBottom: spacing.sm,
-  },
-  placeholderSubtext: {
-    ...typography.body,
-    color: colors.text.secondary,
-    textAlign: 'center',
-  },
-  // Settings Screen Styles
-});
 
 export default AppNavigator;

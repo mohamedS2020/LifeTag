@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -12,7 +12,7 @@ import {
   ScrollView
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { colors, spacing } from '../../theme';
+import { useTheme } from '../../theme';
 import { AuditLog } from '../../types';
 import { profileService } from '../../services';
 import { useAuth } from '../../context/AuthContext';
@@ -34,8 +34,226 @@ export const AuditLogViewer: React.FC<AuditLogViewerProps> = ({
   showFilters = true,
   maxItems = 100
 }) => {
+  const { colors, spacing, borderRadius, typography, shadows } = useTheme();
   const { t } = useTranslation();
   const { user } = useAuth();
+
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background.tertiary
+    },
+    centerContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: spacing.lg
+    },
+    loadingText: {
+      marginTop: spacing.sm,
+      fontSize: 16,
+      color: colors.text.secondary
+    },
+    errorText: {
+      fontSize: 16,
+      color: colors.status.error.main,
+      textAlign: 'center',
+      marginBottom: spacing.lg
+    },
+    retryButton: {
+      backgroundColor: colors.primary.main,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.sm,
+      borderRadius: 8
+    },
+    retryButtonText: {
+      color: colors.text.inverse,
+      fontSize: 16,
+      fontWeight: 'bold'
+    },
+    filtersContainer: {
+      backgroundColor: colors.text.inverse,
+      padding: spacing.md,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border.default
+    },
+    searchInput: {
+      backgroundColor: colors.background.tertiary,
+      borderRadius: 8,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      fontSize: 16,
+      marginBottom: spacing.md
+    },
+    filterRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: spacing.sm
+    },
+    filterLabel: {
+      fontSize: 14,
+      fontWeight: 'bold',
+      marginRight: spacing.sm,
+      minWidth: 80
+    },
+    filterButton: {
+      backgroundColor: colors.border.default,
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: 15,
+      marginRight: spacing.xs
+    },
+    filterButtonActive: {
+      backgroundColor: colors.primary.main
+    },
+    filterButtonText: {
+      fontSize: 12,
+      color: colors.text.primary
+    },
+    summaryContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      backgroundColor: colors.text.inverse,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border.default
+    },
+    summaryText: {
+      fontSize: 14,
+      color: colors.text.secondary
+    },
+    refreshText: {
+      fontSize: 14,
+      color: colors.primary.main
+    },
+    emptyText: {
+      fontSize: 16,
+      color: colors.text.secondary,
+      textAlign: 'center'
+    },
+    listContainer: {
+      padding: spacing.md
+    },
+    logItem: {
+      backgroundColor: colors.text.inverse,
+      padding: spacing.md,
+      marginBottom: spacing.sm,
+      borderRadius: 8,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.1,
+      shadowRadius: 2,
+      elevation: 2
+    },
+    logHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: spacing.xs
+    },
+    logInfo: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      flex: 1
+    },
+    accessTypeIcon: {
+      fontSize: 24,
+      marginRight: spacing.sm
+    },
+    logDetails: {
+      flex: 1
+    },
+    accessType: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: colors.text.primary
+    },
+    timestamp: {
+      fontSize: 12,
+      color: colors.text.secondary,
+      marginTop: 2
+    },
+    accessorTypeBadge: {
+      paddingHorizontal: spacing.xs,
+      paddingVertical: 4,
+      borderRadius: 12
+    },
+    accessorTypeText: {
+      color: colors.text.inverse,
+      fontSize: 10,
+      fontWeight: 'bold'
+    },
+    logMeta: {
+      marginTop: spacing.xs
+    },
+    metaText: {
+      fontSize: 12,
+      color: colors.text.secondary,
+      marginBottom: 2
+    },
+    modalContainer: {
+      flex: 1,
+      backgroundColor: colors.text.inverse
+    },
+    modalHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: spacing.lg,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border.default
+    },
+    modalTitle: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: colors.text.primary
+    },
+    closeButton: {
+      padding: 5
+    },
+    closeButtonText: {
+      fontSize: 20,
+      color: colors.text.secondary
+    },
+    modalContent: {
+      flex: 1,
+      padding: spacing.lg
+    },
+    detailSection: {
+      marginBottom: spacing.lg
+    },
+    detailLabel: {
+      fontSize: 14,
+      fontWeight: 'bold',
+      color: colors.text.secondary,
+      marginBottom: 5
+    },
+    detailValue: {
+      fontSize: 16,
+      color: colors.text.primary
+    },
+    fieldItem: {
+      fontSize: 14,
+      color: colors.text.primary,
+      marginVertical: 2,
+      marginLeft: spacing.sm
+    },
+    warningSection: {
+      backgroundColor: colors.status.warning.main + '30',
+      padding: spacing.md,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: colors.status.warning.main + '50'
+    },
+    warningText: {
+      fontSize: 14,
+      color: colors.status.warning.main,
+      fontWeight: 'bold'
+    }
+  }), [colors, spacing, borderRadius, typography, shadows]);
+
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [filteredLogs, setFilteredLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
@@ -422,221 +640,5 @@ export const AuditLogViewer: React.FC<AuditLogViewerProps> = ({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.tertiary
-  },
-  centerContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: spacing.lg
-  },
-  loadingText: {
-    marginTop: spacing.sm,
-    fontSize: 16,
-    color: colors.text.secondary
-  },
-  errorText: {
-    fontSize: 16,
-    color: colors.status.error.main,
-    textAlign: 'center',
-    marginBottom: spacing.lg
-  },
-  retryButton: {
-    backgroundColor: colors.primary.main,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-    borderRadius: 8
-  },
-  retryButtonText: {
-    color: colors.text.inverse,
-    fontSize: 16,
-    fontWeight: 'bold'
-  },
-  filtersContainer: {
-    backgroundColor: colors.text.inverse,
-    padding: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.default
-  },
-  searchInput: {
-    backgroundColor: colors.background.tertiary,
-    borderRadius: 8,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    fontSize: 16,
-    marginBottom: spacing.md
-  },
-  filterRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.sm
-  },
-  filterLabel: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    marginRight: spacing.sm,
-    minWidth: 80
-  },
-  filterButton: {
-    backgroundColor: colors.border.default,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 15,
-    marginRight: spacing.xs
-  },
-  filterButtonActive: {
-    backgroundColor: colors.primary.main
-  },
-  filterButtonText: {
-    fontSize: 12,
-    color: colors.text.primary
-  },
-  summaryContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    backgroundColor: colors.text.inverse,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.default
-  },
-  summaryText: {
-    fontSize: 14,
-    color: colors.text.secondary
-  },
-  refreshText: {
-    fontSize: 14,
-    color: colors.primary.main
-  },
-  emptyText: {
-    fontSize: 16,
-    color: colors.text.secondary,
-    textAlign: 'center'
-  },
-  listContainer: {
-    padding: spacing.md
-  },
-  logItem: {
-    backgroundColor: colors.text.inverse,
-    padding: spacing.md,
-    marginBottom: spacing.sm,
-    borderRadius: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2
-  },
-  logHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.xs
-  },
-  logInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1
-  },
-  accessTypeIcon: {
-    fontSize: 24,
-    marginRight: spacing.sm
-  },
-  logDetails: {
-    flex: 1
-  },
-  accessType: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: colors.text.primary
-  },
-  timestamp: {
-    fontSize: 12,
-    color: colors.text.secondary,
-    marginTop: 2
-  },
-  accessorTypeBadge: {
-    paddingHorizontal: spacing.xs,
-    paddingVertical: 4,
-    borderRadius: 12
-  },
-  accessorTypeText: {
-    color: colors.text.inverse,
-    fontSize: 10,
-    fontWeight: 'bold'
-  },
-  logMeta: {
-    marginTop: spacing.xs
-  },
-  metaText: {
-    fontSize: 12,
-    color: colors.text.secondary,
-    marginBottom: 2
-  },
-  modalContainer: {
-    flex: 1,
-    backgroundColor: colors.text.inverse
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: spacing.lg,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.default
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: colors.text.primary
-  },
-  closeButton: {
-    padding: 5
-  },
-  closeButtonText: {
-    fontSize: 20,
-    color: colors.text.secondary
-  },
-  modalContent: {
-    flex: 1,
-    padding: spacing.lg
-  },
-  detailSection: {
-    marginBottom: spacing.lg
-  },
-  detailLabel: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: colors.text.secondary,
-    marginBottom: 5
-  },
-  detailValue: {
-    fontSize: 16,
-    color: colors.text.primary
-  },
-  fieldItem: {
-    fontSize: 14,
-    color: colors.text.primary,
-    marginVertical: 2,
-    marginLeft: spacing.sm
-  },
-  warningSection: {
-    backgroundColor: colors.status.warning.main + '30',
-    padding: spacing.md,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: colors.status.warning.main + '50'
-  },
-  warningText: {
-    fontSize: 14,
-    color: colors.status.warning.main,
-    fontWeight: 'bold'
-  }
-});
 
 export default AuditLogViewer;

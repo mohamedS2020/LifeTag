@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -23,7 +23,7 @@ import {
 } from '../../utils';
 import { LoadingOverlay, ErrorDisplay, FieldError, SuccessDisplay } from '../../components/common';
 import { Button, TextInput, Card, H1, Body, Caption } from '../../components/ui';
-import { colors, spacing } from '../../theme';
+import { useTheme } from '../../theme';
 
 interface RegisterScreenProps {
   navigation?: any; // Will be properly typed when navigation is set up
@@ -38,7 +38,81 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({
   onNavigateToMedicalRegister,
   onRegisterSuccess 
 }) => {
+  const { colors, spacing, borderRadius, typography, shadows } = useTheme();
   const { t } = useTranslation();
+  
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background.primary,
+    },
+    scrollContainer: {
+      flexGrow: 1,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.xl,
+    },
+    content: {
+      maxWidth: 400,
+      alignSelf: 'center',
+      width: '100%',
+    },
+    header: {
+      alignItems: 'center',
+      marginBottom: spacing.xl,
+    },
+    logoContainer: {
+      width: 80,
+      height: 80,
+      borderRadius: 40,
+      backgroundColor: colors.background.elevated,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: spacing.md,
+      borderWidth: 1,
+      borderColor: colors.border.light,
+    },
+    title: {
+      color: colors.text.primary,
+      marginBottom: spacing.xs,
+    },
+    subtitle: {
+      color: colors.text.secondary,
+      textAlign: 'center',
+    },
+    registerButton: {
+      marginTop: spacing.md,
+    },
+    medicalProfessionalCard: {
+      marginTop: spacing.xl,
+      borderColor: colors.primary.main,
+    },
+    medicalProfessionalContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: spacing.md,
+    },
+    medicalProfessionalText: {
+      marginLeft: spacing.md,
+      flex: 1,
+    },
+    medicalQuestion: {
+      color: colors.text.primary,
+      fontWeight: '600',
+    },
+    medicalButton: {
+      marginTop: spacing.sm,
+    },
+    loginContainer: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginTop: spacing.xl,
+    },
+    loginText: {
+      color: colors.text.secondary,
+    },
+  }), [colors, spacing, borderRadius, typography, shadows]);
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -378,77 +452,5 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.primary,
-  },
-  scrollContainer: {
-    flexGrow: 1,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.xl,
-  },
-  content: {
-    maxWidth: 400,
-    alignSelf: 'center',
-    width: '100%',
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: spacing.xl,
-  },
-  logoContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: colors.background.elevated,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.border.light,
-  },
-  title: {
-    color: colors.text.primary,
-    marginBottom: spacing.xs,
-  },
-  subtitle: {
-    color: colors.text.secondary,
-    textAlign: 'center',
-  },
-  registerButton: {
-    marginTop: spacing.md,
-  },
-  medicalProfessionalCard: {
-    marginTop: spacing.xl,
-    borderColor: colors.primary.main,
-  },
-  medicalProfessionalContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.md,
-  },
-  medicalProfessionalText: {
-    marginLeft: spacing.md,
-    flex: 1,
-  },
-  medicalQuestion: {
-    color: colors.text.primary,
-    fontWeight: '600',
-  },
-  medicalButton: {
-    marginTop: spacing.sm,
-  },
-  loginContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: spacing.xl,
-  },
-  loginText: {
-    color: colors.text.secondary,
-  },
-});
 
 export default RegisterScreen;

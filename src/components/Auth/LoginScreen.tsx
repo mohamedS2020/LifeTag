@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -29,7 +29,7 @@ import {
 import { LoadingOverlay } from '../../components/common/LoadingOverlay';
 import { ErrorDisplay, FieldError, SuccessDisplay } from '../../components/common/ErrorDisplay';
 import { Button, TextInput, Card, H1, H3, Body, BodySmall, Caption } from '../../components/ui';
-import { colors, spacing, borderRadius, typography, shadows } from '../../theme';
+import { useTheme } from '../../theme';
 
 interface LoginScreenProps {
   navigation?: any; // Will be properly typed when navigation is set up
@@ -42,6 +42,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
   onNavigateToRegister,
   onLoginSuccess 
 }) => {
+  const { colors, spacing, borderRadius, typography, shadows } = useTheme();
   const { t } = useTranslation();
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -201,6 +202,92 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
     }
   };
 
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background.primary,
+    },
+    scrollContainer: {
+      flexGrow: 1,
+      justifyContent: 'center',
+      paddingHorizontal: spacing.xl,
+      paddingVertical: spacing['3xl'],
+    },
+    content: {
+      maxWidth: 400,
+      alignSelf: 'center',
+      width: '100%',
+    },
+    header: {
+      alignItems: 'center',
+      marginBottom: spacing['4xl'],
+    },
+    logoContainer: {
+      width: 80,
+      height: 80,
+      borderRadius: 40,
+      backgroundColor: colors.background.elevated,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: spacing.lg,
+      borderWidth: 1,
+      borderColor: colors.border.default,
+    },
+    title: {
+      color: colors.primary.main,
+      marginBottom: spacing.sm,
+    },
+    subtitle: {
+      marginBottom: spacing.md,
+    },
+    description: {
+      lineHeight: 22,
+      paddingHorizontal: spacing.lg,
+    },
+    form: {
+      marginBottom: spacing['3xl'],
+    },
+    loginButton: {
+      marginTop: spacing.sm,
+    },
+    registerContainer: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginTop: spacing['2xl'],
+    },
+    registerLink: {
+      ...typography.labelLarge,
+      color: colors.primary.main,
+    },
+    linkDisabled: {
+      color: colors.text.disabled,
+    },
+    forgotPasswordLink: {
+      ...typography.labelLarge,
+      color: colors.primary.main,
+      textDecorationLine: 'underline',
+      marginBottom: 2,
+    },
+    emergencyInfo: {
+      borderLeftWidth: 3,
+      borderLeftColor: colors.medical.emergency,
+    },
+    emergencyHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: spacing.sm,
+      gap: spacing.sm,
+    },
+    emergencyTitle: {
+      ...typography.labelLarge,
+      color: colors.medical.emergency,
+    },
+    emergencyText: {
+      lineHeight: 22,
+    },
+  }), [colors, spacing, borderRadius, typography, shadows]);
+
   return (
     <>
       <LoadingOverlay 
@@ -342,91 +429,5 @@ const LoginScreen: React.FC<LoginScreenProps> = ({
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.primary,
-  },
-  scrollContainer: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    paddingHorizontal: spacing.xl,
-    paddingVertical: spacing['3xl'],
-  },
-  content: {
-    maxWidth: 400,
-    alignSelf: 'center',
-    width: '100%',
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: spacing['4xl'],
-  },
-  logoContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: colors.background.elevated,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.lg,
-    borderWidth: 1,
-    borderColor: colors.border.default,
-  },
-  title: {
-    color: colors.primary.main,
-    marginBottom: spacing.sm,
-  },
-  subtitle: {
-    marginBottom: spacing.md,
-  },
-  description: {
-    lineHeight: 22,
-    paddingHorizontal: spacing.lg,
-  },
-  form: {
-    marginBottom: spacing['3xl'],
-  },
-  loginButton: {
-    marginTop: spacing.sm,
-  },
-  registerContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: spacing['2xl'],
-  },
-  registerLink: {
-    ...typography.labelLarge,
-    color: colors.primary.main,
-  },
-  linkDisabled: {
-    color: colors.text.disabled,
-  },
-  forgotPasswordLink: {
-    ...typography.labelLarge,
-    color: colors.primary.main,
-    textDecorationLine: 'underline',
-    marginBottom: 2,
-  },
-  emergencyInfo: {
-    borderLeftWidth: 3,
-    borderLeftColor: colors.medical.emergency,
-  },
-  emergencyHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.sm,
-    gap: spacing.sm,
-  },
-  emergencyTitle: {
-    ...typography.labelLarge,
-    color: colors.medical.emergency,
-  },
-  emergencyText: {
-    lineHeight: 22,
-  },
-});
 
 export default LoginScreen;

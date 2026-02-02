@@ -1,16 +1,16 @@
 /**
  * LifeTag Theme System
  * Centralized theme exports and utilities
+ * Supports dark and light themes
  */
 
-import React, { createContext, useContext } from 'react';
-import { colors, Colors } from './colors';
+import { colors, darkColors, lightColors, Colors, ThemeMode } from './colors';
 import { spacing, borderRadius, layout, Spacing, BorderRadius, Layout } from './spacing';
 import { typography, fontWeights, fontSizes, Typography } from './typography';
-import { shadows, Shadows } from './shadows';
+import { shadows, createShadows, Shadows } from './shadows';
 import { duration, springConfig, timingConfig, animationValues } from './animations';
 
-// Combined theme object
+// Combined theme object (default dark)
 export const theme = {
   colors,
   spacing,
@@ -30,31 +30,20 @@ export const theme = {
 
 export type Theme = typeof theme;
 
-// Theme context
-const ThemeContext = createContext<Theme>(theme);
-
-// Theme provider component
-export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  return React.createElement(ThemeContext.Provider, { value: theme }, children);
-};
-
-// Hook to access theme
-export const useTheme = (): Theme => {
-  const themeContext = useContext(ThemeContext);
-  if (!themeContext) {
-    throw new Error('useTheme must be used within a ThemeProvider');
-  }
-  return themeContext;
-};
+// Re-export ThemeProvider and useTheme from context
+// Note: Import from '../context/ThemeContext' when using in the app
+// This is kept for backwards compatibility
+export { ThemeProvider, useTheme } from '../context/ThemeContext';
+export type { ThemeContextType } from '../context/ThemeContext';
 
 // Re-export everything for convenience
-export { colors } from './colors';
+export { colors, darkColors, lightColors } from './colors';
 export { spacing, borderRadius, layout } from './spacing';
 export { typography, fontWeights, fontSizes } from './typography';
-export { shadows } from './shadows';
+export { shadows, createShadows } from './shadows';
 export { duration, springConfig, timingConfig, animationValues } from './animations';
 
 // Type exports
-export type { Colors, Spacing, BorderRadius, Layout, Typography, Shadows };
+export type { Colors, ThemeMode, Spacing, BorderRadius, Layout, Typography, Shadows };
 
 export default theme;
