@@ -73,7 +73,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
 
   /**
    * Change the app language
-   * Shows restart prompt if switching to/from RTL language
+   * Auto-restarts when switching to/from RTL language (Arabic)
    */
   const changeLanguage = async (languageCode: LanguageCode): Promise<void> => {
     try {
@@ -94,33 +94,18 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
       // Apply RTL settings
       applyRTL(languageCode);
 
-      // If RTL change is needed, prompt for restart
+      // If RTL change is needed, auto-restart the app
       if (needsRestart) {
-        Alert.alert(
-          i18n.t('language.restartRequired'),
-          i18n.t('language.restartMessage'),
-          [
-            {
-              text: i18n.t('language.restartLater'),
-              style: 'cancel',
-            },
-            {
-              text: i18n.t('language.restartNow'),
-              onPress: async () => {
-                try {
-                  await Updates.reloadAsync();
-                } catch (error) {
-                  console.error('Error reloading app:', error);
-                  // Fallback message if reload fails
-                  Alert.alert(
-                    'Restart Required',
-                    'Please close and reopen the app to apply the language change.'
-                  );
-                }
-              },
-            },
-          ]
-        );
+        try {
+          await Updates.reloadAsync();
+        } catch (error) {
+          console.error('Error reloading app:', error);
+          // Fallback message if reload fails
+          Alert.alert(
+            'Restart Required',
+            'Please close and reopen the app to apply the language change.'
+          );
+        }
       }
     } catch (error) {
       console.error('Error changing language:', error);
