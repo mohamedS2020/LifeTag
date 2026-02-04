@@ -26,7 +26,7 @@ import { spacing, borderRadius, typography } from '../theme';
 export const SettingsScreen: React.FC = () => {
   const { t } = useTranslation();
   const { logout } = useAuth();
-  const { currentLanguage, getCurrentLanguageInfo } = useLanguage();
+  const { currentLanguage, getCurrentLanguageInfo, isRTL } = useLanguage();
   const { colors, isDark } = useTheme();
   const navigation = useNavigation();
   const [languageSelectorVisible, setLanguageSelectorVisible] = useState(false);
@@ -57,17 +57,18 @@ export const SettingsScreen: React.FC = () => {
       backgroundColor: colors.background.elevated,
       alignItems: 'center',
       justifyContent: 'center',
-      marginRight: spacing.md,
+      marginEnd: spacing.md,
     },
     settingText: {
       ...typography.body,
       color: colors.text.primary,
       flex: 1,
+      textAlign: isRTL ? 'right' : 'left',
     },
     settingValue: {
       ...typography.body,
       color: colors.text.secondary,
-      marginRight: spacing.sm,
+      marginEnd: spacing.sm,
     },
     signOutIconBg: {
       width: 40,
@@ -76,13 +77,14 @@ export const SettingsScreen: React.FC = () => {
       backgroundColor: `${colors.status.error.main}15`,
       alignItems: 'center',
       justifyContent: 'center',
-      marginRight: spacing.md,
+      marginEnd: spacing.md,
     },
     signOutText: {
       ...typography.body,
       color: colors.status.error.main,
       flex: 1,
       fontWeight: '500',
+      textAlign: isRTL ? 'right' : 'left',
     },
     deleteAccountIconBg: {
       width: 40,
@@ -91,14 +93,20 @@ export const SettingsScreen: React.FC = () => {
       backgroundColor: colors.background.elevated,
       alignItems: 'center',
       justifyContent: 'center',
-      marginRight: spacing.md,
+      marginEnd: spacing.md,
     },
     deleteAccountText: {
       ...typography.body,
       color: colors.text.secondary,
       flex: 1,
+      textAlign: isRTL ? 'right' : 'left',
     },
-  }), [colors]);
+    settingItem: {
+      flexDirection: isRTL ? 'row-reverse' : 'row',
+      alignItems: 'center',
+      paddingVertical: spacing.md,
+    },
+  }), [colors, isRTL]);
 
   /**
    * Handle user sign out
@@ -146,7 +154,7 @@ export const SettingsScreen: React.FC = () => {
             <H4 style={styles.sectionTitle}>{t('settings.appPreferences')}</H4>
             
             {/* Theme Toggle */}
-            <View style={styles.settingItem}>
+            <View style={dynamicStyles.settingItem}>
               <View style={dynamicStyles.settingIconBg}>
                 <Ionicons 
                   name={isDark ? "moon-outline" : "sunny-outline"} 
@@ -163,7 +171,7 @@ export const SettingsScreen: React.FC = () => {
             
             {/* Language Selector */}
             <TouchableOpacity 
-              style={styles.settingItem} 
+              style={dynamicStyles.settingItem} 
               onPress={() => setLanguageSelectorVisible(true)}
               activeOpacity={0.7}
             >
@@ -198,14 +206,14 @@ export const SettingsScreen: React.FC = () => {
           <Card variant="default" style={styles.settingsSection}>
             <H4 style={styles.sectionTitle}>{t('settings.accountPrivacy')}</H4>
             
-            <View style={styles.settingItem}>
+            <View style={dynamicStyles.settingItem}>
               <View style={dynamicStyles.settingIconBg}>
                 <Ionicons name="person-outline" size={20} color={colors.text.secondary} />
               </View>
               <Text style={dynamicStyles.settingText}>{t('settings.profileSettings')}</Text>
               <Badge label={t('common.soon')} variant="warning" size="sm" />
             </View>
-            <View style={styles.settingItem}>
+            <View style={dynamicStyles.settingItem}>
               <View style={dynamicStyles.settingIconBg}>
                 <Ionicons name="shield-outline" size={20} color={colors.text.secondary} />
               </View>
@@ -218,14 +226,14 @@ export const SettingsScreen: React.FC = () => {
         <Animated.View entering={FadeInDown.delay(500).duration(400)}>
           <Card variant="default" style={styles.settingsSection}>
             <H4 style={styles.sectionTitle}>{t('settings.emergencySettings')}</H4>
-            <View style={styles.settingItem}>
+            <View style={dynamicStyles.settingItem}>
               <View style={dynamicStyles.settingIconBg}>
                 <Ionicons name="medical-outline" size={20} color={colors.text.secondary} />
               </View>
               <Text style={dynamicStyles.settingText}>{t('settings.emergencyContacts')}</Text>
               <Badge label={t('common.soon')} variant="warning" size="sm" />
             </View>
-            <View style={styles.settingItem}>
+            <View style={dynamicStyles.settingItem}>
               <View style={dynamicStyles.settingIconBg}>
                 <Ionicons name="notifications-outline" size={20} color={colors.text.secondary} />
               </View>
@@ -242,7 +250,7 @@ export const SettingsScreen: React.FC = () => {
             
             {/* Sign Out */}
             <TouchableOpacity 
-              style={styles.settingItem} 
+              style={dynamicStyles.settingItem} 
               onPress={handleSignOut}
               activeOpacity={0.7}
             >
@@ -254,7 +262,7 @@ export const SettingsScreen: React.FC = () => {
             </TouchableOpacity>
 
             {/* Delete Account - Coming Soon */}
-            <View style={styles.settingItem}>
+            <View style={dynamicStyles.settingItem}>
               <View style={dynamicStyles.deleteAccountIconBg}>
                 <Ionicons name="trash-outline" size={20} color={colors.text.secondary} />
               </View>
@@ -303,11 +311,6 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     marginBottom: spacing.lg,
-  },
-  settingItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: spacing.md,
   },
   accountActionsSection: {
     marginBottom: spacing['4xl'],
