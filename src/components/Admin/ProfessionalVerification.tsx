@@ -15,6 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { MedicalProfessional } from '../../types';
 import { MedicalProfessionalApprovalService } from '../../services/medicalProfessionalApprovalService';
+import { useLanguage } from '../../context/LanguageContext';
 import { VerifiedBadge } from '../common';
 import { useTheme } from '../../theme';
 
@@ -47,6 +48,7 @@ const ProfessionalVerification: React.FC<ProfessionalVerificationProps> = ({
   onProfessionalRejected,
 }) => {
   const { colors, spacing, borderRadius, typography, shadows } = useTheme();
+  const { isRTL } = useLanguage();
 
   const styles = useMemo(() => StyleSheet.create({
     container: {
@@ -250,7 +252,7 @@ const ProfessionalVerification: React.FC<ProfessionalVerificationProps> = ({
       padding: spacing.md,
     },
     infoRow: {
-      flexDirection: 'row',
+      flexDirection: isRTL ? 'row-reverse' : 'row',
       marginBottom: spacing.xs,
     },
     infoLabel: {
@@ -258,11 +260,13 @@ const ProfessionalVerification: React.FC<ProfessionalVerificationProps> = ({
       fontWeight: '500',
       color: colors.text.secondary,
       width: 120,
+      textAlign: isRTL ? 'right' : 'left',
     },
     infoValue: {
       fontSize: 14,
       color: colors.text.primary,
       flex: 1,
+      textAlign: isRTL ? 'right' : 'left',
     },
     notesInput: {
       borderWidth: 1,

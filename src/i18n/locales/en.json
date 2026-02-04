@@ -898,6 +898,7 @@
   },
   "verification": {
     "verified": "Verified",
+    "pending": "Pending",
     "verifiedOnDate": "Verified on {{date}}",
     "allUpdatesMarkedRead": "All recent updates have been marked as read.",
     "reapplyTitle": "Reapply for Verification",

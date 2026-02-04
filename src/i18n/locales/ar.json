@@ -939,6 +939,7 @@
   },
   "verification": {
     "verified": "موثق",
+    "pending": "قيد الانتظار",
     "verifiedOnDate": "تم التحقق في {{date}}",
     "allUpdatesMarkedRead": "تم تحديد جميع التحديثات الأخيرة كمقروءة.",
     "reapplyTitle": "إعادة التقديم للتحقق",

@@ -19,6 +19,7 @@ import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { UserProfile } from '../types';
 import { LoadingOverlay } from '../components/common';
 import { Card, Button, Badge, H2, H3, H4, Body, BodySmall, Caption } from '../components/ui';
@@ -46,6 +47,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const { colors, spacing, borderRadius, typography, shadows } = useTheme();
   const { t } = useTranslation();
   const { user } = useAuth();
+  const { isRTL } = useLanguage();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -242,7 +244,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       marginBottom: spacing.lg,
     },
     emergencyItem: {
-      flexDirection: 'row',
+      flexDirection: isRTL ? 'row-reverse' : 'row',
       marginBottom: spacing.sm,
       flexWrap: 'wrap',
     },
@@ -250,12 +252,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       ...typography.label,
       color: colors.text.secondary,
       marginEnd: spacing.sm,
+      textAlign: isRTL ? 'right' : 'left',
     },
     emergencyValue: {
       ...typography.body,
       color: colors.text.primary,
       flex: 1,
       flexShrink: 1,
+      textAlign: isRTL ? 'right' : 'left',
     },
     
     bottomSpacing: {
