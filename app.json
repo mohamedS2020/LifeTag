@@ -59,8 +59,9 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "d19024b0-e382-43e4-be43-d0526824d3cf"
+        "projectId": "2a16713a-ba4f-4397-813e-1df030d6030c"
       }
-    }
+    },
+    "owner": "egbaki"
   }
 }
