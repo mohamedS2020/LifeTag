@@ -26,6 +26,7 @@ import { UserProfile } from '../../types';
 import { QRService, QRCodeGenerator, EmergencyQRData } from '../../services/qrService';
 import { BackupTextDisplay } from './BackupTextDisplay';
 import { useTheme } from '../../theme';
+import { SafeAreaView as SafeAreaViewContext } from 'react-native-safe-area-context';
 
 /**
  * QR Display Screen Props
@@ -1052,7 +1053,7 @@ export const QRDisplay: React.FC<QRDisplayProps> = ({
         presentationStyle="pageSheet"
         onRequestClose={() => setShowShareModal(false)}
       >
-        <SafeAreaView style={styles.modalContainer}>
+        <SafeAreaViewContext style={styles.modalContainer} edges={['top', 'bottom']}>
           <View style={styles.modalHeader}>
             <TouchableOpacity onPress={() => setShowShareModal(false)}>
               <Ionicons name="close" size={24} color={colors.text.primary} />
@@ -1136,7 +1137,7 @@ export const QRDisplay: React.FC<QRDisplayProps> = ({
               </TouchableOpacity>
             </View>
           </View>
-        </SafeAreaView>
+        </SafeAreaViewContext>
       </Modal>
     </SafeAreaView>
   );
