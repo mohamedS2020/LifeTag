@@ -224,6 +224,20 @@ export interface Colors {
     professional: string;
     professionalBackground: string;
   };
+  accent: {
+    purple: {
+      main: string;
+      light: string;
+      dark: string;
+      background: string;
+    };
+    teal: {
+      main: string;
+      light: string;
+      dark: string;
+      background: string;
+    };
+  };
   transparent: string;
   white: string;
   black: string;

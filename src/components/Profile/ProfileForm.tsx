@@ -1841,16 +1841,26 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
 
               <View style={styles.passwordInputContainer}>
                 <Text style={styles.label}>{t('profile.form.privacy.confirmPassword')}</Text>
-                <TextInput
-                  style={[styles.passwordInput, passwordError ? styles.inputError : null]}
-                  placeholder={t('profile.form.privacy.confirmPasswordPlaceholder')}
-                  placeholderTextColor={colors.text.tertiary}
-                  value={confirmPassword}
-                  onChangeText={setConfirmPassword}
-                  secureTextEntry={!showPassword}
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                />
+                <View style={styles.passwordFieldContainer}>
+                  <TextInput
+                    style={[styles.passwordInput, passwordError ? styles.inputError : null]}
+                    placeholder={t('profile.form.privacy.confirmPasswordPlaceholder')}
+                    placeholderTextColor={colors.text.tertiary}
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                    secureTextEntry={!showPassword}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                  />
+                  <TouchableOpacity
+                    style={styles.passwordToggle}
+                    onPress={() => setShowPassword(!showPassword)}
+                  >
+                    <Text style={styles.passwordToggleText}>
+                      {showPassword ? t('profile.form.privacy.hide') : t('profile.form.privacy.show')}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
 
               {passwordError ? (

@@ -23,6 +23,7 @@ import { QRScanner } from '../QR';
 import { useMedicalProfessionalAccess } from '../../hooks';
 import { useTheme } from '../../theme';
 import { useTranslation } from 'react-i18next';
+import { SafeAreaView as SafeAreaViewContext } from 'react-native-safe-area-context';
 
 /**
  * Medical Professional Dashboard Props
@@ -565,6 +566,10 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
   // =============================================
 
   const styles = useMemo(() => StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: colors.background.primary
+    },
     container: {
       flex: 1,
       backgroundColor: colors.background.primary,
@@ -904,15 +909,17 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
         animationType="slide"
         presentationStyle="fullScreen"
       >
-        <QRScanner
-          onQRScanned={handleQRScanned}
-          onError={(error) => {
-            console.error('QR Scanner error:', error);
-            setShowQRScanner(false);
-            onError?.(error);
-          }}
-          onClose={() => setShowQRScanner(false)}
-        />
+        <SafeAreaViewContext style={styles.safeArea} edges={['top', 'bottom']}>
+          <QRScanner
+            onQRScanned={handleQRScanned}
+            onError={(error) => {
+              console.error('QR Scanner error:', error);
+              setShowQRScanner(false);
+              onError?.(error);
+            }}
+            onClose={() => setShowQRScanner(false)}
+          />
+        </SafeAreaViewContext>
       </Modal>
 
       {/* Profile Display Modal */}
@@ -921,7 +928,7 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
         animationType="slide"
         presentationStyle="pageSheet"
       >
-        <SafeAreaView style={styles.profileModal}>
+        <SafeAreaViewContext style={styles.profileModal} edges={['top', 'bottom']}>
           <View style={styles.profileModalHeader}>
             <TouchableOpacity onPress={() => setShowProfileModal(false)}>
               <Ionicons name="close" size={24} color={colors.text.primary} />
@@ -944,7 +951,7 @@ const MedicalProfessionalDashboard: React.FC<MedicalProfessionalDashboardProps> 
               />
             )}
           </ScrollView>
-        </SafeAreaView>
+        </SafeAreaViewContext>
       </Modal>
 
       {/* Loading Overlay */}

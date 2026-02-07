@@ -13,6 +13,7 @@ import {
   Alert,
   RefreshControl,
   StatusBar,
+  I18nManager,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
@@ -244,7 +245,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       marginBottom: spacing.lg,
     },
     emergencyItem: {
-      flexDirection: isRTL ? 'row-reverse' : 'row',
+      flexDirection: 'row',
       marginBottom: spacing.sm,
       flexWrap: 'wrap',
     },
@@ -252,20 +253,18 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       ...typography.label,
       color: colors.text.secondary,
       marginEnd: spacing.sm,
-      textAlign: isRTL ? 'right' : 'left',
     },
     emergencyValue: {
       ...typography.body,
       color: colors.text.primary,
       flex: 1,
       flexShrink: 1,
-      textAlign: isRTL ? 'right' : 'left',
     },
     
     bottomSpacing: {
       height: spacing.xl,
     },
-  }), [colors, spacing, borderRadius, typography, shadows]);
+  }), [colors, spacing, borderRadius, typography, shadows, isRTL]);
 
   // Load user profile and dashboard data
   const loadDashboardData = async () => {
@@ -277,29 +276,22 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       
       if (profileResponse.success && profileResponse.data) {
         setProfile(profileResponse.data);
-        
-        // Calculate profile completion percentage
+        // Calculate profile completion
         const completion = calculateProfileCompletion(profileResponse.data);
         setProfileCompletion(completion);
       } else {
-        setError(profileResponse.error?.message || t('home.failedLoadProfile'));
+        setError(
+          typeof profileResponse.error === 'string'
+            ? profileResponse.error
+            : profileResponse.error?.message || t('home.failedToLoadProfile')
+        );
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error loading dashboard data:', err);
-      setError(t('home.failedLoadDashboard'));
+      setError(t('home.failedToLoadProfile'));
     } finally {
       setLoading(false);
-      setRefreshing(false);
     }
-  };
-
-  useEffect(() => {
-    loadDashboardData();
-  }, [user?.id]);
-
-  const onRefresh = () => {
-    setRefreshing(true);
-    loadDashboardData();
   };
 
   // Calculate profile completion percentage
@@ -329,7 +321,18 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     return Math.round((completedFields / totalFields) * 100);
   };
 
-  // Define quick actions
+  // Refresh handler
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await loadDashboardData();
+    setRefreshing(false);
+  };
+
+  useEffect(() => {
+    loadDashboardData();
+  }, [user?.id]);
+
+  // Generate quick actions based on user context
   const getQuickActions = (): QuickAction[] => {
     const actions: QuickAction[] = [
       {
@@ -348,7 +351,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         color: colors.status.warning.main,
         onPress: () => navigation.navigate('ProfileForm'),
       },
-      {
+       {
         id: 'access-history',
         title: t('home.accessHistory'),
         subtitle: t('home.viewWhoAccessed'),

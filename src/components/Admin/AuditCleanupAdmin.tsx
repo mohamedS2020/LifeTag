@@ -8,6 +8,7 @@ import {
   Alert,
   ActivityIndicator
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { auditRetentionManager, CleanupResult } from '../../utils/auditRetention';
 import { auditCleanupService } from '../../services/auditCleanupService';
 import { useTheme } from '../../theme';
@@ -40,6 +41,10 @@ export const AuditCleanupAdmin: React.FC<AuditCleanupAdminProps> = ({ onClose })
   const { colors, spacing, borderRadius, typography, shadows } = useTheme();
 
   const styles = useMemo(() => StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: colors.background.primary
+    },
     container: {
       flex: 1,
       backgroundColor: colors.background.primary
@@ -297,174 +302,180 @@ export const AuditCleanupAdmin: React.FC<AuditCleanupAdminProps> = ({ onClose })
 
   if (loading) {
     return (
-      <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color={colors.primary.main} />
-        <Text style={styles.loadingText}>{t('admin.loadingRetentionStatus')}</Text>
-      </View>
+      <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+        <View style={styles.centerContainer}>
+          <ActivityIndicator size="large" color={colors.primary.main} />
+          <Text style={styles.loadingText}>{t('admin.loadingRetentionStatus')}</Text>
+        </View>
+      </SafeAreaView>
     );
   }
 
   if (error) {
     return (
-      <View style={styles.centerContainer}>
-        <Text style={styles.errorText}>❌ {error}</Text>
-        <TouchableOpacity style={styles.retryButton} onPress={loadRetentionStatus}>
-          <Text style={styles.retryButtonText}>{t('common.retry')}</Text>
-        </TouchableOpacity>
-      </View>
+      <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+        <View style={styles.centerContainer}>
+          <Text style={styles.errorText}>❌ {error}</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={loadRetentionStatus}>
+            <Text style={styles.retryButtonText}>{t('common.retry')}</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <ScrollView style={styles.container}>
-      {onClose && (
-        <View style={styles.header}>
-          <Text style={styles.title}>{t('admin.auditLogCleanupAdmin')}</Text>
-          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-            <Text style={styles.closeButtonText}>✕</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-
-      {retentionStatus && (
-        <>
-          {/* Retention Policy */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t('admin.retentionPolicy')}</Text>
-            <View style={styles.policyInfo}>
-              <Text style={styles.policyText}>
-                {t('admin.retentionPeriod')} {retentionStatus.policy.retentionDays} {t('common.days')}
-              </Text>
-              <Text style={styles.policyText}>
-                {t('admin.maxLogsPerProfile')} {retentionStatus.policy.maxLogsPerProfile}
-              </Text>
-            </View>
+    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+      <ScrollView style={styles.container}>
+        {onClose && (
+          <View style={styles.header}>
+            <Text style={styles.title}>{t('admin.auditLogCleanupAdmin')}</Text>
+            <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+              <Text style={styles.closeButtonText}>✕</Text>
+            </TouchableOpacity>
           </View>
+        )}
 
-          {/* Current Status */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t('admin.currentStatus')}</Text>
-            <View style={styles.statusInfo}>
-              <Text style={styles.statusText}>
-                {t('admin.totalAuditLogs')} {retentionStatus.current.totalLogs}
-              </Text>
-              {retentionStatus.current.oldestLogAge !== undefined && (
-                <Text style={styles.statusText}>
-                  {t('admin.oldestLog')} {retentionStatus.current.oldestLogAge} {t('admin.daysAgo')}
-                </Text>
-              )}
-              <View style={[
-                styles.statusBadge,
-                { backgroundColor: retentionStatus.current.cleanupNeeded ? colors.status.warning.main : colors.status.success.main }
-              ]}>
-                <Text style={styles.statusBadgeText}>
-                  {retentionStatus.current.cleanupNeeded ? t('admin.cleanupNeeded') : t('admin.noCleanupNeeded')}
-                </Text>
-              </View>
-              {retentionStatus.current.reason && (
-                <Text style={styles.reasonText}>
-                  {retentionStatus.current.reason}
-                </Text>
-              )}
-            </View>
-          </View>
-
-          {/* Cleanup History */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t('admin.cleanupHistory')}</Text>
-            <View style={styles.historyInfo}>
-              {retentionStatus.status.lastCleanupRun ? (
-                <Text style={styles.historyText}>
-                  {t('admin.lastRun')} {formatDate(retentionStatus.status.lastCleanupRun)}
-                </Text>
-              ) : (
-                <Text style={styles.historyText}>
-                  {t('admin.noPreviousCleanups')}
-                </Text>
-              )}
-              <Text style={styles.historyText}>
-                {t('admin.nextRecommended')} {formatDate(retentionStatus.status.nextRecommendedRun)}
-              </Text>
-              <Text style={styles.historyText}>
-                {t('common.status')} {retentionStatus.status.isCleanupRunning ? t('common.running') : t('common.idle')}
-              </Text>
-            </View>
-          </View>
-
-          {/* Last Cleanup Result */}
-          {lastCleanupResult && (
+        {retentionStatus && (
+          <>
+            {/* Retention Policy */}
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>{t('admin.lastCleanupResult')}</Text>
-              <View style={styles.resultInfo}>
-                <Text style={[
-                  styles.resultText,
-                  { color: lastCleanupResult.success ? colors.status.success.main : colors.status.error.main }
+              <Text style={styles.sectionTitle}>{t('admin.retentionPolicy')}</Text>
+              <View style={styles.policyInfo}>
+                <Text style={styles.policyText}>
+                  {t('admin.retentionPeriod')} {retentionStatus.policy.retentionDays} {t('common.days')}
+                </Text>
+                <Text style={styles.policyText}>
+                  {t('admin.maxLogsPerProfile')} {retentionStatus.policy.maxLogsPerProfile}
+                </Text>
+              </View>
+            </View>
+
+            {/* Current Status */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>{t('admin.currentStatus')}</Text>
+              <View style={styles.statusInfo}>
+                <Text style={styles.statusText}>
+                  {t('admin.totalAuditLogs')} {retentionStatus.current.totalLogs}
+                </Text>
+                {retentionStatus.current.oldestLogAge !== undefined && (
+                  <Text style={styles.statusText}>
+                    {t('admin.oldestLog')} {retentionStatus.current.oldestLogAge} {t('admin.daysAgo')}
+                  </Text>
+                )}
+                <View style={[
+                  styles.statusBadge,
+                  { backgroundColor: retentionStatus.current.cleanupNeeded ? colors.status.warning.main : colors.status.success.main }
                 ]}>
-                  {lastCleanupResult.success ? t('common.success') : t('common.failed')}
-                </Text>
-                <Text style={styles.resultText}>
-                  {t('admin.deleted')} {lastCleanupResult.deletedCount} {t('admin.logs')}
-                </Text>
-                <Text style={styles.resultText}>
-                  {t('admin.profilesProcessed')} {lastCleanupResult.profilesProcessed}
-                </Text>
-                <Text style={styles.resultText}>
-                  {t('admin.executionTime')} {formatDuration(lastCleanupResult.executionTimeMs)}
-                </Text>
-                <Text style={styles.resultText}>
-                  {t('admin.timestamp')} {formatDate(lastCleanupResult.timestamp)}
-                </Text>
-                {lastCleanupResult.errors.length > 0 && (
-                  <View style={styles.errorContainer}>
-                    <Text style={styles.errorLabel}>{t('common.errors')}</Text>
-                    {lastCleanupResult.errors.map((error, index) => (
-                      <Text key={index} style={styles.errorItem}>• {error}</Text>
-                    ))}
-                  </View>
+                  <Text style={styles.statusBadgeText}>
+                    {retentionStatus.current.cleanupNeeded ? t('admin.cleanupNeeded') : t('admin.noCleanupNeeded')}
+                  </Text>
+                </View>
+                {retentionStatus.current.reason && (
+                  <Text style={styles.reasonText}>
+                    {retentionStatus.current.reason}
+                  </Text>
                 )}
               </View>
             </View>
-          )}
 
-          {/* Actions */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t('admin.actions')}</Text>
-            <View style={styles.actionButtons}>
-              <TouchableOpacity
-                style={[
-                  styles.actionButton,
-                  styles.cleanupButton,
-                  (cleanupLoading || retentionStatus.status.isCleanupRunning) && styles.disabledButton
-                ]}
-                onPress={handleManualCleanup}
-                disabled={cleanupLoading || retentionStatus.status.isCleanupRunning}
-              >
-                {cleanupLoading ? (
-                  <ActivityIndicator size="small" color={colors.text.inverse} />
+            {/* Cleanup History */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>{t('admin.cleanupHistory')}</Text>
+              <View style={styles.historyInfo}>
+                {retentionStatus.status.lastCleanupRun ? (
+                  <Text style={styles.historyText}>
+                    {t('admin.lastRun')} {formatDate(retentionStatus.status.lastCleanupRun)}
+                  </Text>
                 ) : (
-                  <Text style={styles.actionButtonText}>{t('admin.runManualCleanup')}</Text>
+                  <Text style={styles.historyText}>
+                    {t('admin.noPreviousCleanups')}
+                  </Text>
                 )}
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[styles.actionButton, styles.refreshButton]}
-                onPress={loadRetentionStatus}
-              >
-                <Text style={styles.actionButtonText}>{t('admin.refreshStatus')}</Text>
-              </TouchableOpacity>
+                <Text style={styles.historyText}>
+                  {t('admin.nextRecommended')} {formatDate(retentionStatus.status.nextRecommendedRun)}
+                </Text>
+                <Text style={styles.historyText}>
+                  {t('common.status')} {retentionStatus.status.isCleanupRunning ? t('common.running') : t('common.idle')}
+                </Text>
+              </View>
             </View>
-          </View>
 
-          {/* Information */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t('admin.information')}</Text>
-            <Text style={styles.infoText}>
-              {t('admin.cleanupInfoText', { days: retentionStatus.policy.retentionDays, maxLogs: retentionStatus.policy.maxLogsPerProfile })}
-            </Text>
-          </View>
-        </>
-      )}
-    </ScrollView>
+            {/* Last Cleanup Result */}
+            {lastCleanupResult && (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>{t('admin.lastCleanupResult')}</Text>
+                <View style={styles.resultInfo}>
+                  <Text style={[
+                    styles.resultText,
+                    { color: lastCleanupResult.success ? colors.status.success.main : colors.status.error.main }
+                  ]}>
+                    {lastCleanupResult.success ? t('common.success') : t('common.failed')}
+                  </Text>
+                  <Text style={styles.resultText}>
+                    {t('admin.deleted')} {lastCleanupResult.deletedCount} {t('admin.logs')}
+                  </Text>
+                  <Text style={styles.resultText}>
+                    {t('admin.profilesProcessed')} {lastCleanupResult.profilesProcessed}
+                  </Text>
+                  <Text style={styles.resultText}>
+                    {t('admin.executionTime')} {formatDuration(lastCleanupResult.executionTimeMs)}
+                  </Text>
+                  <Text style={styles.resultText}>
+                    {t('admin.timestamp')} {formatDate(lastCleanupResult.timestamp)}
+                  </Text>
+                  {lastCleanupResult.errors.length > 0 && (
+                    <View style={styles.errorContainer}>
+                      <Text style={styles.errorLabel}>{t('common.errors')}</Text>
+                      {lastCleanupResult.errors.map((error, index) => (
+                        <Text key={index} style={styles.errorItem}>• {error}</Text>
+                      ))}
+                    </View>
+                  )}
+                </View>
+              </View>
+            )}
+
+            {/* Actions */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>{t('admin.actions')}</Text>
+              <View style={styles.actionButtons}>
+                <TouchableOpacity
+                  style={[
+                    styles.actionButton,
+                    styles.cleanupButton,
+                    (cleanupLoading || retentionStatus.status.isCleanupRunning) && styles.disabledButton
+                  ]}
+                  onPress={handleManualCleanup}
+                  disabled={cleanupLoading || retentionStatus.status.isCleanupRunning}
+                >
+                  {cleanupLoading ? (
+                    <ActivityIndicator size="small" color={colors.text.inverse} />
+                  ) : (
+                    <Text style={styles.actionButtonText}>{t('admin.runManualCleanup')}</Text>
+                  )}
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[styles.actionButton, styles.refreshButton]}
+                  onPress={loadRetentionStatus}
+                >
+                  <Text style={styles.actionButtonText}>{t('admin.refreshStatus')}</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Information */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>{t('admin.information')}</Text>
+              <Text style={styles.infoText}>
+                {t('admin.cleanupInfoText', { days: retentionStatus.policy.retentionDays, maxLogs: retentionStatus.policy.maxLogsPerProfile })}
+              </Text>
+            </View>
+          </>
+        )}
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 

@@ -20,6 +20,7 @@ import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../theme';
+import { SafeAreaView as SafeAreaViewContext } from 'react-native-safe-area-context';
 
 /**
  * Admin Dashboard Props
@@ -611,7 +612,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
         animationType="slide"
         presentationStyle="formSheet"
       >
-        <SafeAreaView style={styles.modalContainer}>
+        <SafeAreaViewContext style={styles.modalContainer} edges={['top', 'bottom']}>
           <View style={styles.modalHeader}>
             <TouchableOpacity onPress={() => setActiveModal(null)}>
               <Ionicons name="close" size={24} color={colors.text.primary} />
@@ -683,7 +684,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
               )}
             </TouchableOpacity>
           </ScrollView>
-        </SafeAreaView>
+        </SafeAreaViewContext>
       </Modal>
     </SafeAreaView>
   );

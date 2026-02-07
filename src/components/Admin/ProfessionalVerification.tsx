@@ -18,6 +18,7 @@ import { MedicalProfessionalApprovalService } from '../../services/medicalProfes
 import { useLanguage } from '../../context/LanguageContext';
 import { VerifiedBadge } from '../common';
 import { useTheme } from '../../theme';
+import { SafeAreaView as SafeAreaViewContext } from 'react-native-safe-area-context';
 
 /**
  * Props for ProfessionalVerification component
@@ -553,7 +554,7 @@ const ProfessionalVerification: React.FC<ProfessionalVerificationProps> = ({
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaViewContext style={styles.modalContainer} edges={['top', 'bottom']}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={onClose}>
@@ -598,7 +599,7 @@ const ProfessionalVerification: React.FC<ProfessionalVerificationProps> = ({
         presentationStyle="pageSheet"
         onRequestClose={() => setShowDetailModal(false)}
       >
-        <SafeAreaView style={styles.modalContainer}>
+        <SafeAreaViewContext style={styles.modalContainer} edges={['top', 'bottom']}>
           {selectedProfessional && (
             <>
               {/* Modal Header */}
@@ -719,9 +720,9 @@ const ProfessionalVerification: React.FC<ProfessionalVerificationProps> = ({
               </View>
             </>
           )}
-        </SafeAreaView>
+        </SafeAreaViewContext>
       </Modal>
-    </SafeAreaView>
+    </SafeAreaViewContext>
   );
 };
 
