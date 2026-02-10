@@ -49,9 +49,7 @@ export const CONDITION_SEVERITIES = [
 
 export const GENDER_OPTIONS = [
   'male',
-  'female',
-  'non-binary',
-  'prefer-not-to-say'
+  'female'
 ] as const;
 
 // =============================================

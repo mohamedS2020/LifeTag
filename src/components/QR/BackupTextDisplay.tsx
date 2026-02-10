@@ -49,6 +49,7 @@ export const BackupTextDisplay: React.FC<BackupTextDisplayProps> = ({
       borderRadius: borderRadius.lg,
       padding: spacing.md,
       margin: spacing.sm,
+      maxHeight: 600, // Add max height for compact mode
     },
     header: {
       flexDirection: 'row',
@@ -59,6 +60,12 @@ export const BackupTextDisplay: React.FC<BackupTextDisplayProps> = ({
       backgroundColor: colors.background.secondary,
       borderBottomWidth: 1,
       borderBottomColor: colors.border.default,
+    },
+    compactHeader: {
+      paddingHorizontal: 0,
+      paddingVertical: spacing.sm,
+      backgroundColor: 'transparent',
+      borderBottomWidth: 0,
     },
     headerLeft: {
       flexDirection: 'row',
@@ -71,6 +78,9 @@ export const BackupTextDisplay: React.FC<BackupTextDisplayProps> = ({
       color: colors.text.primary,
       marginLeft: spacing.sm,
     },
+    compactHeaderTitle: {
+      fontSize: 16,
+    },
     copyButton: {
       padding: spacing.xs,
       borderRadius: borderRadius.full,
@@ -79,6 +89,10 @@ export const BackupTextDisplay: React.FC<BackupTextDisplayProps> = ({
     scrollContainer: {
       flex: 1,
       paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+    },
+    compactScrollContainer: {
+      paddingHorizontal: 0,
       paddingVertical: spacing.sm,
     },
     
@@ -91,10 +105,17 @@ export const BackupTextDisplay: React.FC<BackupTextDisplayProps> = ({
       borderLeftWidth: 5,
       borderLeftColor: colors.status.error.main,
     },
+    compactCriticalCard: {
+      padding: spacing.md,
+      marginBottom: spacing.sm,
+    },
     cardHeader: {
       flexDirection: 'row',
       alignItems: 'center',
       marginBottom: spacing.md,
+    },
+    compactCardHeader: {
+      marginBottom: spacing.sm,
     },
     cardTitle: {
       fontSize: 16,
@@ -102,11 +123,17 @@ export const BackupTextDisplay: React.FC<BackupTextDisplayProps> = ({
       color: colors.text.primary,
       marginLeft: spacing.xs,
     },
+    compactCardTitle: {
+      fontSize: 14,
+    },
     criticalGrid: {
       flexDirection: 'row',
       flexWrap: 'wrap',
       justifyContent: 'space-between',
       marginBottom: spacing.md,
+    },
+    compactCriticalGrid: {
+      marginBottom: spacing.sm,
     },
     criticalItem: {
       width: '48%',
@@ -124,9 +151,15 @@ export const BackupTextDisplay: React.FC<BackupTextDisplayProps> = ({
       fontWeight: 'bold',
       color: colors.text.primary,
     },
+    compactCriticalValue: {
+      fontSize: 16,
+    },
     bloodType: {
       color: colors.status.error.main,
       fontSize: 24,
+    },
+    compactBloodType: {
+      fontSize: 20,
     },
     allergiesSection: {
       marginTop: spacing.sm,
@@ -149,6 +182,9 @@ export const BackupTextDisplay: React.FC<BackupTextDisplayProps> = ({
       fontSize: 14,
       fontWeight: '600',
     },
+    compactAllergyText: {
+      fontSize: 12,
+    },
 
     // Emergency Contact Card
     contactCard: {
@@ -159,6 +195,10 @@ export const BackupTextDisplay: React.FC<BackupTextDisplayProps> = ({
       borderLeftWidth: 5,
       borderLeftColor: colors.primary.main,
     },
+    compactContactCard: {
+      padding: spacing.md,
+      marginBottom: spacing.sm,
+    },
     contactInfo: {
       alignItems: 'center',
     },
@@ -168,16 +208,25 @@ export const BackupTextDisplay: React.FC<BackupTextDisplayProps> = ({
       color: colors.text.primary,
       marginBottom: spacing.xs,
     },
+    compactContactName: {
+      fontSize: 16,
+    },
     contactPhone: {
       fontSize: 18,
       color: colors.primary.main,
       fontWeight: '600',
       marginBottom: spacing.xs,
     },
+    compactContactPhone: {
+      fontSize: 16,
+    },
     contactRelation: {
       fontSize: 14,
       color: colors.text.secondary,
       textTransform: 'capitalize',
+    },
+    compactContactRelation: {
+      fontSize: 12,
     },
 
     // Medical Notes Card
@@ -189,10 +238,18 @@ export const BackupTextDisplay: React.FC<BackupTextDisplayProps> = ({
       borderLeftWidth: 5,
       borderLeftColor: colors.status.warning.main,
     },
+    compactNotesCard: {
+      padding: spacing.md,
+      marginBottom: spacing.sm,
+    },
     notesText: {
       fontSize: 16,
       color: colors.text.primary,
       lineHeight: 24,
+    },
+    compactNotesText: {
+      fontSize: 14,
+      lineHeight: 20,
     },
 
     // QR Data Card
@@ -203,6 +260,10 @@ export const BackupTextDisplay: React.FC<BackupTextDisplayProps> = ({
       marginBottom: spacing.md,
       borderLeftWidth: 5,
       borderLeftColor: colors.text.tertiary,
+    },
+    compactQrDataCard: {
+      padding: spacing.md,
+      marginBottom: spacing.sm,
     },
     qrDataScroll: {
       maxHeight: 100,
@@ -222,11 +283,20 @@ export const BackupTextDisplay: React.FC<BackupTextDisplayProps> = ({
       borderLeftWidth: 5,
       borderLeftColor: colors.status.success.main,
     },
+    compactInstructionsCard: {
+      padding: spacing.md,
+      marginBottom: spacing.sm,
+    },
     instructionsText: {
       fontSize: 14,
       color: colors.text.primary,
       lineHeight: 20,
       marginBottom: spacing.md,
+    },
+    compactInstructionsText: {
+      fontSize: 12,
+      lineHeight: 18,
+      marginBottom: spacing.sm,
     },
     timestampContainer: {
       alignItems: 'center',
@@ -235,6 +305,9 @@ export const BackupTextDisplay: React.FC<BackupTextDisplayProps> = ({
       fontSize: 12,
       color: colors.text.tertiary,
       fontStyle: 'italic',
+    },
+    compactTimestampText: {
+      fontSize: 10,
     },
 
     // Action Bar
@@ -247,6 +320,13 @@ export const BackupTextDisplay: React.FC<BackupTextDisplayProps> = ({
       borderTopWidth: 1,
       borderTopColor: colors.border.default,
     },
+    compactActionBar: {
+      paddingHorizontal: 0,
+      paddingVertical: spacing.sm,
+      backgroundColor: 'transparent',
+      borderTopWidth: 0,
+      marginTop: spacing.sm,
+    },
     actionButton: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -257,11 +337,18 @@ export const BackupTextDisplay: React.FC<BackupTextDisplayProps> = ({
       borderWidth: 1,
       borderColor: colors.primary.main,
     },
+    compactActionButton: {
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.xs,
+    },
     actionButtonText: {
       color: colors.primary.main,
       fontSize: 14,
       fontWeight: '600',
       marginLeft: spacing.xs,
+    },
+    compactActionButtonText: {
+      fontSize: 12,
     },
   }), [colors, spacing, borderRadius, typography, shadows]);
 
@@ -356,39 +443,53 @@ export const BackupTextDisplay: React.FC<BackupTextDisplayProps> = ({
   return (
     <View style={containerStyle}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, compact && styles.compactHeader]}>
         <View style={styles.headerLeft}>
-          <Ionicons name="medical" size={24} color={colors.status.error.main} />
-          <Text style={styles.headerTitle}>Emergency Medical Information</Text>
+          <Ionicons name="medical" size={compact ? 20 : 24} color={colors.status.error.main} />
+          <Text style={[styles.headerTitle, compact && styles.compactHeaderTitle]}>
+            Emergency Medical Information
+          </Text>
         </View>
         
         {showCopyButton && (
           <TouchableOpacity style={styles.copyButton} onPress={copyEmergencyInfo}>
-            <Ionicons name="copy" size={20} color={colors.primary.main} />
+            <Ionicons name="copy" size={compact ? 18 : 20} color={colors.primary.main} />
           </TouchableOpacity>
         )}
       </View>
 
       {/* Emergency Information Cards */}
-      <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        style={[styles.scrollContainer, compact && styles.compactScrollContainer]} 
+        showsVerticalScrollIndicator={true}
+        nestedScrollEnabled={true}
+      >
         
         {/* Critical Information Card */}
-        <View style={styles.criticalCard}>
-          <View style={styles.cardHeader}>
-            <Ionicons name="warning" size={20} color={colors.status.error.main} />
-            <Text style={styles.cardTitle}>Critical Information</Text>
+        <View style={[styles.criticalCard, compact && styles.compactCriticalCard]}>
+          <View style={[styles.cardHeader, compact && styles.compactCardHeader]}>
+            <Ionicons name="warning" size={compact ? 18 : 20} color={colors.status.error.main} />
+            <Text style={[styles.cardTitle, compact && styles.compactCardTitle]}>
+              Critical Information
+            </Text>
           </View>
           
-          <View style={styles.criticalGrid}>
+          <View style={[styles.criticalGrid, compact && styles.compactCriticalGrid]}>
             <View style={styles.criticalItem}>
               <Text style={styles.criticalLabel}>NAME</Text>
-              <Text style={styles.criticalValue}>{emergencyData.name}</Text>
+              <Text style={[styles.criticalValue, compact && styles.compactCriticalValue]}>
+                {emergencyData.name}
+              </Text>
             </View>
 
             {emergencyData.bloodType && (
               <View style={styles.criticalItem}>
                 <Text style={styles.criticalLabel}>BLOOD TYPE</Text>
-                <Text style={[styles.criticalValue, styles.bloodType]}>
+                <Text style={[
+                  styles.criticalValue, 
+                  styles.bloodType,
+                  compact && styles.compactBloodType
+                ]}>
                   {emergencyData.bloodType}
                 </Text>
               </View>
@@ -401,7 +502,9 @@ export const BackupTextDisplay: React.FC<BackupTextDisplayProps> = ({
               <View style={styles.allergiesList}>
                 {emergencyData.allergies.map((allergy, index) => (
                   <View key={index} style={styles.allergyTag}>
-                    <Text style={styles.allergyText}>{allergy}</Text>
+                    <Text style={[styles.allergyText, compact && styles.compactAllergyText]}>
+                      {allergy}
+                    </Text>
                   </View>
                 ))}
               </View>
@@ -411,20 +514,22 @@ export const BackupTextDisplay: React.FC<BackupTextDisplayProps> = ({
 
         {/* Emergency Contact Card */}
         {emergencyData.emergencyContact && (
-          <View style={styles.contactCard}>
-            <View style={styles.cardHeader}>
-              <Ionicons name="call" size={20} color={colors.primary.main} />
-              <Text style={styles.cardTitle}>Emergency Contact</Text>
+          <View style={[styles.contactCard, compact && styles.compactContactCard]}>
+            <View style={[styles.cardHeader, compact && styles.compactCardHeader]}>
+              <Ionicons name="call" size={compact ? 18 : 20} color={colors.primary.main} />
+              <Text style={[styles.cardTitle, compact && styles.compactCardTitle]}>
+                Emergency Contact
+              </Text>
             </View>
             
             <View style={styles.contactInfo}>
-              <Text style={styles.contactName}>
+              <Text style={[styles.contactName, compact && styles.compactContactName]}>
                 {emergencyData.emergencyContact.name}
               </Text>
-              <Text style={styles.contactPhone}>
+              <Text style={[styles.contactPhone, compact && styles.compactContactPhone]}>
                 {emergencyData.emergencyContact.phone}
               </Text>
-              <Text style={styles.contactRelation}>
+              <Text style={[styles.contactRelation, compact && styles.compactContactRelation]}>
                 {emergencyData.emergencyContact.relationship}
               </Text>
             </View>
@@ -433,13 +538,15 @@ export const BackupTextDisplay: React.FC<BackupTextDisplayProps> = ({
 
         {/* Medical Notes Card */}
         {emergencyData.emergencyNote && (
-          <View style={styles.notesCard}>
-            <View style={styles.cardHeader}>
-              <Ionicons name="document-text" size={20} color={colors.status.warning.main} />
-              <Text style={styles.cardTitle}>Medical Notes</Text>
+          <View style={[styles.notesCard, compact && styles.compactNotesCard]}>
+            <View style={[styles.cardHeader, compact && styles.compactCardHeader]}>
+              <Ionicons name="document-text" size={compact ? 18 : 20} color={colors.status.warning.main} />
+              <Text style={[styles.cardTitle, compact && styles.compactCardTitle]}>
+                Medical Notes
+              </Text>
             </View>
             
-            <Text style={styles.notesText}>
+            <Text style={[styles.notesText, compact && styles.compactNotesText]}>
               {emergencyData.emergencyNote}
             </Text>
           </View>
@@ -447,10 +554,12 @@ export const BackupTextDisplay: React.FC<BackupTextDisplayProps> = ({
 
         {/* QR Data Card (if requested) */}
         {showQRData && qrData && (
-          <View style={styles.qrDataCard}>
-            <View style={styles.cardHeader}>
-              <Ionicons name="qr-code" size={20} color={colors.text.tertiary} />
-              <Text style={styles.cardTitle}>QR Code Data</Text>
+          <View style={[styles.qrDataCard, compact && styles.compactQrDataCard]}>
+            <View style={[styles.cardHeader, compact && styles.compactCardHeader]}>
+              <Ionicons name="qr-code" size={compact ? 18 : 20} color={colors.text.tertiary} />
+              <Text style={[styles.cardTitle, compact && styles.compactCardTitle]}>
+                QR Code Data
+              </Text>
             </View>
             
             <ScrollView style={styles.qrDataScroll} horizontal>
@@ -460,20 +569,22 @@ export const BackupTextDisplay: React.FC<BackupTextDisplayProps> = ({
         )}
 
         {/* Instructions Card */}
-        <View style={styles.instructionsCard}>
-          <View style={styles.cardHeader}>
-            <Ionicons name="information-circle" size={20} color={colors.status.success.main} />
-            <Text style={styles.cardTitle}>For First Responders</Text>
+        <View style={[styles.instructionsCard, compact && styles.compactInstructionsCard]}>
+          <View style={[styles.cardHeader, compact && styles.compactCardHeader]}>
+            <Ionicons name="information-circle" size={compact ? 18 : 20} color={colors.status.success.main} />
+            <Text style={[styles.cardTitle, compact && styles.compactCardTitle]}>
+              For First Responders
+            </Text>
           </View>
           
-          <Text style={styles.instructionsText}>
+          <Text style={[styles.instructionsText, compact && styles.compactInstructionsText]}>
             This information is provided for emergency medical treatment only. 
             Please verify critical details with the patient or emergency contacts 
             when possible.
           </Text>
           
           <View style={styles.timestampContainer}>
-            <Text style={styles.timestampText}>
+            <Text style={[styles.timestampText, compact && styles.compactTimestampText]}>
               Generated: {new Date(emergencyData.timestamp).toLocaleString()}
             </Text>
           </View>
@@ -482,17 +593,33 @@ export const BackupTextDisplay: React.FC<BackupTextDisplayProps> = ({
       </ScrollView>
 
       {/* Action Buttons */}
-      <View style={styles.actionBar}>
-        <TouchableOpacity style={styles.actionButton} onPress={showDetailedInfo}>
-          <Ionicons name="document-text" size={18} color={colors.primary.main} />
-          <Text style={styles.actionButtonText}>View All</Text>
-        </TouchableOpacity>
+      {!compact && (
+        <View style={styles.actionBar}>
+          <TouchableOpacity style={styles.actionButton} onPress={showDetailedInfo}>
+            <Ionicons name="document-text" size={18} color={colors.primary.main} />
+            <Text style={styles.actionButtonText}>View All</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity style={styles.actionButton} onPress={copyEmergencyInfo}>
-          <Ionicons name="copy" size={18} color={colors.primary.main} />
-          <Text style={styles.actionButtonText}>Copy Text</Text>
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity style={styles.actionButton} onPress={copyEmergencyInfo}>
+            <Ionicons name="copy" size={18} color={colors.primary.main} />
+            <Text style={styles.actionButtonText}>Copy Text</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+      
+      {compact && (
+        <View style={[styles.actionBar, styles.compactActionBar]}>
+          <TouchableOpacity 
+            style={[styles.actionButton, styles.compactActionButton]} 
+            onPress={copyEmergencyInfo}
+          >
+            <Ionicons name="copy" size={16} color={colors.primary.main} />
+            <Text style={[styles.actionButtonText, styles.compactActionButtonText]}>
+              Copy Text
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 };

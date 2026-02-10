@@ -889,20 +889,7 @@ export const QRDisplay: React.FC<QRDisplayProps> = ({
           </Text>
         </TouchableOpacity>
 
-        {showBackupText ? (
-          /* Backup Text Display */
-          emergencyData && (
-            <View style={styles.backupTextContainer}>
-              <BackupTextDisplay 
-                emergencyData={emergencyData}
-                qrData={qrData}
-                showQRData={false}
-                showCopyButton={true}
-                compact={true}
-              />
-            </View>
-          )
-        ) : (
+        {!showBackupText && (
           /* QR Code Display */
           <View style={styles.qrContainer}>
             {isGenerating ? (
@@ -1137,6 +1124,34 @@ export const QRDisplay: React.FC<QRDisplayProps> = ({
               </TouchableOpacity>
             </View>
           </View>
+        </SafeAreaViewContext>
+      </Modal>
+
+      {/* Backup Text Modal */}
+      <Modal
+        visible={showBackupText}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowBackupText(false)}
+      >
+        <SafeAreaViewContext style={styles.modalContainer} edges={['top', 'bottom']}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity onPress={() => setShowBackupText(false)}>
+              <Ionicons name="close" size={24} color={colors.text.primary} />
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>Backup Text</Text>
+            <View style={{ width: 24 }} />
+          </View>
+          
+          {emergencyData && (
+            <BackupTextDisplay 
+              emergencyData={emergencyData}
+              qrData={qrData}
+              showQRData={false}
+              showCopyButton={false}
+              compact={false}
+            />
+          )}
         </SafeAreaViewContext>
       </Modal>
     </SafeAreaView>

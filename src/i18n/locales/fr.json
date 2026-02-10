@@ -304,9 +304,7 @@
       },
       "genderOptions": {
         "male": "Masculin",
-        "female": "Féminin",
-        "nonBinary": "Non-binaire",
-        "preferNotToSay": "Préfère ne pas dire"
+        "female": "Féminin"
       },
       "helpers": {
         "allergies": "Ajoutez toute allergie ou sensibilité",

@@ -304,9 +304,7 @@
       },
       "genderOptions": {
         "male": "ذكر",
-        "female": "أنثى",
-        "nonBinary": "غير ثنائي",
-        "preferNotToSay": "أفضل عدم الإفصاح"
+        "female": "أنثى"
       },
       "helpers": {
         "allergies": "أضف أي حساسية أو تحسسات",

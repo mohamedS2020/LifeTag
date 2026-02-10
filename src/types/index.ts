@@ -54,7 +54,7 @@ export interface PersonalInfo {
   lastName: string;
   displayName?: string; // Optional display name
   dateOfBirth: Date;
-  gender?: 'male' | 'female' | 'non-binary' | 'prefer-not-to-say';
+  gender?: 'male' | 'female';
   phoneNumber?: string;
   address?: Address;
   profilePicture?: string; // URL or base64 string

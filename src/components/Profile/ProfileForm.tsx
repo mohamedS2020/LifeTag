@@ -1252,12 +1252,10 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
 
       <View style={styles.inputGroup}>
         <Text style={styles.label}>{t('profile.gender')}</Text>
-        <View style={styles.genderContainer}>
+          <View style={styles.genderContainer}>
           {[
             { value: 'male', label: t('profile.form.genderOptions.male') },
-            { value: 'female', label: t('profile.form.genderOptions.female') },
-            { value: 'non-binary', label: t('profile.form.genderOptions.nonBinary') },
-            { value: 'prefer-not-to-say', label: t('profile.form.genderOptions.preferNotToSay') }
+            { value: 'female', label: t('profile.form.genderOptions.female') }
           ].map((option) => (
             <TouchableOpacity
               key={option.value}
